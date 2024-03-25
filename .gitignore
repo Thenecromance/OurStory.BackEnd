@@ -8,3 +8,6 @@ out
 gen
 dist
 setting
+*.json
+*.ini
+*.log

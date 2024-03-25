@@ -28,6 +28,7 @@ func (m *Model) initdb() error {
 	}
 	m.db = SQL.Default()
 	m.db.AddTableWithName(Info{}, "users").SetKeys(true, "ID")
+	m.db.AddTableWithName(userLoggedInInfo{}, "loginInfo").SetKeys(true, "ID")
 	err := m.db.CreateTablesIfNotExists()
 	if err != nil {
 		logger.Get().Error(err)
