@@ -91,6 +91,7 @@ func (cfg *ginConfig) save() {
 	}
 }
 
+// apply will load the template path, statics, redirect, noRoute, and noMethod to the gin engine
 func (cfg *ginConfig) apply(_gin *gin.Engine) {
 	if len(cfg.TemplatePath) > 0 {
 		_gin.LoadHTMLGlob(cfg.TemplatePath)
@@ -101,18 +102,25 @@ func (cfg *ginConfig) apply(_gin *gin.Engine) {
 		}
 	}
 
-	for _, redirect := range cfg.Redirect {
-		logger.Get().Infof("redirect path %s to index.html", redirect)
-		_gin.GET(redirect, func(c *gin.Context) {
-			c.HTML(200, "index.html", gin.H{})
+	if cfg.Redirect != nil && len(cfg.Redirect) != 0 {
+		for _, redirect := range cfg.Redirect {
+			logger.Get().Infof("redirect path %s to index.html", redirect)
+			_gin.GET(redirect, func(c *gin.Context) {
+				c.HTML(200, "index.html", gin.H{})
+			})
+		}
+	}
+
+	if len(cfg.NoRoute) != 0 {
+		_gin.NoRoute(func(c *gin.Context) {
+			c.File(cfg.NoRoute)
 		})
 	}
 
-	_gin.NoRoute(func(c *gin.Context) {
-		c.File(cfg.NoRoute)
-	})
-	_gin.NoMethod(func(c *gin.Context) {
-		c.File(cfg.NoMethod)
-	})
+	if len(cfg.NoMethod) == 0 {
+		_gin.NoMethod(func(c *gin.Context) {
+			c.File(cfg.NoMethod)
+		})
+	}
 
 }
