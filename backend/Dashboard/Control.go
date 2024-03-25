@@ -2,7 +2,9 @@ package Dashboard
 
 import (
 	Interface "github.com/Thenecromance/OurStories/interface"
+	"github.com/Thenecromance/OurStories/server"
 	"github.com/gin-gonic/gin"
+	"html/template"
 )
 
 type Controller struct {
@@ -41,6 +43,10 @@ func (c *Controller) BuildRoutes() {
 	c.ChildrenBuildRoutes()
 }
 
+func (c *Controller) GetTitle() string {
+	return c.resource.Title
+}
+
 //----------------------------Interface.Controller Implementation--------------------------------
 
 func (c *Controller) getTitle(ctx *gin.Context) {
@@ -50,6 +56,10 @@ func (c *Controller) getTitle(ctx *gin.Context) {
 func NewController() Interface.Controller {
 	c := &Controller{}
 	c.resource.load()
+
+	server.AppendFuncMap(template.FuncMap{
+		"GetTitle": c.GetTitle,
+	})
 
 	return c
 }

@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+var (
+	funcMap template.FuncMap = template.FuncMap{}
+)
+
 func init() {
 	os.Mkdir("setting", 0755)
 }
@@ -22,8 +26,6 @@ type Server struct {
 	root *gin.RouterGroup
 
 	controllers []Interface.Controller
-
-	funcMap template.FuncMap
 }
 
 // Gin returns the gin engine
@@ -47,21 +49,21 @@ func (s *Server) Run(addr string) {
 	}
 
 	s.UpdateFuncMap()
-
+	s.initialize()
 	s.g.Run(addr)
 }
 
-func (s *Server) AppendFuncMap(functionMap template.FuncMap) {
+func AppendFuncMap(functionMap template.FuncMap) {
 	/*s.funcMap[key] = function*/
 	for key, function := range functionMap {
-		s.funcMap[key] = function
+		funcMap[key] = function
 	}
 }
 
 func (s *Server) UpdateFuncMap() {
-	s.g.SetFuncMap(s.funcMap)
+	s.g.SetFuncMap(funcMap)
 	logger.Get().Info("===========UpdateFuncMap===========")
-	for key, _ := range s.funcMap {
+	for key, _ := range funcMap {
 		logger.Get().Info(key)
 	}
 	logger.Get().Info("===========UpdateFuncMap===========")
@@ -79,10 +81,8 @@ func (s *Server) initialize() {
 func New(opts ...Option) *Server {
 
 	svr := &Server{
-		g:       gin.Default(),
-		funcMap: template.FuncMap{},
+		g: gin.Default(),
 	}
-	svr.initialize()
 
 	for _, opt := range opts {
 		opt(&svr.option)

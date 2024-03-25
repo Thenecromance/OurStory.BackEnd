@@ -14,6 +14,7 @@ type Info struct {
 	UserName string `json:"username" db:"username, size:20" form:"username" binding:"required"`
 	Password string `json:"password" db:"password, size:64" form:"password" binding:"required"`
 	Email    string `json:"email" db:"email, size:64" form:"email"`
+	Gender   string `json:"gender" db:"gender"`
 }
 
 type Model struct {
@@ -27,13 +28,26 @@ func (m *Model) initdb() error {
 		return nil
 	}
 	m.db = SQL.Default()
-	m.db.AddTableWithName(Info{}, "users").SetKeys(true, "ID")
-	m.db.AddTableWithName(userLoggedInInfo{}, "loginInfo").SetKeys(true, "ID")
+	tm := m.db.AddTableWithName(Info{}, "users")
+	tm.SetKeys(true, "ID")
+	tm.ColMap("username").SetUnique(true).SetNotNull(true)
+	tm.ColMap("email").SetUnique(true).SetNotNull(true)
+	tm.ColMap("password").SetNotNull(true)
+	tm.ColMap("gender").DefaultValue = "unset"
+
 	err := m.db.CreateTablesIfNotExists()
 	if err != nil {
 		logger.Get().Error(err)
 		return err
 	}
+
+	m.db.AddTableWithName(loginInfo{}, "loginInfo").SetKeys(true, "ID")
+	err = m.db.CreateTablesIfNotExists()
+	if err != nil {
+		logger.Get().Error(err)
+		return err
+	}
+
 	return nil
 }
 

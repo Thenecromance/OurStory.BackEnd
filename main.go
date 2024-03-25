@@ -8,9 +8,11 @@ import (
 	"github.com/Thenecromance/OurStories/backend/api"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/server"
+	"github.com/gin-gonic/gin"
 )
 
 func loadServerComponent() *server.Server {
+	gin.SetMode(gin.ReleaseMode)
 	svr := server.New()
 
 	api := api.NewController()
