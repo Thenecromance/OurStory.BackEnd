@@ -5,71 +5,42 @@ import TimelineList from "@/ourStories/Cards/TimelineList.vue";
 import TimelineItem from "@/ourStories/Cards/TimelineItem.vue";
 
 import axios from "axios";
-import {onMounted} from "vue";
 
-let travelList = null;
+import {onMounted, ref} from "vue";
 
-/* import axios from "axios";
-onMounted(
-  async () => {
-    try {
+let travelList = ref(null);
 
-      const response = await axios.get('/agronDash/sidenav');
-      navList.value = response.data;
-    } catch (error) {
-      // console.error(error);
-      navList.value = []; // 或者你的默认值
-    }
-  }
-); */
 onMounted(
     async () => {
       const response = await axios.get("/api/travel?user=1");
       console.log(response.data);
-      travelList = response.data.data;
-      /* await axios.get("/api/travel?user=1").then(
-           response=>{
-             if (response.code != 0) {
-               travelList = []
-               return
-             }
-             travelList.value = response.data
-           }
-       )*/
-
+      travelList.value = response.data.data;
     }
 )
 
 // eslint-disable-next-line no-unused-vars
 function unixToTime(time_stamp) {
-  const unixTimestamp = new Date(time_stamp * 1000);
-  const commonTime = unixTimestamp.toLocaleString();
-  return commonTime
+  const date = new Date(time_stamp);
+  let Y = date.getFullYear() + '-';
+  let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+  let D = date.getDate();
+  return Y + M + D;
 }
 
 </script>
 
 <template>
-  <timeline-list v-for="(item,i) in travelList" :key="i" title="Timeline with dotted line">
+  <timeline-list title="旅行日记">
 
-    <timeline-item
-        :icon="{ component: 'ni ni-bell-55', color: 'success' }"
-        title="{{item.location}}"
-        date-time="{{unixToTime(item.stamp)}}"
-        description="{{item.log}}"
+    <timeline-item v-for="(item,i) in travelList" :key="i"
+                   :icon="{ component: 'ni ni-bell-55', color: 'success' }"
+                   color="primary"
+                   :title="item.location"
+                   :date-time="unixToTime(item.stamp)"
+                   :description="item.logs"
+                   :badges="['准备中']"
     />
-    <!--    <timeline-item :icon="{ component: 'ni ni-bell-55', color: 'success' }" title="$2400 Design changes"
-                       date-time="22 DEC 7:20 PM"
-                       description="People care about how you see the world, how you think, what motivates you, what you’re struggling with or afraid of."
-                       :badges="['design']"/>
-        <TimelineItem :icon="{ component: 'ni ni-html5', color: 'danger' }" title="New order #1832412"
-                      date-time="21 DEC 11 PM"
-                      description="People care about how you see the world, how you think, what motivates you, what you’re struggling with or afraid of."
-                      :badges="['order', '#1832412']"/>
-        <TimelineItem :icon="{ component: 'ni ni-cart', color: 'info' }" title="Server payments for April"
-                      date-time="21 DEC 9:34 PM"
-                      description="People care about how you see the world, how you think, what motivates you, what you’re struggling with or afraid of."
-                      :badges="['server', 'payments']"/>-->
+
   </timeline-list>
 </template>
 
