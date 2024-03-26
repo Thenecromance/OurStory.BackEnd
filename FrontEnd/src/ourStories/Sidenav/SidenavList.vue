@@ -1,7 +1,7 @@
 <script setup>
-import { useRoute } from "vue-router";
+import {useRoute} from "vue-router";
 import SidenavItem from "./SidenavItem.vue";
-import SidenavCard from "./SidenavCard.vue";
+// import SidenavCard from "./SidenavCard.vue";
 
 
 const getRoute = () => {
@@ -11,8 +11,8 @@ const getRoute = () => {
 };
 
 
+import {ref, onMounted} from "vue";
 
-import { ref, onMounted } from "vue";
 let navList = ref(null);
 
 /* import axios from "axios";
@@ -30,7 +30,6 @@ onMounted(
 ); */
 
 
-  
 function NavSpliter(msg) {
   return {
     to: "",
@@ -43,6 +42,7 @@ function NavSpliter(msg) {
   }
 
 }
+
 function NavItem(to, NavText, icon) {
   return {
     to: to,
@@ -55,19 +55,20 @@ function NavItem(to, NavText, icon) {
   }
 
 }
+
 onMounted(
-  () => {
-    navList.value = [
-      NavSpliter("Our stories Start"),
-      NavItem("/dashboard-default", "dashboard-default", "ni ni-tv-2 text-primary text-sm opacity-10"),
-      NavItem("/", "myDash", "ni ni-tv-2 text-primary text-sm opacity-10"),
-      NavItem("/login", "login", "ni ni-tv-2 text-primary text-sm opacity-10"),
-      NavItem("/register", "register", "ni ni-tv-2 text-primary text-sm opacity-10"),
-      NavItem("/404","404",""),
-      NavItem("/test","test",""),
-      NavSpliter("---------------------"),
-    ]
-  }
+    () => {
+      navList.value = [
+        NavSpliter("Our stories Start"),
+        NavItem("/dashboard-default", "dashboard-default", "ni ni-tv-2 text-primary text-sm opacity-10"),
+        NavItem("/", "myDash", "ni ni-tv-2 text-primary text-sm opacity-10"),
+        NavItem("/login", "login", "ni ni-tv-2 text-primary text-sm opacity-10"),
+        NavItem("/register", "register", "ni ni-tv-2 text-primary text-sm opacity-10"),
+        NavItem("/404", "404", ""),
+        NavItem("/test", "test", ""),
+        NavSpliter("---------------------"),
+      ]
+    }
 )
 
 
@@ -110,22 +111,22 @@ onMounted(
         </sidenav-item>
       </li>
 
-     <!--  <li class="nav-item">
-        <sidenav-item to="/virtual-reality" :class="getRoute() === 'virtual-reality' ? 'active' : ''"
-          :navText="'Virtual Reality'">
-          <template v-slot:icon>
-            <i class="ni ni-app text-info text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li> -->
+      <!--  <li class="nav-item">
+         <sidenav-item to="/virtual-reality" :class="getRoute() === 'virtual-reality' ? 'active' : ''"
+           :navText="'Virtual Reality'">
+           <template v-slot:icon>
+             <i class="ni ni-app text-info text-sm opacity-10"></i>
+           </template>
+         </sidenav-item>
+       </li> -->
 
-     <!--  <li class="nav-item">
-        <sidenav-item to="/rtl-page" :class="getRoute() === 'rtl-page' ? 'active' : ''" navText="RTL">
-          <template v-slot:icon>
-            <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li> -->
+      <!--  <li class="nav-item">
+         <sidenav-item to="/rtl-page" :class="getRoute() === 'rtl-page' ? 'active' : ''" navText="RTL">
+           <template v-slot:icon>
+             <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
+           </template>
+         </sidenav-item>
+       </li> -->
 
       <li class="mt-3 nav-item">
         <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6" :class="'ms-2'">
@@ -159,24 +160,24 @@ onMounted(
     </ul>
   </div>
 
-<!--  <div class="pt-3 mx-3 mt-3 sidenav-footer">-->
-<!--    <sidenav-card :card="{-->
-<!--      title: 'Need Help?',-->
-<!--      description: 'Please check our docs',-->
-<!--      links: [-->
-<!--        {-->
-<!--          label: 'Documentation',-->
-<!--          route:-->
-<!--            'https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/',-->
-<!--          color: 'dark',-->
-<!--        },-->
-<!--        {-->
-<!--          label: 'Buy now',-->
-<!--          route:-->
-<!--            'https://www.creative-tim.com/product/vue-argon-dashboard-pro?ref=vadp',-->
-<!--          color: 'success',-->
-<!--        },-->
-<!--      ],-->
-<!--    }" />-->
-<!--  </div>-->
+  <!--  <div class="pt-3 mx-3 mt-3 sidenav-footer">-->
+  <!--    <sidenav-card :card="{-->
+  <!--      title: 'Need Help?',-->
+  <!--      description: 'Please check our docs',-->
+  <!--      links: [-->
+  <!--        {-->
+  <!--          label: 'Documentation',-->
+  <!--          route:-->
+  <!--            'https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/',-->
+  <!--          color: 'dark',-->
+  <!--        },-->
+  <!--        {-->
+  <!--          label: 'Buy now',-->
+  <!--          route:-->
+  <!--            'https://www.creative-tim.com/product/vue-argon-dashboard-pro?ref=vadp',-->
+  <!--          color: 'success',-->
+  <!--        },-->
+  <!--      ],-->
+  <!--    }" />-->
+  <!--  </div>-->
 </template>

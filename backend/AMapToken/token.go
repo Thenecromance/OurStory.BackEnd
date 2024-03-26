@@ -1,4 +1,4 @@
-package Token
+package AMapToken
 
 import (
 	Config "github.com/Thenecromance/OurStories/base/config"

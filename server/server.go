@@ -4,6 +4,7 @@ import (
 	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
+	"github.com/Thenecromance/OurStories/middleWare/Tracer"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"os"
@@ -50,6 +51,7 @@ func (s *Server) Run(addr string) {
 
 	s.UpdateFuncMap()
 	s.initialize()
+
 	s.g.Run(addr)
 }
 
@@ -83,6 +85,12 @@ func New(opts ...Option) *Server {
 	svr := &Server{
 		g: gin.Default(),
 	}
+	svr.g.Use(
+		Tracer.MiddleWare(),
+		/*gJWT.NewMiddleware(
+		gJWT.WithExpireTime(3600),
+		gJWT.WithKey("")),*/
+	)
 
 	for _, opt := range opts {
 		opt(&svr.option)

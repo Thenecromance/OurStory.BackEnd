@@ -3,16 +3,16 @@ package main
 import (
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
 	"github.com/Thenecromance/OurStories/backend/Location"
+	"github.com/Thenecromance/OurStories/backend/Travel"
 	"github.com/Thenecromance/OurStories/backend/User"
 	"github.com/Thenecromance/OurStories/backend/Weather"
 	"github.com/Thenecromance/OurStories/backend/api"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/server"
-	"github.com/gin-gonic/gin"
 )
 
 func loadServerComponent() *server.Server {
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	svr := server.New()
 
 	api := api.NewController()
@@ -21,6 +21,7 @@ func loadServerComponent() *server.Server {
 		User.NewController(),
 		Location.NewController(),
 		Weather.NewController(),
+		Travel.NewController(),
 	)
 
 	//dashboard controller for control the dashboard text values' change
@@ -45,6 +46,6 @@ func main() {
 	svr := loadServerComponent()
 	loadDashboardComponent()
 	SQL.Initialize()
-
 	svr.Run(":8080")
+
 }

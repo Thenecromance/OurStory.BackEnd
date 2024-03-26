@@ -4,74 +4,112 @@ import (
 	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"net/http"
 	"time"
 )
 
-const (
-	tokenExpireTime = time.Hour * time.Duration(1) // 1 hour
-	secret          = "secert.www.ourstories.com"
+var (
+	option Options
 )
 
-// when user login, we will sign a token for him
-func SignTokenToUser(c *gin.Context, usr string, uid int) {
-	//sign a new token to user
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claim(usr, uid))
-	tokenStr, err := token.SignedString([]byte(secret))
+//==================Options for the token==================
 
-	// if sign token failed, return 401
-	if err != nil {
-		responseUnauthorized(c, "Sign token failed")
-	}
-
-	// using Set-Cookie to store token in user client
-	StoreInCookie(c, tokenStr)
+type Options struct {
+	ExpireTime time.Duration
+	Key        string
+	Claim      interface{}
 }
 
-// add Set-Cookie to store token in user client
-func StoreInCookie(c *gin.Context, token string) {
-	c.SetCookie("token", token, 3600, "/", "localhost", false, true)
+type Option func(*Options)
+
+// WithExpireTime can set the expire time for the token
+func WithExpireTime(expireTime time.Duration) Option {
+	return func(o *Options) {
+		o.ExpireTime = expireTime
+	}
 }
 
-// auth token sequence
-func authUserTokenIsValid(c *gin.Context) {
+// WithKey can set the secret for the token
+func WithKey(key string) Option {
+	return func(o *Options) {
+		o.Key = key
+	}
+}
 
-	// get token from header
-	tokenStr := c.GetHeader("Authorization")
-	if tokenStr == "" {
-		logger.Get().Errorf("%s token is empty ", c.Request.RemoteAddr)
-		responseUnauthorized(c, "token is empty")
-		return
+//=========================================================
+
+type DemoUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+// Claim is a struct that will be used to store the user information
+type Claim struct {
+	UserInfo             DemoUser
+	jwt.RegisteredClaims // embedded unmodified `jwt.RegisteredClaims`
+}
+
+type gJWT struct {
+	options Options
+	token   *jwt.Token
+}
+
+// SignedToken should only be called by the place where you want to sign the token to user
+func SignedToken(arg interface{}) (string, error) {
+
+	claim := Claim{
+		UserInfo: arg.(DemoUser),
+	}
+	claim.RegisteredClaims = jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(option.ExpireTime)),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}
 
-	//start to parse token and check if it is valid
-	token_, err := jwt.ParseWithClaims(tokenStr, &JWTClaim{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	return token.SignedString([]byte(option.Key))
+}
+
+// AuthToken will authenticate the token is valid or not
+func AuthToken(tokenString string) error {
+	_, err := jwt.ParseWithClaims(tokenString, &Claim{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(option.Key), nil
 	})
-
-	if err != nil || token_.Valid {
-		responseUnauthorized(c, "Invalid token")
-		return
-	}
-
-	claims, ok := token_.Claims.(*JWTClaim)
-	if !ok {
-		responseUnauthorized(c, "Invalid token")
-		return
-	}
-
-	if claims.ExpiresAt.Unix() <= time.Now().Unix() {
-		responseUnauthorized(c, "Token is expired")
-		return
-	}
-
-	//allow request to continue
-	c.Next()
-
+	return err
 }
 
-// middleware to check if token is valid
-func MiddleWare() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authUserTokenIsValid(c)
+// UnauthorizedResponse is a helper function to return a unauthorized response (due to most situation is api auth, so we return 200)
+func UnauthorizedResponse(ctx *gin.Context) {
+	ctx.Abort()
+	ctx.JSON(http.StatusOK, gin.H{
+		"error": "Unauthorized operation",
+	})
+}
+
+func New(opts ...Option) {
+	for _, opt := range opts {
+		opt(&option)
+	}
+}
+
+// NewMiddleware is a middleware for gin to authenticate the token
+func NewMiddleware(opts ...Option) gin.HandlerFunc {
+
+	for _, opt := range opts {
+		opt(&option)
+	}
+
+	return func(ctx *gin.Context) {
+		auth := ctx.Request.Header.Get("Authorization") // get the token from the header
+		if len(auth) == 0 {
+			UnauthorizedResponse(ctx)
+			return
+		}
+		err := AuthToken(auth)
+		if err != nil {
+			UnauthorizedResponse(ctx)
+		}
+		logger.Get().Debug("auth success")
+		ctx.Next()
 	}
 }

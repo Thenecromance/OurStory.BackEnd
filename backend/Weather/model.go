@@ -3,7 +3,7 @@ package Weather
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Thenecromance/OurStories/backend/Token"
+	"github.com/Thenecromance/OurStories/backend/AMapToken"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"gopkg.in/gorp.v2"
 	"io"
@@ -77,7 +77,7 @@ func (m *Model) UpdateFromAMap(code string) (result Weather) {
 		m.weather = make(map[string]Weather)
 	}
 
-	resp, err := http.Get(fmt.Sprintf(weatherApiTemplate, Token.Instance().Amap, code))
+	resp, err := http.Get(fmt.Sprintf(weatherApiTemplate, AMapToken.Instance().Amap, code))
 	if err != nil {
 		logger.Get().Error("fail to request weather info", err)
 		return

@@ -2,9 +2,11 @@
 
 // import notification_card from "@/ourStories/utils/Test.vue";
 import Notification from "@/ourStories/utils/Notification.vue";
+import TravelLog from "@/ourStories/Travel/TraveTimeLine.vue";
 
 export default {
   components: {
+    TravelLog,
     Notification,
   },
   data() {
@@ -43,5 +45,7 @@ export default {
     <button @click="registerUser">Register</button>
     <!-- Notification component -->
     <notification :message="notificationMessage"/>
+
+    <TravelLog/>
   </div>
 </template>

@@ -1,7 +1,7 @@
 package Location
 
 import (
-	"github.com/Thenecromance/OurStories/backend/Token"
+	"github.com/Thenecromance/OurStories/backend/AMapToken"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +36,7 @@ func (c *controller) Use(middleware ...gin.HandlerFunc) {
 }
 
 func (c *controller) BuildRoutes() {
-	Token.Instance()
+	AMapToken.Instance()
 	c.Group.GET("/ip", c.getLocationByIP)
 	c.ChildrenBuildRoutes()
 }
@@ -45,8 +45,8 @@ func (c *controller) BuildRoutes() {
 
 // ------------------------------------------------------------
 func (c *controller) getLocationByIP(ctx *gin.Context) {
-	//ip := ctx.ClientIP() // get Client's IP first to get location
-	ip := ctx.Query("a")
+	ip := ctx.ClientIP() // get Client's IP first to get location
+
 	loc := c.model.GetLocation(ip)
 	if loc.Status != "1" {
 		//c.JSON(400, gin.H{"status": "failed", "message": "fail to get location"})
