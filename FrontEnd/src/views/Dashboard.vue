@@ -51,8 +51,8 @@ const sales = {
               component: 'ni ni-money-coins',
               background: 'bg-gradient-primary',
               shape: 'rounded-circle',
-            }" />
-        </div>
+            }"/>
+          </div>
 
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card title="Today's Users" value="2,300" description="<span
@@ -61,7 +61,7 @@ const sales = {
               component: 'ni ni-world',
               background: 'bg-gradient-danger',
               shape: 'rounded-circle',
-            }" />
+            }"/>
           </div>
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card title="New Clients" value="+3,462" description="<span
@@ -70,7 +70,7 @@ const sales = {
               component: 'ni ni-paper-diploma',
               background: 'bg-gradient-success',
               shape: 'rounded-circle',
-            }" />
+            }"/>
           </div>
           <div class="col-lg-3 col-md-6 col-12">
             <mini-statistics-card title="Sales" value="$103,430" description="<span
@@ -79,7 +79,7 @@ const sales = {
               component: 'ni ni-cart',
               background: 'bg-gradient-warning',
               shape: 'rounded-circle',
-            }" />
+            }"/>
           </div>
         </div>
 
@@ -106,11 +106,11 @@ const sales = {
                   data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
                 },
               ],
-            }" />
+            }"/>
             </div>
           </div>
           <div class="col-lg-5">
-            <carousel />
+            <carousel/>
           </div>
         </div>
 
@@ -125,39 +125,39 @@ const sales = {
               <div class="table-responsive">
                 <table class="table align-items-center">
                   <tbody>
-                    <tr v-for="(sale, index) in sales" :key="index">
-                      <td class="w-30">
-                        <div class="px-2 py-1 d-flex align-items-center">
-                          <div>
-                            <img :src="sale.flag" alt="Country flag" />
-                          </div>
-                          <div class="ms-4">
-                            <p class="mb-0 text-xs font-weight-bold">
-                              Country:
-                            </p>
-                            <h6 class="mb-0 text-sm">{{ sale.country }}</h6>
-                          </div>
+                  <tr v-for="(sale, index) in sales" :key="index">
+                    <td class="w-30">
+                      <div class="px-2 py-1 d-flex align-items-center">
+                        <div>
+                          <img :src="sale.flag" alt="Country flag"/>
                         </div>
-                      </td>
-                      <td>
-                        <div class="text-center">
-                          <p class="mb-0 text-xs font-weight-bold">Sales:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.sales }}</h6>
+                        <div class="ms-4">
+                          <p class="mb-0 text-xs font-weight-bold">
+                            Country:
+                          </p>
+                          <h6 class="mb-0 text-sm">{{ sale.country }}</h6>
                         </div>
-                      </td>
-                      <td>
-                        <div class="text-center">
-                          <p class="mb-0 text-xs font-weight-bold">Value:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.value }}</h6>
-                        </div>
-                      </td>
-                      <td class="text-sm align-middle">
-                        <div class="text-center col">
-                          <p class="mb-0 text-xs font-weight-bold">Bounce:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.bounce }}</h6>
-                        </div>
-                      </td>
-                    </tr>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="text-center">
+                        <p class="mb-0 text-xs font-weight-bold">Sales:</p>
+                        <h6 class="mb-0 text-sm">{{ sale.sales }}</h6>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="text-center">
+                        <p class="mb-0 text-xs font-weight-bold">Value:</p>
+                        <h6 class="mb-0 text-sm">{{ sale.value }}</h6>
+                      </div>
+                    </td>
+                    <td class="text-sm align-middle">
+                      <div class="text-center col">
+                        <p class="mb-0 text-xs font-weight-bold">Bounce:</p>
+                        <h6 class="mb-0 text-sm">{{ sale.bounce }}</h6>
+                      </div>
+                    </td>
+                  </tr>
                   </tbody>
                 </table>
               </div>
@@ -191,7 +191,7 @@ const sales = {
                 label: 'Happy Users',
                 description: '+ 430',
               },
-            ]" />
+            ]"/>
           </div>
         </div>
       </div>

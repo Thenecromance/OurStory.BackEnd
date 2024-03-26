@@ -1,6 +1,7 @@
 package User
 
 import (
+	"github.com/Thenecromance/OurStories/backend/api"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -48,17 +49,26 @@ func (c *Controller) login(ctx *gin.Context) {
 	var user Info
 	err := ctx.BindJSON(&user)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(200, api.Response{
+			Code:   api.Failed,
+			Result: err.Error(),
+		})
 		return
 	}
 
-	err = c.model.login(user)
+	err = c.model.login(&user)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(200, api.Response{
+			Code:   api.Failed,
+			Result: err.Error(),
+		})
 		return
 	}
-
-	ctx.JSON(200, gin.H{"status": "success"})
+	user.Password = ""
+	ctx.JSON(200, api.Response{
+		Code:   api.Success,
+		Result: user,
+	})
 	return
 }
 
@@ -66,17 +76,25 @@ func (c *Controller) register(ctx *gin.Context) {
 	var user Info
 	err := ctx.BindJSON(&user)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(200, api.Response{
+			Code:   api.Failed,
+			Result: err.Error(),
+		})
 		return
 	}
 
 	err = c.model.register(user)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(200, api.Response{
+			Code:   api.Failed,
+			Result: err.Error(),
+		})
 		return
 	}
-
-	ctx.JSON(200, gin.H{"status": "success"})
+	ctx.JSON(200, api.Response{
+		Code:   api.Success,
+		Result: user,
+	})
 }
 
 //------------------------------------------------------------

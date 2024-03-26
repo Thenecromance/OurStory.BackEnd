@@ -6,6 +6,7 @@ import (
 	"github.com/Thenecromance/OurStories/base/hash"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"gopkg.in/gorp.v2"
+	"time"
 )
 
 // when user login or register, or something else need user data, it will be looked like this
@@ -99,13 +100,18 @@ func (m *Model) register(user Info) error {
 	//push to cache
 	m.cache.add(user)
 
+	logged := loginInfo{
+		UserId:    user.ID,
+		TimeStamp: time.Now().Unix(),
+	}
+	m.db.Insert(&logged)
 	return nil
 }
 
-func (m *Model) login(requestUser Info) error {
+func (m *Model) login(requestUser *Info) error {
 	userInDatabase := m.cache.getByName(requestUser.UserName)
 	if userInDatabase.ID == 0 {
-		userInDatabase = m.getUserFromDatabase(&requestUser)
+		userInDatabase = m.getUserFromDatabase(requestUser)
 	}
 
 	if userInDatabase.ID == 0 {
@@ -120,7 +126,16 @@ func (m *Model) login(requestUser Info) error {
 		logger.Get().Info("password not match")
 		return errors.New("password not match")
 	}
+
+	requestUser.ID = userInDatabase.ID
+
+	m.cache.add(*requestUser)
 	logger.Get().Infof("%s login success", requestUser.UserName)
+	logged := loginInfo{
+		UserId:    userInDatabase.ID,
+		TimeStamp: time.Now().Unix(),
+	}
+	m.db.Insert(&logged)
 	return nil
 }
 
