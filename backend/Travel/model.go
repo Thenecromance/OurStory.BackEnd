@@ -247,6 +247,3 @@ func (m *Model) RemoveTravel(id int) error {
 	}
 	return nil
 }
-
-//1523141099
-//1650211200000
