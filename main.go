@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Thenecromance/OurStories/backend/Credit"
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
 	"github.com/Thenecromance/OurStories/backend/Location"
 	"github.com/Thenecromance/OurStories/backend/Travel"
@@ -8,28 +9,32 @@ import (
 	"github.com/Thenecromance/OurStories/backend/Weather"
 	"github.com/Thenecromance/OurStories/backend/api"
 	"github.com/Thenecromance/OurStories/base/SQL"
+	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/server"
+	"github.com/gin-gonic/gin"
 )
 
 func loadServerComponent() *server.Server {
-	//gin.SetMode(gin.ReleaseMode)
+	mode := Config.GetBool("Server", "ReleaseMode")
+	if mode {
+		gin.SetMode(gin.ReleaseMode)
+	} else if mode {
+		Config.SetBool("Server", "ReleaseMode", false)
+	}
+
 	svr := server.New()
 
-	api := api.NewController()
-	api.SetRootGroup(svr.Group())
-	api.LoadChildren(
-		User.NewController(),
-		Location.NewController(),
-		Weather.NewController(),
-		Travel.NewController(),
-	)
-
 	//dashboard controller for control the dashboard text values' change
-	dash := Dashboard.NewController()
-	dash.SetRootGroup(svr.Group())
 
-	svr.LoadComponent(api,
-		dash,
+	svr.LoadComponent(
+		api.NewControllerWithGroup(svr.Group(),
+			User.NewController(),
+			Location.NewController(),
+			Weather.NewController(),
+			Travel.NewController(),
+			Credit.NewController(),
+		),
+		Dashboard.NewControllerWithGroup(svr.Group()),
 	)
 	return svr
 }

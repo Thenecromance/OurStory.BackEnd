@@ -6,36 +6,44 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type controller struct {
+type Controller struct {
 	Interface.ControllerBase
 	model Model
 }
 
-//----------------------------Interface.Controller Implementation--------------------------------
+// ----------------------------Interface.Controller Implementation--------------------------------
 
-func (c *controller) Name() string {
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{
+		model: Model{},
+	}
+	c.LoadChildren(i...)
+	return c
+}
+
+func (c *Controller) Name() string {
 	return "location"
 }
 
-func (c *controller) SetRootGroup(group *gin.RouterGroup) {
+func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
 	// parent group is  /api/
 	c.ParentGroup = group
 	//setup self group as /api/user
 	c.Group = group.Group("/" + c.Name())
 }
 
-func (c *controller) LoadChildren(children ...Interface.Controller) {
+func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
 	c.ChildrenSetGroup(c.Group)
 }
 
-// Use adds middleware to the controller's group
-func (c *controller) Use(middleware ...gin.HandlerFunc) {
+// Use adds middleware to the Controller's group
+func (c *Controller) Use(middleware ...gin.HandlerFunc) {
 	c.Group.Use(middleware...)
 }
 
-func (c *controller) BuildRoutes() {
+func (c *Controller) BuildRoutes() {
 	AMapToken.Instance()
 	c.Group.GET("/ip", c.getLocationByIP)
 	c.ChildrenBuildRoutes()
@@ -44,7 +52,7 @@ func (c *controller) BuildRoutes() {
 //----------------------------Interface.Controller Implementation--------------------------------
 
 // ------------------------------------------------------------
-func (c *controller) getLocationByIP(ctx *gin.Context) {
+func (c *Controller) getLocationByIP(ctx *gin.Context) {
 	ip := ctx.ClientIP() // get Client's IP first to get location
 
 	loc := c.model.GetLocation(ip)
@@ -66,7 +74,3 @@ func (c *controller) getLocationByIP(ctx *gin.Context) {
 }
 
 // ------------------------------------------------------------
-
-func NewController() Interface.Controller {
-	return &controller{}
-}

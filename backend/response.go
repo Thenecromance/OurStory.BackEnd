@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -51,6 +52,20 @@ func RespWithCount(ctx *gin.Context, data interface{}, count int) {
 				Count: count,
 			},
 			Data: data,
+		})
+	return
+}
+
+func ResponseUnImplemented(ctx *gin.Context) {
+
+	ctx.JSON(
+		http.StatusOK,
+		Response{
+			Status: 1,
+			Meta: Meta{
+				Count: 0,
+			},
+			Data: fmt.Sprintf("Path: %s working in development", ctx.Request.URL.Path),
 		})
 	return
 }

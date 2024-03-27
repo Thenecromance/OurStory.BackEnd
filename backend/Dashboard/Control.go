@@ -16,6 +16,30 @@ type Controller struct {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
+func NewControllerWithGroup(group *gin.RouterGroup, i ...Interface.Controller) Interface.Controller {
+	c := &Controller{}
+	c.resource.load()
+
+	server.AppendFuncMap(template.FuncMap{
+		"GetTitle": c.GetTitle,
+	})
+
+	c.SetRootGroup(group)
+	c.LoadChildren(i...)
+	return c
+}
+
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{}
+	c.resource.load()
+
+	server.AppendFuncMap(template.FuncMap{
+		"GetTitle": c.GetTitle,
+	})
+	c.LoadChildren(i...)
+	return c
+}
+
 func (c *Controller) Name() string {
 	return "agronDash"
 }
@@ -51,15 +75,4 @@ func (c *Controller) GetTitle() string {
 
 func (c *Controller) getTitle(ctx *gin.Context) {
 	ctx.JSON(200, c.resource)
-}
-
-func NewController() Interface.Controller {
-	c := &Controller{}
-	c.resource.load()
-
-	server.AppendFuncMap(template.FuncMap{
-		"GetTitle": c.GetTitle,
-	})
-
-	return c
 }

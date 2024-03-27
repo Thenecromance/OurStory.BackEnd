@@ -105,6 +105,13 @@ func GetUint(section string, key string) uint {
 func SetString(section string, key string, value string) {
 	defaultCfg.Section(section).Key(key).SetValue(value)
 }
+func SetBool(section string, key string, value bool) {
+	if value {
+		defaultCfg.Section(section).Key(key).SetValue("true")
+	} else {
+		defaultCfg.Section(section).Key(key).SetValue("false")
+	}
+}
 
 func Flush() {
 	defaultCfg.SaveToIndent(configPath, "\t")

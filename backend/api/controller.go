@@ -37,7 +37,14 @@ func (ctrl *controller) BuildRoutes() {
 	ctrl.ChildrenBuildRoutes()
 }
 
-func NewController() Interface.Controller {
+func NewController(i ...Interface.Controller) Interface.Controller {
 	ctrl := &controller{}
+	ctrl.LoadChildren(i...)
+	return ctrl
+}
+func NewControllerWithGroup(group *gin.RouterGroup, i ...Interface.Controller) Interface.Controller {
+	ctrl := &controller{}
+	ctrl.SetRootGroup(group)
+	ctrl.LoadChildren(i...)
 	return ctrl
 }

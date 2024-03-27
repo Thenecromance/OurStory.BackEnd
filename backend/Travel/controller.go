@@ -52,6 +52,14 @@ func (c *Controller) BuildRoutes() {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{
+		model: Model{},
+	}
+	c.LoadChildren(i...)
+	return c
+}
+
 func (c *Controller) addTravel(ctx *gin.Context) {
 	var received Data
 
@@ -141,10 +149,4 @@ func (c *Controller) updateTravel(ctx *gin.Context) {
 
 	backend.Resp(ctx, "success")
 
-}
-
-func NewController() *Controller {
-	return &Controller{
-		model: Model{},
-	}
 }

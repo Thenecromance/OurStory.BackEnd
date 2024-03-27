@@ -1,6 +1,7 @@
 package Credit
 
 import (
+	"github.com/Thenecromance/OurStories/backend"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -9,12 +10,18 @@ type Controller struct {
 	Interface.ControllerBase
 
 	model Model
+
+	jobRouter *gin.RouterGroup
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
-func NewController() Interface.Controller {
-	return &Controller{}
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{
+		model: Model{},
+	}
+	c.LoadChildren(i...)
+	return c
 }
 
 func (c *Controller) Name() string {
@@ -43,10 +50,16 @@ func (c *Controller) BuildRoutes() {
 	c.ChildrenBuildRoutes()
 
 	//using RESTful API to handle the credit
-	c.Group.GET("/", c.getCreditCount)
+	c.Group.GET("/", c.getCreditCount) // get user credits count
 	c.Group.POST("/", c.addCredit)
 	c.Group.PUT("/", c.modifiedCredit)
 	c.Group.DELETE("/", c.modifiedCredit)
+
+	c.jobRouter = c.Group.Group("/job")
+	c.jobRouter.GET("/")    //get the job list
+	c.jobRouter.POST("/")   //add a new job
+	c.jobRouter.PUT("/")    //modify a job
+	c.jobRouter.DELETE("/") //delete a job
 
 	//c.Group.Group("/job")
 }
@@ -55,11 +68,14 @@ func (c *Controller) BuildRoutes() {
 
 func (c *Controller) getCreditCount(ctx *gin.Context) {
 	//get the credit count of the user
+	backend.ResponseUnImplemented(ctx)
 }
 func (c *Controller) addCredit(ctx *gin.Context) {
 	//add credit to the user
+	backend.ResponseUnImplemented(ctx)
 }
 
 func (c *Controller) modifiedCredit(ctx *gin.Context) {
 	//modify the credit of the user
+	backend.ResponseUnImplemented(ctx)
 }

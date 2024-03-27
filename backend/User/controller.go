@@ -13,6 +13,14 @@ type Controller struct {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{
+		model: Model{},
+	}
+	c.LoadChildren(i...)
+	return c
+}
+
 func (c *Controller) Name() string {
 	return "user"
 }
@@ -98,9 +106,3 @@ func (c *Controller) register(ctx *gin.Context) {
 }
 
 //------------------------------------------------------------
-
-func NewController() Interface.Controller {
-	return &Controller{
-		model: Model{},
-	}
-}
