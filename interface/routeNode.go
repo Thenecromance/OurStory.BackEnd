@@ -1,6 +1,7 @@
 package Interface
 
 import (
+	"encoding/json"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -79,11 +80,27 @@ func (rn *RouteNode) CreateNodeGroups() {
 	}
 }
 
-func (rn *RouteNode) Path() string {
+func (rn *RouteNode) path() string {
 	if rn.IsRoot() {
 		return rn.Name
 	}
-	return rn.ParentPtr.Path() + "/" + rn.Name
+	return rn.ParentPtr.path() + "/" + rn.Name
+}
+func (rn *RouteNode) Path() string {
+	p := rn.path()
+	if p == "/" {
+		return p
+	}
+	return p[1:]
+}
+
+// String will return the json string of this RouteNode
+func (rn *RouteNode) String() string {
+	marshal, err := json.MarshalIndent(rn, "", "    ")
+	if err != nil {
+		return ""
+	}
+	return string(marshal)
 }
 
 func NewRootNode() *RouteNode {

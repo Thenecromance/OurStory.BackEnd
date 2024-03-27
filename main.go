@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
 	"github.com/Thenecromance/OurStories/backend/Location"
@@ -50,7 +49,8 @@ func initGinMode() {
 func nodeTest() {
 	temp := Interface.NewNode("credit", "store")
 	ctrl := Interface.NewRootNode()
-	ctrl.Load(Interface.NewNode("/", "api"),
+	api := Interface.NewNode("/", "api")
+	ctrl.Load(api,
 		Interface.NewNode("api", "user"),
 		Interface.NewNode("api", "location"),
 		Interface.NewNode("api", "weather"),
@@ -66,12 +66,8 @@ func nodeTest() {
 	)
 
 	ctrl.MakeAsTree()
-	marshal, err := json.MarshalIndent(ctrl, "", " ")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(marshal))
+
+	fmt.Println(ctrl.String())
 	fmt.Println(temp.Path())
 }
 

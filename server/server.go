@@ -80,11 +80,11 @@ func AppendFuncMap(functionMap template.FuncMap) {
 
 func (s *Server) UpdateFuncMap() {
 	s.g.SetFuncMap(funcMap)
-	logger.Get().Info("===========UpdateFuncMap===========")
+	//logger.Get().Info("===========UpdateFuncMap===========")
 	for key, _ := range funcMap {
 		logger.Get().Info(key)
 	}
-	logger.Get().Info("===========UpdateFuncMap===========")
+	//logger.Get().Info("===========UpdateFuncMap===========")
 }
 
 func (s *Server) LoadComponent(controller ...Interface.Controller) {
