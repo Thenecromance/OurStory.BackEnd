@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/Thenecromance/OurStories/backend/Credit"
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
 	"github.com/Thenecromance/OurStories/backend/Location"
 	"github.com/Thenecromance/OurStories/backend/Travel"
@@ -21,14 +20,16 @@ func loadServerComponent() *server.Server {
 	//dashboard controller for control the dashboard text values' change
 
 	svr.LoadComponent(
-		api.NewControllerWithGroup(svr.Group(),
-			User.NewController(),
-			Location.NewController(),
-			Weather.NewController(),
-			Travel.NewController(),
-			Credit.NewController(),
+		api.NewController(
+
+			//Credit.NewController(),
 		),
-		Dashboard.NewControllerWithGroup(svr.Group()),
+		Dashboard.NewController(),
+
+		User.NewController(),
+		Location.NewController(),
+		Weather.NewController(),
+		Travel.NewController(),
 	)
 	return svr
 }
@@ -52,7 +53,31 @@ func initGinMode() {
 }
 
 func main() {
+	/*	temp := Interface.NewNode("credit", "store")
+		ctrl := Interface.NewRootNode()
+		ctrl.Load(Interface.NewNode("/", "api"),
+			Interface.NewNode("api", "user"),
+			Interface.NewNode("api", "location"),
+			Interface.NewNode("api", "weather"),
+			Interface.NewNode("api", "travel"),
+			Interface.NewNode("api", "credit"),
+			Interface.NewNode("/", "dashboard"),
+			Interface.NewNode("dashboard", "topcard"),
+			Interface.NewNode("dashboard", "sidenavbar"),
+			Interface.NewNode("dashboard", "main"),
+			Interface.NewNode("credit", "bank"),
+			Interface.NewNode("a", "D"), // this node will be ignored
+			temp,
+		)
 
+		ctrl.MakeAsTree()
+		marshal, err := json.MarshalIndent(ctrl, "", " ")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(marshal))
+		fmt.Println(temp.Path())*/
 	initGinMode()
 	svr := loadServerComponent()
 	loadDashboardComponent()

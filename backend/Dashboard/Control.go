@@ -16,7 +16,7 @@ type Controller struct {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
-func NewControllerWithGroup(group *gin.RouterGroup, i ...Interface.Controller) Interface.Controller {
+/*func NewControllerWithGroup(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{}
 	c.resource.load()
 
@@ -24,15 +24,15 @@ func NewControllerWithGroup(group *gin.RouterGroup, i ...Interface.Controller) I
 		"GetTitle": c.GetTitle,
 	})
 
-	c.SetRootGroup(group)
+	//c.SetRootGroup(group)
 	c.LoadChildren(i...)
 	return c
-}
+}*/
 
 func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{}
 	c.resource.load()
-
+	c.RouteNode = Interface.NewNode("/", c.Name())
 	server.AppendFuncMap(template.FuncMap{
 		"GetTitle": c.GetTitle,
 	})
@@ -44,26 +44,26 @@ func (c *Controller) Name() string {
 	return "agronDash"
 }
 
-func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
+/*func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
 	// parent group is  /api/
 	c.ParentGroup = group
 	//setup self group as /api/user
 	c.Group = group.Group("/" + c.Name())
-}
+}*/
 
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
-	c.ChildrenSetGroup(c.Group)
+	//c.ChildrenSetGroup(c.Group)
 }
 
 // Use adds middleware to the Controller's group
 func (c *Controller) Use(middleware ...gin.HandlerFunc) {
-	c.Group.Use(middleware...)
+	c.Use(middleware...)
 }
 
 func (c *Controller) BuildRoutes() {
-	c.Group.GET("/title", c.getTitle)
+	c.GET("/title", c.getTitle)
 	c.ChildrenBuildRoutes()
 }
 

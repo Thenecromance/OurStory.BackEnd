@@ -16,6 +16,7 @@ func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{
 		model: Model{},
 	}
+	c.RouteNode = Interface.NewNode("api", c.Name())
 	c.LoadChildren(i...)
 	return c
 }
@@ -24,26 +25,26 @@ func (c *Controller) Name() string {
 	return "weather"
 }
 
-func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
+/*func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
 	// parent group is  /api/
 	c.ParentGroup = group
 	//setup self group as /api/user
 	c.Group = group.Group("/" + c.Name())
-}
+}*/
 
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
-	c.ChildrenSetGroup(c.Group)
+	//c.ChildrenSetGroup(c.Group)
 }
 
 // Use adds middleware to the Controller's group
 func (c *Controller) Use(middleware ...gin.HandlerFunc) {
-	c.Group.Use(middleware...)
+	c.Use(middleware...)
 }
 
 func (c *Controller) BuildRoutes() {
-	c.Group.GET("/", c.getWeather)
+	c.GET("/", c.getWeather)
 	c.ChildrenBuildRoutes()
 }
 

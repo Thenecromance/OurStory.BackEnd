@@ -20,45 +20,46 @@ func (c *Controller) Name() string {
 	return "travel"
 }
 
-func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
+func NewController(i ...Interface.Controller) Interface.Controller {
+	c := &Controller{
+		model: Model{},
+	}
+	c.RouteNode = Interface.NewNode("api", c.Name())
+	c.LoadChildren(i...)
+	return c
+}
+
+/*func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
 	// parent group is  /api/
 	c.ParentGroup = group
 	//setup self group as /api/user
 	c.Group = group.Group("/" + c.Name())
-}
+}*/
 
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
-	c.ChildrenSetGroup(c.Group)
+	//c.ChildrenSetGroup(c.Group)
 }
 
 // Use adds middleware to the controller's group
 func (c *Controller) Use(middleware ...gin.HandlerFunc) {
-	c.Group.Use(middleware...)
+	c.Use(middleware...)
 }
 
 func (c *Controller) BuildRoutes() {
 	/*	c.Group.POST("/addTravel", c.addTravel)
 		c.Group.POST("/removeTravel", c.removeTravel)*/
 	// I want to use the RESTful API
-	c.Group.GET("/", c.getTravels)
-	c.Group.POST("/", c.addTravel)
-	c.Group.PUT("/", c.updateTravel)
-	c.Group.DELETE("/", c.removeTravel)
+	c.GET("/", c.getTravels)
+	c.POST("/", c.addTravel)
+	c.PUT("/", c.updateTravel)
+	c.DELETE("/", c.removeTravel)
 
 	c.ChildrenBuildRoutes()
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------
-
-func NewController(i ...Interface.Controller) Interface.Controller {
-	c := &Controller{
-		model: Model{},
-	}
-	c.LoadChildren(i...)
-	return c
-}
 
 func (c *Controller) addTravel(ctx *gin.Context) {
 	var received Data

@@ -1,32 +1,34 @@
 package Interface
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Controller interface {
-	SetRootGroup(group *gin.RouterGroup)
+	//SetRootGroup(group *gin.RouterGroup)
 
-	LoadChildren(sub ...Controller)
+	//LoadChildren(sub ...Controller)
 
 	Use(middleware ...gin.HandlerFunc)
 
 	BuildRoutes()
 
 	Name() string
+
+	GetNode() *RouteNode
 }
 
 type ControllerBase struct {
-	ParentGroup *gin.RouterGroup
-	Group       *gin.RouterGroup
-	Children    []Controller
+	*RouteNode
+	Children []Controller
 }
 
-func (c *ControllerBase) ChildrenSetGroup(group *gin.RouterGroup) {
-	for _, child := range c.Children {
-		child.SetRootGroup(group)
-	}
-}
 func (c *ControllerBase) ChildrenBuildRoutes() {
 	for _, child := range c.Children {
 		child.BuildRoutes()
 	}
+}
+
+func (c *ControllerBase) GetNode() *RouteNode {
+	return c.RouteNode
 }
