@@ -48,10 +48,3 @@ func NewController(i ...Interface.Controller) Interface.Controller {
 	ctrl.LoadChildren(i...)
 	return ctrl
 }
-func NewControllerWithGroup(group *gin.RouterGroup, i ...Interface.Controller) Interface.Controller {
-	ctrl := &controller{}
-	ctrl.RouteNode = Interface.NewNode("/", ctrl.Name())
-	//ctrl.SetRootGroup(group)
-	ctrl.LoadChildren(i...)
-	return ctrl
-}
