@@ -71,12 +71,27 @@ func SignedToken(arg interface{}) (string, error) {
 	return token.SignedString([]byte(option.Key))
 }
 
-// AuthToken will authenticate the token is valid or not
+// AuthToken will authenticate the token is valid or not if return not nil,means the token is invalid otherwise it is valid
 func AuthToken(tokenString string) error {
-	_, err := jwt.ParseWithClaims(tokenString, &Claim{}, func(t *jwt.Token) (interface{}, error) {
+	_, err := GetObjectFromToken(tokenString)
+	return err
+}
+
+// GetObjectFromToken will return the object from the token, if the token is invalid, it will return an error and the object will be nil
+func GetObjectFromToken(tokenString string) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claim{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(option.Key), nil
 	})
-	return err
+
+	if err != nil {
+		return nil, err
+	}
+
+	claim, ok := token.Claims.(*Claim)
+	if !ok {
+		return nil, err
+	}
+	return claim.UserInfo, nil
 }
 
 // UnauthorizedResponse is a helper function to return a unauthorized response (due to most situation is api auth, so we return 200)
@@ -95,9 +110,7 @@ func New(opts ...Option) {
 
 // NewMiddleware is a middleware for gin to authenticate the token
 func NewMiddleware(opts ...Option) gin.HandlerFunc {
-
 	New(opts...)
-
 	return func(ctx *gin.Context) {
 		auth := ctx.Request.Header.Get("Authorization") // get the token from the header
 		if len(auth) == 0 {
