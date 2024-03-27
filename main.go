@@ -15,12 +15,6 @@ import (
 )
 
 func loadServerComponent() *server.Server {
-	mode := Config.GetBool("Server", "ReleaseMode")
-	if mode {
-		gin.SetMode(gin.ReleaseMode)
-	} else if mode {
-		Config.SetBool("Server", "ReleaseMode", false)
-	}
 
 	svr := server.New()
 
@@ -47,7 +41,19 @@ func loadDashboardComponent() {
 	////ArgonDashControl.LoadAPI(ArgonDashControl.GetSideNavBarController())
 }
 
+func initGinMode() {
+	mode := Config.GetBool("Server", "ReleaseMode")
+	if mode {
+		gin.SetMode(gin.ReleaseMode)
+	} else if mode {
+		Config.SetBool("Server", "ReleaseMode", false)
+	}
+
+}
+
 func main() {
+
+	initGinMode()
 	svr := loadServerComponent()
 	loadDashboardComponent()
 	SQL.Initialize()

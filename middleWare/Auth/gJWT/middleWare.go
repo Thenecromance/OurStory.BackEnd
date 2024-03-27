@@ -38,16 +38,17 @@ func WithKey(key string) Option {
 
 //=========================================================
 
+/*// DemoUser is a test struct for the jwt testing purpose only( and do not use this in production)
 type DemoUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
 }
-
+*/
 // Claim is a struct that will be used to store the user information
 type Claim struct {
-	UserInfo             DemoUser
-	jwt.RegisteredClaims // embedded unmodified `jwt.RegisteredClaims`
+	UserInfo             interface{} `json:"info"` // the user information
+	jwt.RegisteredClaims                           // embedded unmodified `jwt.RegisteredClaims`
 }
 
 type gJWT struct {
@@ -59,7 +60,7 @@ type gJWT struct {
 func SignedToken(arg interface{}) (string, error) {
 
 	claim := Claim{
-		UserInfo: arg.(DemoUser),
+		UserInfo: arg,
 	}
 	claim.RegisteredClaims = jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(option.ExpireTime)),
@@ -95,9 +96,7 @@ func New(opts ...Option) {
 // NewMiddleware is a middleware for gin to authenticate the token
 func NewMiddleware(opts ...Option) gin.HandlerFunc {
 
-	for _, opt := range opts {
-		opt(&option)
-	}
+	New(opts...)
 
 	return func(ctx *gin.Context) {
 		auth := ctx.Request.Header.Get("Authorization") // get the token from the header
