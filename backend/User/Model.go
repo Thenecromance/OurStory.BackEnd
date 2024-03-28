@@ -2,24 +2,11 @@ package User
 
 import (
 	"errors"
-	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/hash"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"gopkg.in/gorp.v2"
 	"time"
 )
-
-// when user login or register, or something else need user data, it will be looked like this
-type Info struct {
-	ID          int    `json:"id" db:"id"`
-	UserName    string `json:"username" db:"username, size:20" form:"username" binding:"required"`
-	Password    string `json:"password" db:"password, size:64" form:"password" binding:"required"`
-	Email       string `json:"email" db:"email, size:64" form:"email"`
-	Gender      string `json:"gender" db:"gender"`
-	CreatedAt   int    `json:"created_at" db:"created_at"`       // create time stamp
-	LastLoginAt int    `json:"last_login_at" db:"last_login_at"` // last login time stamp
-	Mate        int    `json:"mate" db:"mate"`                   // after setting the mate, it will be recorded here
-}
 
 type Model struct {
 	db *gorp.DbMap
@@ -27,36 +14,8 @@ type Model struct {
 	cache pool
 }
 
-func (m *Model) initdb() error {
-	if m.db != nil {
-		return nil
-	}
-	m.db = SQL.Default()
-	tm := m.db.AddTableWithName(Info{}, "users")
-	tm.SetKeys(true, "ID")
-	tm.ColMap("username").SetUnique(true).SetNotNull(true)
-	tm.ColMap("email").SetUnique(true).SetNotNull(true)
-	tm.ColMap("password").SetNotNull(true)
-	tm.ColMap("gender")
-
-	err := m.db.CreateTablesIfNotExists()
-	if err != nil {
-		logger.Get().Error(err)
-		return err
-	}
-
-	m.db.AddTableWithName(loginInfo{}, "loginInfo").SetKeys(true, "ID")
-	err = m.db.CreateTablesIfNotExists()
-	if err != nil {
-		logger.Get().Error(err)
-		return err
-	}
-
-	return nil
-}
-
 func (m *Model) getUserFromDatabase(user *Info) Info {
-	logger.Get().Debugf("start to get user %s from database", user.UserName)
+	/*logger.Get().Debugf("start to get user %s from database", user.UserName)
 	err := m.initdb()
 	if err != nil {
 
@@ -68,6 +27,9 @@ func (m *Model) getUserFromDatabase(user *Info) Info {
 	if err != nil {
 		return Info{}
 	}
+	return temp*/
+	var temp Info
+	temp.GetUserFromDatabase(user.ID)
 	return temp
 }
 
@@ -101,35 +63,47 @@ func (m *Model) register(user Info) error {
 		}
 	}
 
-	user.CreatedAt = int(time.Now().Unix())
-	user.LastLoginAt = user.CreatedAt
-	user.Password = hash.Hash(user.Password)
-	err := m.db.Insert(&user)
+	{
+		user.CreatedAt = int(time.Now().Unix())  // record the create time
+		user.LastLoginAt = user.CreatedAt        // record the last login time
+		user.Password = hash.Hash(user.Password) // hash the password
+	}
+
+	err := user.SelfInsert()
 	if err != nil {
 		logger.Get().Error(err)
 		return err
 	}
 
-	// update user info to cache
-	user = m.getUserFromDatabase(&user)
+	// update user self info
+	err = user.SelfGet()
+	if err != nil {
+		logger.Get().Error(err)
+		return err
+	}
 	//push to cache
 	m.cache.add(user)
 
 	m.recordUserLoginTime(user.ID)
-
 	return nil
 }
 
 func (m *Model) login(requestUser *Info) error {
+
+	// check user is in the cache or not
 	userInDatabase := m.cache.getByName(requestUser.UserName)
 	if userInDatabase.ID == 0 {
+		// if user does not exist in the cache, so I need to get it from the database
 		userInDatabase = m.getUserFromDatabase(requestUser)
 	}
 
+	//user check sections
+	// if user's id is 0 means user not exists
 	if userInDatabase.ID == 0 {
 		logger.Get().Infof("requestUser not exists")
 		return errors.New("requestUser not exists")
 	}
+	//compare the username and pass word
 	if userInDatabase.UserName != requestUser.UserName {
 		logger.Get().Info("username not match")
 		return errors.New("username not match")

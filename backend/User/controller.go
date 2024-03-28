@@ -1,7 +1,7 @@
 package User
 
 import (
-	"github.com/Thenecromance/OurStories/backend/api"
+	"github.com/Thenecromance/OurStories/backend"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +34,7 @@ func (c *Controller) Name() string {
 		c.Group = group.Group("/" + c.Name())
 	}
 */
+
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
@@ -54,31 +55,24 @@ func (c *Controller) BuildRoutes() {
 //----------------------------Interface.Controller Implementation--------------------------------
 
 // ------------------------------------------------------------
+
 func (c *Controller) login(ctx *gin.Context) {
 
 	var user Info
 	err := ctx.BindJSON(&user)
 	if err != nil {
-		ctx.JSON(200, api.Response{
-			Code:   api.Failed,
-			Result: err.Error(),
-		})
+		backend.RespErr(ctx, err.Error())
 		return
 	}
 
 	err = c.model.login(&user)
 	if err != nil {
-		ctx.JSON(200, api.Response{
-			Code:   api.Failed,
-			Result: err.Error(),
-		})
+		backend.RespErr(ctx, err.Error())
 		return
 	}
 	user.Password = ""
-	ctx.JSON(200, api.Response{
-		Code:   api.Success,
-		Result: user,
-	})
+
+	backend.Resp(ctx, user)
 	return
 }
 
@@ -86,25 +80,16 @@ func (c *Controller) register(ctx *gin.Context) {
 	var user Info
 	err := ctx.BindJSON(&user)
 	if err != nil {
-		ctx.JSON(200, api.Response{
-			Code:   api.Failed,
-			Result: err.Error(),
-		})
+		backend.RespErr(ctx, err.Error())
 		return
 	}
 
 	err = c.model.register(user)
 	if err != nil {
-		ctx.JSON(200, api.Response{
-			Code:   api.Failed,
-			Result: err.Error(),
-		})
+		backend.RespErr(ctx, err.Error())
 		return
 	}
-	ctx.JSON(200, api.Response{
-		Code:   api.Success,
-		Result: user,
-	})
+	backend.Resp(ctx, user)
 }
 
 //------------------------------------------------------------
