@@ -11,11 +11,14 @@ import (
 
 // when user login or register, or something else need user data, it will be looked like this
 type Info struct {
-	ID       int    `json:"id" db:"id"`
-	UserName string `json:"username" db:"username, size:20" form:"username" binding:"required"`
-	Password string `json:"password" db:"password, size:64" form:"password" binding:"required"`
-	Email    string `json:"email" db:"email, size:64" form:"email"`
-	Gender   string `json:"gender" db:"gender"`
+	ID          int    `json:"id" db:"id"`
+	UserName    string `json:"username" db:"username, size:20" form:"username" binding:"required"`
+	Password    string `json:"password" db:"password, size:64" form:"password" binding:"required"`
+	Email       string `json:"email" db:"email, size:64" form:"email"`
+	Gender      string `json:"gender" db:"gender"`
+	CreatedAt   int    `json:"created_at" db:"created_at"`       // create time stamp
+	LastLoginAt int    `json:"last_login_at" db:"last_login_at"` // last login time stamp
+	Mate        int    `json:"mate" db:"mate"`                   // after setting the mate, it will be recorded here
 }
 
 type Model struct {
@@ -34,7 +37,7 @@ func (m *Model) initdb() error {
 	tm.ColMap("username").SetUnique(true).SetNotNull(true)
 	tm.ColMap("email").SetUnique(true).SetNotNull(true)
 	tm.ColMap("password").SetNotNull(true)
-	tm.ColMap("gender").DefaultValue = "unset"
+	tm.ColMap("gender")
 
 	err := m.db.CreateTablesIfNotExists()
 	if err != nil {
@@ -73,6 +76,15 @@ func (m *Model) userInDatabase(user *Info) bool {
 }
 
 // -----------------------------------------------------------------
+
+func (m *Model) recordUserLoginTime(userId int) {
+	logged := loginInfo{
+		UserId:    userId,
+		TimeStamp: time.Now().Unix(),
+	}
+	m.db.Insert(&logged)
+}
+
 func (m *Model) register(user Info) error {
 	//pre check user already exists
 	{
@@ -89,22 +101,22 @@ func (m *Model) register(user Info) error {
 		}
 	}
 
+	user.CreatedAt = int(time.Now().Unix())
+	user.LastLoginAt = user.CreatedAt
 	user.Password = hash.Hash(user.Password)
 	err := m.db.Insert(&user)
 	if err != nil {
 		logger.Get().Error(err)
 		return err
 	}
-	// update user info
+
+	// update user info to cache
 	user = m.getUserFromDatabase(&user)
 	//push to cache
 	m.cache.add(user)
 
-	logged := loginInfo{
-		UserId:    user.ID,
-		TimeStamp: time.Now().Unix(),
-	}
-	m.db.Insert(&logged)
+	m.recordUserLoginTime(user.ID)
+
 	return nil
 }
 
@@ -131,11 +143,8 @@ func (m *Model) login(requestUser *Info) error {
 
 	m.cache.add(*requestUser)
 	logger.Get().Infof("%s login success", requestUser.UserName)
-	logged := loginInfo{
-		UserId:    userInDatabase.ID,
-		TimeStamp: time.Now().Unix(),
-	}
-	m.db.Insert(&logged)
+
+	m.recordUserLoginTime(requestUser.ID)
 	return nil
 }
 
