@@ -59,7 +59,7 @@ func (c *Controller) BuildRoutes() {
 func (c *Controller) login(ctx *gin.Context) {
 
 	var user Info
-	err := ctx.BindJSON(&user)
+	err := ctx.ShouldBind(&user) // both support form and json
 	if err != nil {
 		backend.RespErr(ctx, err.Error())
 		return
@@ -78,7 +78,7 @@ func (c *Controller) login(ctx *gin.Context) {
 
 func (c *Controller) register(ctx *gin.Context) {
 	var user Info
-	err := ctx.BindJSON(&user)
+	err := ctx.ShouldBind(&user)
 	if err != nil {
 		backend.RespErr(ctx, err.Error())
 		return

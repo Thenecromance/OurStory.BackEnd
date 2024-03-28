@@ -81,9 +81,7 @@ func (c *Controller) addTravel(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"info": "success",
-	})
+	backend.Resp(ctx, "add travel complete!")
 }
 
 func (c *Controller) removeTravel(ctx *gin.Context) {

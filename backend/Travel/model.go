@@ -1,6 +1,7 @@
 package Travel
 
 import (
+	"errors"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"gopkg.in/gorp.v2"
@@ -144,6 +145,9 @@ func (m *Model) getDbDataById(id int) (*DbData, error) {
 	data, err := m.db.Get(DbData{}, id)
 	if err != nil {
 		return nil, err
+	}
+	if data == nil {
+		return nil, errors.New("no data found")
 	}
 	return data.(*DbData), nil
 }

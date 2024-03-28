@@ -4,12 +4,11 @@ import (
 	"errors"
 	"github.com/Thenecromance/OurStories/base/hash"
 	"github.com/Thenecromance/OurStories/base/logger"
-	"gopkg.in/gorp.v2"
 	"time"
 )
 
 type Model struct {
-	db *gorp.DbMap
+	//db *gorp.DbMap
 	// the place where stored logged in user
 	cache pool
 }
@@ -29,7 +28,7 @@ func (m *Model) getUserFromDatabase(user *Info) Info {
 	}
 	return temp*/
 	var temp Info
-	temp.GetUserFromDatabase(user.ID)
+	temp.GetUserFromDatabase(user)
 	return temp
 }
 
@@ -40,11 +39,11 @@ func (m *Model) userInDatabase(user *Info) bool {
 // -----------------------------------------------------------------
 
 func (m *Model) recordUserLoginTime(userId int) {
-	logged := loginInfo{
+	loggedinfo := loginInfo{
 		UserId:    userId,
 		TimeStamp: time.Now().Unix(),
 	}
-	m.db.Insert(&logged)
+	loggedinfo.SelfInsert()
 }
 
 func (m *Model) register(user Info) error {
@@ -113,9 +112,20 @@ func (m *Model) login(requestUser *Info) error {
 		return errors.New("password not match")
 	}
 
-	requestUser.ID = userInDatabase.ID
+	{
+		requestUser.ID = userInDatabase.ID
+		requestUser.UserName = userInDatabase.UserName
+		requestUser.Password = userInDatabase.Password
+		requestUser.Email = userInDatabase.Email
+		requestUser.Gender = userInDatabase.Gender
+		requestUser.CreatedAt = userInDatabase.CreatedAt
+		requestUser.LastLoginAt = userInDatabase.LastLoginAt
+		requestUser.Mate = userInDatabase.Mate
+	}
 
-	m.cache.add(*requestUser)
+	//just copy
+	m.cache.add(userInDatabase)
+
 	logger.Get().Infof("%s login success", requestUser.UserName)
 
 	m.recordUserLoginTime(requestUser.ID)
