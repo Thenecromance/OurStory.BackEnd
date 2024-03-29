@@ -5,6 +5,7 @@ import (
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"os"
@@ -109,6 +110,12 @@ func New(opts ...Option) *Server {
 		gJWT.WithExpireTime(3600),
 		gJWT.WithKey("")),*/
 	)
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true                                              // 允许所有来源
+	config.AllowMethods = []string{"GET", "POST"}                              // 允许的请求方法
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"} // 允许的头部
+
+	svr.g.Use(cors.New(config))
 
 	for _, opt := range opts {
 		opt(&svr.option)

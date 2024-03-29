@@ -1,10 +1,9 @@
 package Dashboard
 
 import (
+	"github.com/Thenecromance/OurStories/backend"
 	Interface "github.com/Thenecromance/OurStories/interface"
-	"github.com/Thenecromance/OurStories/server"
 	"github.com/gin-gonic/gin"
-	"html/template"
 )
 
 type Controller struct {
@@ -16,26 +15,10 @@ type Controller struct {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
-/*func NewControllerWithGroup(i ...Interface.Controller) Interface.Controller {
-	c := &Controller{}
-	c.resource.load()
-
-	server.AppendFuncMap(template.FuncMap{
-		"GetTitle": c.GetTitle,
-	})
-
-	//c.SetRootGroup(group)
-	c.LoadChildren(i...)
-	return c
-}*/
-
 func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{}
 	c.resource.load()
 	c.RouteNode = Interface.NewNode("/", c.Name())
-	server.AppendFuncMap(template.FuncMap{
-		"GetTitle": c.GetTitle,
-	})
 	c.LoadChildren(i...)
 	return c
 }
@@ -64,6 +47,7 @@ func (c *Controller) Use(middleware ...gin.HandlerFunc) {
 
 func (c *Controller) BuildRoutes() {
 	c.GET("/title", c.getTitle)
+	c.GET("/topCard", c.getTopCard)
 	c.ChildrenBuildRoutes()
 }
 
@@ -75,4 +59,9 @@ func (c *Controller) GetTitle() string {
 
 func (c *Controller) getTitle(ctx *gin.Context) {
 	ctx.JSON(200, c.resource)
+}
+
+func (c *Controller) getTopCard(ctx *gin.Context) {
+	var cardsInfo []topCardItem
+	backend.Resp(ctx, cardsInfo)
 }

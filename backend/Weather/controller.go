@@ -25,13 +25,6 @@ func (c *Controller) Name() string {
 	return "weather"
 }
 
-/*func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
-	// parent group is  /api/
-	c.ParentGroup = group
-	//setup self group as /api/user
-	c.Group = group.Group("/" + c.Name())
-}*/
-
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
