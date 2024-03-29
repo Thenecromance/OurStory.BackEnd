@@ -7,6 +7,7 @@ import (
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type Controller struct {
@@ -16,12 +17,14 @@ type Controller struct {
 	resource DynamicResource
 	weather  Weather.Model
 	location Location.Model
+	sNav     SideNavBarModel
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
 func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{}
+	c.sNav.Load()
 	c.resource.load()
 	c.RouteNode = Interface.NewNode("/", c.Name())
 	c.LoadChildren(i...)
@@ -74,24 +77,25 @@ func (c *Controller) getTopCard(ctx *gin.Context) {
 }
 
 // getLocationWeather get the location and weather info
-func (c *Controller) getLocationWeather(ip string) topCardItem {
+func (c *Controller) getLocationWeather(ip string) (item topCardItem) {
 	logger.Get().Info(ip)
-	loc := c.location.GetLocation("111.197.34.158")
-	todayWeather := c.weather.GetWeatherByCode(loc.Adcode)
-
-	return topCardItem{
-		Title:       loc.City,
-		Value:       todayWeather.Weather,
-		Description: todayWeather.Temperature + "°C",
-		ShowIcon: Icon{
-			Component:  "",
-			Background: "",
-			Shape:      "",
-		},
+	if strings.HasSuffix(ip, "::1") {
+		todayWeather := c.weather.GetWeatherByCode("110105")
+		item.Title = "北京"
+		item.Value = todayWeather.Weather
+		item.Description = todayWeather.Temperature + "°C"
+		return
 	}
 
+	loc := c.location.GetLocation(ip)
+	todayWeather := c.weather.GetWeatherByCode(loc.Adcode)
+	item.Title = loc.City
+	item.Value = todayWeather.Weather
+	item.Description = todayWeather.Temperature + "°C"
+
+	return
 }
 
 func (c *Controller) getSideNavBar(ctx *gin.Context) {
-
+	backend.Resp(ctx, c.sNav.Navs)
 }
