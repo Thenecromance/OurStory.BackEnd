@@ -85,6 +85,5 @@ func (m *Model) GetLocation(ip string) Data {
 	if ok {
 		return loc
 	}
-
 	return m.requestFromAMap(ip)
 }

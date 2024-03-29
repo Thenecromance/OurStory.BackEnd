@@ -20,13 +20,14 @@ func (d *DynamicResource) load() {
 	}
 }
 
+type Icon struct {
+	Component  string `json:"component"`
+	Background string `json:"background"`
+	Shape      string `json:"shape"`
+}
 type topCardItem struct {
 	Title       string `json:"title"`
 	Value       string `json:"value"`
 	Description string `json:"description"`
-	Icon        struct {
-		Component  string `json:"component"`
-		Background string `json:"background"`
-		Shape      string `json:"shape"`
-	} `json:"icon"`
+	ShowIcon    Icon   `json:"icon"`
 }
