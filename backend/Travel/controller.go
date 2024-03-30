@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+// Travel section still has a lot of shit to do , user auth, monkey created bugs ,
+
 type Controller struct {
 	Interface.ControllerBase
 	model Model
@@ -36,11 +38,12 @@ func (c *Controller) LoadChildren(children ...Interface.Controller) {
 }
 
 // Use adds middleware to the controller's group
-func (c *Controller) Use(middleware ...gin.HandlerFunc) {
+func (c *Controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
 	c.Use(middleware...)
 }
 
 func (c *Controller) BuildRoutes() {
+
 	/*	c.Group.POST("/addTravel", c.addTravel)
 		c.Group.POST("/removeTravel", c.removeTravel)*/
 	// I want to use the RESTful API

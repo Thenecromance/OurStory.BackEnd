@@ -30,12 +30,12 @@ func (ctrl *controller) LoadChildren(sub ...Interface.Controller) {
 	//setup children groups
 }
 
-func (ctrl *controller) Use(middleware ...gin.HandlerFunc) {
+func (ctrl *controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
 	/*if ctrl.Group == nil {
 		return
 	}
-	ctrl.Group.Use(middleware...)*/
-	ctrl.Use(middleware...)
+	ctrl.Group.AddMiddleWare(middleware...)*/
+	ctrl.AddMiddleWare(middleware...)
 
 }
 func (ctrl *controller) BuildRoutes() {

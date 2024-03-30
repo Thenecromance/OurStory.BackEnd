@@ -9,7 +9,7 @@ type Controller interface {
 
 	//LoadChildren(sub ...Controller)
 
-	Use(middleware ...gin.HandlerFunc)
+	AddMiddleWare(middleware ...gin.HandlerFunc)
 
 	BuildRoutes()
 

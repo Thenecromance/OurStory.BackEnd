@@ -14,11 +14,13 @@ const (
 	Finished
 )
 
+// Client side data struct
 type Data struct {
 	Id           int    `json:"id"          `
 	State        int    `json:"state"         form:"state"    binding:"required"`
 	UserId       int    `json:"owner"         form:"owner"    binding:"required"` // the user who create this travel
-	Stamp        int64  `json:"stamp"         form:"stamp"    binding:"required"` // this stamp is the time when the travel start, so it's need to be required
+	StartTime    int64  `json:"start"         form:"start"    binding:"required"` // this stamp is the time when the travel start, so it's need to be required
+	EndTime      int64  `json:"end"           form:"end"    binding:"required"`   // this stamp stored the time when the travel end
 	Location     string `json:"location"      form:"location" binding:"required"` // the location where he/she go
 	TogetherWith []int  `json:"together"      form:"together"`                    //don't need to required, maybe go alone
 	Logs         string `json:"logs"          form:"logs"`                        //if the travel is prepare travel, nothing will be here
@@ -29,7 +31,8 @@ type UpdateData struct {
 	Id           int    `json:"id"              form:"id"   binding:"required"`
 	State        int    `json:"state"           form:"state"    `
 	UserId       int    `json:"owner"           form:"owner"    ` // the user who create this travel
-	Stamp        int64  `json:"stamp"           form:"stamp"    ` // this stamp is the time when the travel start, so it's need to be required
+	Start        int64  `json:"start"           form:"start"    ` // this stamp is the time when the travel start, so it's need to be required
+	End          int64  `json:"end"             form:"end"    `   // this stamp stored the time when the travel end
 	Location     string `json:"location"        form:"location" ` // the location where he/she go
 	TogetherWith []int  `json:"together"        form:"together"`  //don't need to required, maybe go alone
 	Logs         string `json:"logs"            form:"logs"`      //if the travel is prepare travel, nothing will be here
@@ -41,7 +44,8 @@ type DbData struct {
 	Id           int    `json:"id"          db:"id"`
 	State        int    `json:"state"       db:"state"      form:"state"    binding:"required"`
 	UserId       int    `json:"owner"       db:"owner"      form:"owner"    binding:"required"` // the user who create this travel
-	Stamp        int64  `json:"stamp"       db:"stamp"      form:"stamp"    binding:"required"` // this stamp is the time when the travel start, so it's need to be required
+	StartStamp   int64  `json:"start"       db:"start"      form:"start"    binding:"required"` // this stamp is the time when the travel start, so it's need to be required
+	EndStamp     int64  `json:"end"         db:"end"        form:"end"      binding:"required"` // this stamp stored the time when the travel end
 	Location     string `json:"location"    db:"location"   form:"location" binding:"required"` // the location where he/she go
 	TogetherWith string `json:"together"    db:"together"   form:"together"`                    //don't need to required, maybe go alone
 	Logs         string `json:"logs"        db:"logs"       form:"logs"`                        //if the travel is prepare travel, nothing will be here
@@ -56,7 +60,7 @@ func (d DbData) setUpTable(db *gorp.DbMap) error {
 	tbl.ColMap("State").SetNotNull(true)
 	tbl.ColMap("UserId").SetNotNull(true)
 	tbl.ColMap("Location").SetNotNull(true)
-	tbl.ColMap("Stamp").SetNotNull(true)
+	tbl.ColMap("StartStamp").SetNotNull(true)
 
 	return db.CreateTablesIfNotExists()
 }
@@ -67,7 +71,8 @@ func transferDataToDbData(data Data) DbData {
 		Id:           data.Id,
 		State:        data.State,
 		UserId:       data.UserId,
-		Stamp:        data.Stamp,
+		StartStamp:   data.StartTime,
+		EndStamp:     data.EndTime,
 		Location:     data.Location,
 		TogetherWith: "",
 		Logs:         data.Logs,
@@ -87,7 +92,8 @@ func fromDbDataToData(data *DbData) Data {
 		Id:           data.Id,
 		State:        data.State,
 		UserId:       data.UserId,
-		Stamp:        data.Stamp,
+		StartTime:    data.StartStamp,
+		EndTime:      data.EndStamp,
 		Location:     data.Location,
 		TogetherWith: []int{},
 		Logs:         data.Logs,
@@ -157,7 +163,7 @@ func (m *Model) GetTravelByUserId(id int) ([]Data, error) {
 	if err != nil {
 		return nil, err
 	}
-	datas, err := m.db.Select(DbData{}, "SELECT * FROM `travel` WHERE `owner` = ? ORDER BY `stamp` desc ", id)
+	datas, err := m.db.Select(DbData{}, "SELECT * FROM `travel` WHERE `owner` = ? ORDER BY `start` desc ", id)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +203,8 @@ func (m *Model) updateToDatabase(data UpdateData) error {
 		Id:           data.Id,
 		State:        data.State,
 		UserId:       data.UserId,
-		Stamp:        data.Stamp,
+		StartTime:    data.Start,
+		EndTime:      data.End,
 		Location:     data.Location,
 		TogetherWith: data.TogetherWith,
 		Logs:         data.Logs,
@@ -212,8 +219,8 @@ func (m *Model) updateToDatabase(data UpdateData) error {
 		if dbData.UserId == 0 {
 			dbData.UserId = old.UserId
 		}
-		if dbData.Stamp == 0 {
-			dbData.Stamp = old.Stamp
+		if dbData.StartStamp == 0 {
+			dbData.StartStamp = old.StartStamp
 		}
 		if dbData.Location == "" {
 			dbData.Location = old.Location
