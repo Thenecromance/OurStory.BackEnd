@@ -77,6 +77,7 @@ func (cfg *ginConfig) load() {
 		return
 	}
 	cfg.save()
+
 }
 
 func (cfg *ginConfig) save() {

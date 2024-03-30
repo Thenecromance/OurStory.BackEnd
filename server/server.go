@@ -5,11 +5,9 @@ import (
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
-	"github.com/fsnotify/fsnotify"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"html/template"
-	"log"
 	"os"
 )
 
@@ -24,40 +22,11 @@ func init() {
 type Server struct {
 	option ServerOption
 
-	fsWatcher *fsnotify.Watcher
-	root      *Interface.RouteNode
-	cfg       ginConfig
-	g         *gin.Engine
+	root *Interface.RouteNode
+	cfg  ginConfig
+	g    *gin.Engine
 
 	controllers []Interface.Controller
-}
-
-func (s *Server) initializeFileWatcher() {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		logger.Get().Error(err)
-		return
-	}
-	s.fsWatcher = watcher
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				log.Println("event:", event)
-				if event.Has(fsnotify.Write) {
-					log.Println("modified file:", event.Name)
-				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				log.Println("error:", err)
-			}
-		}
-	}()
 }
 
 func (s *Server) initializeRouter() error {
@@ -125,7 +94,6 @@ func (s *Server) initialize() {
 		return
 	}
 
-	s.initializeFileWatcher()
 }
 
 func New(opts ...Option) *Server {

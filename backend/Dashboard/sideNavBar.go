@@ -2,8 +2,13 @@ package Dashboard
 
 import (
 	"encoding/json"
+	"github.com/Thenecromance/OurStories/base/fileWatcher"
 	"github.com/Thenecromance/OurStories/base/logger"
 	"os"
+)
+
+const (
+	configPath = "setting/sideNavBar.json"
 )
 
 type sideNavBar struct {
@@ -28,29 +33,37 @@ func (sb *SideNavBarModel) defaultConfig() {
 	})
 }
 
-func (sb *SideNavBarModel) Load() {
+func (sb *SideNavBarModel) reload() {
 	sb.Navs = make([]sideNavBar, 0)
 
-	_, err := os.Stat("setting/sideNavBar.json")
+	_, err := os.Stat(configPath)
 	if err != nil {
 		sb.defaultConfig()
 		marshal, err := json.Marshal(sb.Navs)
 		if err != nil {
 			return
 		}
-		os.WriteFile("setting/sideNavBar.json", marshal, 0644)
+		os.WriteFile(configPath, marshal, 0644)
 		return
 	}
-	file, err := os.ReadFile("setting/sideNavBar.json")
+	file, err := os.ReadFile(configPath)
 	if err != nil {
-		logger.Get().Info("fail to read sideNavBar.json", err)
+		logger.Get().Info("fail to read sideNavBar.json ", err)
 		return
 	}
 
 	err = json.Unmarshal(file, &sb.Navs)
 	if err != nil {
-		logger.Get().Info("fail to unmarshal sideNavBar.json", err)
+		logger.Get().Info("fail to unmarshal sideNavBar.json ", err)
 		return
 	}
+}
+
+func (sb *SideNavBarModel) Load() {
+	sb.reload()
+
+	fileWatcher.WatchFile(configPath, fileWatcher.FileCallback{
+		OnChanged: sb.reload,
+	})
 
 }
