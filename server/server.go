@@ -5,9 +5,11 @@ import (
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
+	"github.com/fsnotify/fsnotify"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"html/template"
+	"log"
 	"os"
 )
 
@@ -21,17 +23,42 @@ func init() {
 
 type Server struct {
 	option ServerOption
-	root   *Interface.RouteNode
-	cfg    ginConfig
-	g      *gin.Engine
+
+	fsWatcher *fsnotify.Watcher
+	root      *Interface.RouteNode
+	cfg       ginConfig
+	g         *gin.Engine
 
 	controllers []Interface.Controller
 }
 
-//// Gin returns the gin engine
-//func (s *Server) Gin() *gin.Engine {
-//	return s.g
-//}
+func (s *Server) initializeFileWatcher() {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		logger.Get().Error(err)
+		return
+	}
+	s.fsWatcher = watcher
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				log.Println("event:", event)
+				if event.Has(fsnotify.Write) {
+					log.Println("modified file:", event.Name)
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println("error:", err)
+			}
+		}
+	}()
+}
 
 func (s *Server) initializeRouter() error {
 	// load the routes node first. in this situation all the controllers didn't has any relationship between each other
@@ -65,10 +92,6 @@ func (s *Server) Run(addr string) {
 	s.UpdateFuncMap()
 	s.initialize()
 
-	if err := s.initializeRouter(); err != nil {
-		return
-	}
-
 	s.g.Run(addr)
 }
 
@@ -97,6 +120,12 @@ func (s *Server) initialize() {
 	s.cfg.apply(s.g)
 	s.root = Interface.NewRootNode()
 	s.root.RouterGroup = s.g.Group("/") // set up the root group as "/"
+
+	if err := s.initializeRouter(); err != nil {
+		return
+	}
+
+	s.initializeFileWatcher()
 }
 
 func New(opts ...Option) *Server {

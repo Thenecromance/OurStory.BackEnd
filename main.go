@@ -22,10 +22,7 @@ func loadServerComponent() *server.Server {
 	//dashboard controller for control the dashboard text values' change
 
 	svr.LoadComponent(
-		api.NewController(
-
-			//Credit.NewController(),
-		),
+		api.NewController(),
 		Dashboard.NewController(),
 
 		User.NewController(),
