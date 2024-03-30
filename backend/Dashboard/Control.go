@@ -35,13 +35,6 @@ func (c *Controller) Name() string {
 	return "agronDash"
 }
 
-/*func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
-	// parent group is  /api/
-	c.ParentGroup = group
-	//setup self group as /api/user
-	c.Group = group.Group("/" + c.Name())
-}*/
-
 func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	c.Children = append(c.Children, children...)
 	//setup children groups
@@ -84,6 +77,9 @@ func (c *Controller) getLocationWeather(ip string) (item topCardItem) {
 		item.Title = "北京"
 		item.Value = todayWeather.Weather
 		item.Description = todayWeather.Temperature + "°C"
+		item.ShowIcon.Component = "qi qi-100"
+		item.ShowIcon.Background = "bg-primary"
+		item.ShowIcon.Shape = "circle"
 		return
 	}
 
@@ -92,6 +88,9 @@ func (c *Controller) getLocationWeather(ip string) (item topCardItem) {
 	item.Title = loc.City
 	item.Value = todayWeather.Weather
 	item.Description = todayWeather.Temperature + "°C"
+	item.ShowIcon.Component = "qi qi-100"
+	item.ShowIcon.Background = "bg-primary"
+	item.ShowIcon.Shape = "circle"
 
 	return
 }
