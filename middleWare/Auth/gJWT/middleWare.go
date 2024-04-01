@@ -38,13 +38,6 @@ func WithKey(key string) Option {
 
 //=========================================================
 
-/*// DemoUser is a test struct for the jwt testing purpose only( and do not use this in production)
-type DemoUser struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-}
-*/
 // Claim is a struct that will be used to store the user information
 type Claim struct {
 	UserInfo             interface{} `json:"info"` // the user information
@@ -75,6 +68,14 @@ func SignedToken(arg interface{}) (string, error) {
 func AuthToken(tokenString string) error {
 	_, err := GetObjectFromToken(tokenString)
 	return err
+}
+
+func AuthorizeToken(tokenString string) bool {
+	_, err := GetObjectFromToken(tokenString)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 // GetObjectFromToken will return the object from the token, if the token is invalid, it will return an error and the object will be nil

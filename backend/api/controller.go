@@ -35,7 +35,7 @@ func (ctrl *controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
 		return
 	}
 	ctrl.Group.AddMiddleWare(middleware...)*/
-	ctrl.AddMiddleWare(middleware...)
+	ctrl.Use(middleware...)
 
 }
 func (ctrl *controller) BuildRoutes() {

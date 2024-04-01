@@ -32,6 +32,7 @@ func loadServerComponent() *server.Server {
 		Weather.NewController(),
 		Travel.NewController(),
 	)
+
 	return svr
 }
 
@@ -99,6 +100,11 @@ func snowflakeTest() {
 	fmt.Printf("ID       : %d\n", node.Generate().Int64())
 	time.Sleep(1 * time.Second)
 	fmt.Printf("ID       : %d\n", node.Generate().Int64())
+}
+
+func userInfoTest() {
+	SQL.Initialize()
+	User.BindInfoTable()
 }
 func main() {
 

@@ -41,7 +41,7 @@ func (c *Controller) LoadChildren(children ...Interface.Controller) {
 
 // Use adds middleware to the Controller's group
 func (c *Controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
-	c.AddMiddleWare(middleware...)
+	c.Use(middleware...)
 }
 
 func (c *Controller) BuildRoutes() {
