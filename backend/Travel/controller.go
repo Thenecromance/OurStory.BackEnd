@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // Travel section still has a lot of shit to do , user auth, monkey created bugs ,
@@ -58,7 +59,7 @@ func (c *Controller) BuildRoutes() {
 //----------------------------Interface.Controller Implementation--------------------------------
 
 func (c *Controller) addTravel(ctx *gin.Context) {
-	var received Data
+	var received ClientData
 
 	err := ctx.ShouldBind(&received)
 	if err != nil {
@@ -69,7 +70,7 @@ func (c *Controller) addTravel(ctx *gin.Context) {
 		return
 	}
 
-	err = c.model.AddTravel(received)
+	err = c.model.AddToSQL(&received)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"info": "failed to add travel",
@@ -87,13 +88,13 @@ func (c *Controller) removeTravel(ctx *gin.Context) {
 		return
 	}
 
-	iid, err := strconv.Atoi(id)
-	if err != nil {
-		backend.RespErr(ctx, "id is not a number")
-		return
-	}
-
-	err = c.model.RemoveTravel(iid)
+	//iid, err := strconv.ParseInt(id, 10, 64)
+	//logger.Get().Info(iid)
+	//if err != nil {
+	//	backend.RespErr(ctx, "id is not a number")
+	//	return
+	//}
+	err := c.model.RemoveTravel(id)
 	if err != nil {
 		logger.Get().Error(err.Error())
 		backend.RespErr(ctx,
@@ -105,6 +106,21 @@ func (c *Controller) removeTravel(ctx *gin.Context) {
 	backend.Resp(ctx, "success")
 }
 
+//1711952398
+//1712016000000
+
+func (c *Controller) checkState(item *ClientData) {
+	current := time.Now().Unix() * 1000
+
+	if item.StartTime > current {
+		item.State = Prepare
+	} else if item.EndTime < current {
+		item.State = Finished
+	} else {
+		item.State = Ongoing
+	}
+
+}
 func (c *Controller) getTravels(ctx *gin.Context) {
 	usrId := ctx.Query("user")
 	if usrId == "" {
@@ -117,7 +133,12 @@ func (c *Controller) getTravels(ctx *gin.Context) {
 		return
 
 	}
-	data, err := c.model.GetTravelByUserId(iid)
+	data, err := c.model.GetTravelListByUser(iid)
+
+	for index := range data {
+		c.checkState(&data[index])
+	}
+
 	if err != nil {
 		logger.Get().Error(err.Error())
 		backend.RespErr(ctx, "failed to get travel")
@@ -127,21 +148,22 @@ func (c *Controller) getTravels(ctx *gin.Context) {
 }
 
 func (c *Controller) updateTravel(ctx *gin.Context) {
-	data := UpdateData{}
-
-	err := ctx.ShouldBind(&data)
-	if err != nil {
-		backend.RespErr(ctx, "wrong params")
-		return
-	}
-
-	err = c.model.updateToDatabase(data)
-	if err != nil {
-		backend.RespErr(ctx, "failed to update travel")
-
-		return
-	}
-
-	backend.Resp(ctx, "success")
+	backend.ResponseUnImplemented(ctx)
+	//data := UpdateData{}
+	//
+	//err := ctx.ShouldBind(&data)
+	//if err != nil {
+	//	backend.RespErr(ctx, "wrong params")
+	//	return
+	//}
+	//
+	//err = c.model.updateToDatabase(data)
+	//if err != nil {
+	//	backend.RespErr(ctx, "failed to update travel")
+	//
+	//	return
+	//}
+	//
+	//backend.Resp(ctx, "success")
 
 }

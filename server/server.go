@@ -109,7 +109,7 @@ func New(opts ...Option) *Server {
 	)
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true                                              // 允许所有来源
-	config.AllowMethods = []string{"GET", "POST"}                              // 允许的请求方法
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}             // 允许的请求方法
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"} // 允许的头部
 
 	svr.g.Use(cors.New(config))
