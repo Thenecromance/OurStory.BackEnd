@@ -13,33 +13,30 @@ func (ctrl *controller) Name() string {
 	return "api"
 }
 
-/*
-	func (ctrl *controller) SetRootGroup(group *gin.RouterGroup) {
-		// parent group is  /api/
-		ctrl.ParentGroup = group
-		//setup self group as /api/user
-		ctrl.Group = group.Group("/" + ctrl.Name())
-
-		ctrl.node.Group(ctrl.node.Name)
-
-}
-*/
-
 func (ctrl *controller) LoadChildren(sub ...Interface.Controller) {
 	ctrl.Children = append(ctrl.Children, sub...)
 	//setup children groups
 }
 
-func (ctrl *controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
+func (ctrl *controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
 	/*if ctrl.Group == nil {
 		return
 	}
-	ctrl.Group.AddMiddleWare(middleware...)*/
-	ctrl.Use(middleware...)
+	ctrl.Group.PreLoadMiddleWare(middleware...)*/
+
+	ctrl.CachedMiddleWare = append(ctrl.CachedMiddleWare, middleware...)
 
 }
 func (ctrl *controller) BuildRoutes() {
+	ctrl.POST("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"Test": "test",
+		})
+	})
+}
 
+func (ctrl *controller) ApplyMiddleWare() {
+	ctrl.Use(ctrl.CachedMiddleWare...)
 }
 
 func NewController(i ...Interface.Controller) Interface.Controller {

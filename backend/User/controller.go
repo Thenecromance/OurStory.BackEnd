@@ -27,7 +27,7 @@ func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{
 		model: Model{},
 	}
-	c.RouteNode = Interface.NewNode("api", c.Name())
+	c.RouteNode = Interface.NewNode("/", c.Name())
 	c.LoadChildren(i...)
 	return c
 }
@@ -42,9 +42,12 @@ func (c *Controller) LoadChildren(children ...Interface.Controller) {
 	//c.ChildrenSetGroup(c.Group)
 }
 
-// Use adds middleware to the controller's group
-func (c *Controller) AddMiddleWare(middleware ...gin.HandlerFunc) {
-	c.Use(middleware...)
+// Use adds middleware to the Controller's group
+func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
+	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
+}
+func (c *Controller) ApplyMiddleWare() {
+	c.Use(c.CachedMiddleWare...)
 }
 
 func (c *Controller) BuildRoutes() {

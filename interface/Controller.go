@@ -9,7 +9,9 @@ type Controller interface {
 
 	//LoadChildren(sub ...Controller)
 
-	AddMiddleWare(middleware ...gin.HandlerFunc)
+	PreLoadMiddleWare(middleware ...gin.HandlerFunc)
+
+	ApplyMiddleWare()
 
 	BuildRoutes()
 
@@ -20,7 +22,8 @@ type Controller interface {
 
 type ControllerBase struct {
 	*RouteNode
-	Children []Controller
+	CachedMiddleWare []gin.HandlerFunc
+	Children         []Controller
 }
 
 func (c *ControllerBase) ChildrenBuildRoutes() {

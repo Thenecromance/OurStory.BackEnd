@@ -10,28 +10,43 @@ import (
 	"github.com/Thenecromance/OurStories/backend/api"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	Config "github.com/Thenecromance/OurStories/base/config"
+	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
+	"github.com/Thenecromance/OurStories/middleWare/Auth/gJWT"
 	"github.com/Thenecromance/OurStories/server"
 	"github.com/bwmarrin/snowflake"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
+func AddMiddleWare(middleWare gin.HandlerFunc, controller ...Interface.Controller) []Interface.Controller {
+	for _, c := range controller {
+		c.PreLoadMiddleWare(middleWare)
+	}
+	return controller
+}
+
 func loadServerComponent() *server.Server {
 
 	svr := server.New()
+	logger.Get().Info("using Middle ware")
+	key := Config.GetStringWithDefault("JWT", "AuthKey", "putTheKeyHere")
 
 	//dashboard controller for control the dashboard text values' change
+	apiRoute := api.NewController()
 
-	svr.LoadComponent(
-		api.NewController(),
-		Dashboard.NewController(),
-
-		User.NewController(),
+	list := AddMiddleWare(
+		gJWT.NewMiddleware(gJWT.WithExpireTime(time.Hour*24*15), gJWT.WithKey(key)),
+		apiRoute,
 		Location.NewController(),
 		Weather.NewController(),
-		Travel.NewController(),
+		Travel.NewController())
+
+	svr.LoadComponent(
+		Dashboard.NewController(),
+		User.NewController(),
 	)
+	svr.LoadComponent(list...)
 
 	return svr
 }

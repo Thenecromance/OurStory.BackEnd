@@ -44,6 +44,7 @@ func (s *Server) initializeRouter() error {
 	s.root.CreateNodeGroups()
 	// finally we will build the routes for each controller
 	for _, controller := range s.controllers {
+		controller.ApplyMiddleWare()
 		controller.BuildRoutes()
 	}
 
@@ -90,6 +91,7 @@ func (s *Server) initialize() {
 	s.root = Interface.NewRootNode()
 	s.root.RouterGroup = s.g.Group("/") // set up the root group as "/"
 
+	//build each node's group
 	if err := s.initializeRouter(); err != nil {
 		return
 	}

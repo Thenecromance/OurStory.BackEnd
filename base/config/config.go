@@ -86,6 +86,14 @@ func HasSection(section string) bool {
 func GetString(section string, key string) string {
 	return defaultCfg.Section(section).Key(key).String()
 }
+func GetStringWithDefault(section, key, shouldbe string) string {
+	if defaultCfg.Section(section).HasKey(key) {
+		return GetString(section, key)
+	} else {
+		SetString(section, key, shouldbe)
+		return shouldbe
+	}
+}
 func GetInt(section string, key string) int {
 	return defaultCfg.Section(section).Key(key).MustInt()
 }
