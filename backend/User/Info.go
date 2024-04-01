@@ -92,3 +92,25 @@ func (i *Info) Copy() Info {
 		LastLogin:   i.LastLogin,
 	}
 }
+
+func (i *Info) Overwrite(new Info) {
+	if new.Avatar != "" {
+		i.Avatar = new.Avatar
+	}
+	if new.UserName != "" {
+		i.UserName = new.UserName
+	}
+	//if new.Password != "" {
+	//	i.Password = new.Password
+	//}
+	if new.Email != "" {
+		i.Email = new.Email
+	}
+	if new.MBTI != "" {
+		i.MBTI = new.MBTI
+	}
+
+	if new.Gender != i.Gender {
+		i.Gender = new.Gender
+	}
+}

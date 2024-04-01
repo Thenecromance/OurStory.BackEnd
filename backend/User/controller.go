@@ -51,7 +51,8 @@ func (c *Controller) BuildRoutes() {
 	c.model.init()
 	c.POST("/login", c.login)
 	c.POST("/register", c.register)
-	c.GET("/profile", c.profile)
+	c.POST("/profile", c.profile)
+	c.PUT("/profile", c.updateProfile)
 	c.ChildrenBuildRoutes()
 }
 
@@ -130,10 +131,30 @@ func (c *Controller) profile(ctx *gin.Context) {
 		return
 	}
 	id := ctx.Query("id")
-	logger.Get().Info(id)
+
 	user.Id, err = strconv.Atoi(id)
 	user.GetFromSQLById()
 	backend.Resp(ctx, user)
+}
+
+func (c *Controller) updateProfile(ctx *gin.Context) {
+	logger.Get().Debug("updateProfile")
+	var newProfile Info
+	var profile Info
+	err := ctx.ShouldBind(&newProfile)
+	if err != nil {
+		backend.RespErr(ctx, err.Error())
+		return
+	}
+	id := ctx.Query("id")
+	newProfile.Id, err = strconv.Atoi(id)
+	profile.Id = newProfile.Id
+	profile.GetFromSQLById()
+
+	profile.Overwrite(newProfile)
+
+	profile.UpdateToSQL()
+	backend.Resp(ctx, profile)
 }
 
 //------------------------------------------------------------
