@@ -141,13 +141,15 @@ func (c *Controller) updateProfile(ctx *gin.Context) {
 	logger.Get().Debug("updateProfile")
 	var newProfile Info
 	var profile Info
-	err := ctx.ShouldBind(&newProfile)
+	err := ctx.ShouldBindJSON(&newProfile)
 	if err != nil {
 		backend.RespErr(ctx, err.Error())
 		return
 	}
 	id := ctx.Query("id")
 	newProfile.Id, err = strconv.Atoi(id)
+
+	logger.Get().Info(newProfile)
 	profile.Id = newProfile.Id
 	profile.GetFromSQLById()
 
