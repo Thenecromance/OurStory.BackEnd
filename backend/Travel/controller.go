@@ -13,7 +13,7 @@ import (
 // Travel section still has a lot of shit to do , user auth, monkey created bugs ,
 
 type Controller struct {
-	Interface.ControllerBase
+	group *Interface.GroupNode
 	model Model
 }
 
@@ -23,27 +23,15 @@ func (c *Controller) Name() string {
 	return "travel"
 }
 
-func NewController(i ...Interface.Controller) Interface.Controller {
+func NewController() Interface.Controller {
 	c := &Controller{
 		model: Model{},
 	}
-	c.RouteNode = Interface.NewNode("api", c.Name())
-	c.LoadChildren(i...)
+
 	return c
 }
-
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
-}
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "api")
 }
 
 func (c *Controller) BuildRoutes() {
@@ -51,12 +39,10 @@ func (c *Controller) BuildRoutes() {
 	/*	c.Group.POST("/addTravel", c.addTravel)
 		c.Group.POST("/removeTravel", c.removeTravel)*/
 	// I want to use the RESTful API
-	c.GET("/", c.getTravels)
-	c.POST("/", c.addTravel)
-	c.PUT("/", c.updateTravel)
-	c.DELETE("/", c.removeTravel)
-
-	c.ChildrenBuildRoutes()
+	c.group.Router.GET("/", c.getTravels)
+	c.group.Router.POST("/", c.addTravel)
+	c.group.Router.PUT("/", c.updateTravel)
+	c.group.Router.DELETE("/", c.removeTravel)
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------

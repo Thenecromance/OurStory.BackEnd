@@ -6,7 +6,7 @@ import (
 )
 
 type Controller struct {
-	Interface.ControllerBase
+	group *Interface.GroupNode
 	model Model
 }
 
@@ -16,8 +16,6 @@ func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{
 		model: Model{},
 	}
-	c.RouteNode = Interface.NewNode("api", c.Name())
-	c.LoadChildren(i...)
 	return c
 }
 
@@ -25,23 +23,12 @@ func (c *Controller) Name() string {
 	return "weather"
 }
 
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
-}
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "api")
 }
 
 func (c *Controller) BuildRoutes() {
-	c.GET("/", c.getWeather)
-	c.ChildrenBuildRoutes()
+	c.group.Router.GET("/", c.getWeather)
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------

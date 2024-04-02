@@ -14,7 +14,7 @@ type SignTokenCallback = func(*gin.Context, interface{}) (string, error)
 type GetObjectFromTokenCallback = func(string) (interface{}, error)
 type AuthorizeCallback = func(interface{}) bool
 type Controller struct {
-	Interface.ControllerBase
+	group *Interface.GroupNode
 	model Model
 
 	signedToken    SignTokenCallback
@@ -29,8 +29,7 @@ func NewController(i ...Interface.Controller) Interface.Controller {
 		model:       Model{},
 		signedToken: gJWT.SignedToken,
 	}
-	c.RouteNode = Interface.NewNode("api", c.Name())
-	c.LoadChildren(i...)
+
 	return c
 }
 
@@ -38,28 +37,17 @@ func (c *Controller) Name() string {
 	return "user"
 }
 
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
-}
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "api")
 }
 
 func (c *Controller) BuildRoutes() {
 	c.model.init()
-	c.POST("/login", c.login)
-	c.POST("/register", c.register)
-	c.POST("/profile", c.profile)
-	c.PUT("/profile", c.updateProfile)
-	c.POST("/", c.preAuth)
-	c.ChildrenBuildRoutes()
+	c.group.Router.POST("/login", c.login)
+	c.group.Router.POST("/register", c.register)
+	c.group.Router.POST("/profile", c.profile)
+	c.group.Router.PUT("/profile", c.updateProfile)
+	c.group.Router.POST("/", c.preAuth)
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------

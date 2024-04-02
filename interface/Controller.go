@@ -1,37 +1,10 @@
 package Interface
 
-import (
-	"github.com/gin-gonic/gin"
-)
-
+type NodeCallback func(path string, parent string, middleWare ...string) *GroupNode
 type Controller interface {
-	//SetRootGroup(group *gin.RouterGroup)
-
-	//LoadChildren(sub ...Controller)
-
-	PreLoadMiddleWare(middleware ...gin.HandlerFunc)
-
-	ApplyMiddleWare()
-
 	BuildRoutes()
 
 	Name() string
 
-	GetNode() *RouteNode
-}
-
-type ControllerBase struct {
-	*RouteNode
-	CachedMiddleWare []gin.HandlerFunc
-	Children         []Controller
-}
-
-func (c *ControllerBase) ChildrenBuildRoutes() {
-	for _, child := range c.Children {
-		child.BuildRoutes()
-	}
-}
-
-func (c *ControllerBase) GetNode() *RouteNode {
-	return c.RouteNode
+	RequestGroup(NodeCallback)
 }

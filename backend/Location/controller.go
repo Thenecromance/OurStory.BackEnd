@@ -7,18 +7,16 @@ import (
 )
 
 type Controller struct {
-	Interface.ControllerBase
+	group *Interface.GroupNode
 	model Model
 }
 
 // ----------------------------Interface.Controller Implementation--------------------------------
 
-func NewController(i ...Interface.Controller) Interface.Controller {
+func NewController() Interface.Controller {
 	c := &Controller{
 		model: Model{},
 	}
-	c.RouteNode = Interface.NewNode("api", c.Name())
-	c.LoadChildren(i...)
 	return c
 }
 
@@ -26,32 +24,13 @@ func (c *Controller) Name() string {
 	return "location"
 }
 
-//func (c *Controller) SetRootGroup(group *gin.RouterGroup) {
-//	// parent group is  /api/
-//	c.ParentGroup = group
-//	//setup self group as /api/user
-//	c.Group = group.Group("/" + c.Name())
-//}
-
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "api")
 }
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
-}
-
 func (c *Controller) BuildRoutes() {
 	AMapToken.Instance()
 
-	c.GET("/ip", c.getLocationByIP)
-	c.ChildrenBuildRoutes()
+	c.group.Router.GET("/ip", c.getLocationByIP)
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------

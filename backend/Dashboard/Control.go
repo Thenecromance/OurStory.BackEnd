@@ -11,8 +11,7 @@ import (
 )
 
 type Controller struct {
-	Interface.ControllerBase
-	//model Model
+	group *Interface.GroupNode
 
 	resource DynamicResource
 	weather  Weather.Model
@@ -22,38 +21,26 @@ type Controller struct {
 
 //----------------------------Interface.Controller Implementation--------------------------------
 
-func NewController(i ...Interface.Controller) Interface.Controller {
+func NewController() Interface.Controller {
 	c := &Controller{}
 	c.sNav.Load()
 	c.resource.load()
-	c.RouteNode = Interface.NewNode("/", c.Name())
-	c.LoadChildren(i...)
+
 	return c
+}
+
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "/")
 }
 
 func (c *Controller) Name() string {
 	return "agronDash"
 }
 
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
-}
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
-}
-
 func (c *Controller) BuildRoutes() {
-	c.GET("/title", c.getTitle)
-	c.GET("/topCards", c.getTopCard)
-	c.GET("/sideNavBar", c.getSideNavBar)
-	c.ChildrenBuildRoutes()
+	c.group.Router.GET("/title", c.getTitle)
+	c.group.Router.GET("/topCards", c.getTopCard)
+	c.group.Router.GET("/sideNavBar", c.getSideNavBar)
 }
 
 func (c *Controller) GetTitle() string {
