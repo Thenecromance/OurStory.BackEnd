@@ -5,6 +5,7 @@ import (
 	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"os"
 )
@@ -118,6 +119,7 @@ func (g *ginControl) initializeRouterGroups() {
 		logger.Get().Debug("Start to build root node")
 		g.GroupMap["/"].Router = g.root.Group("/")
 		for _, mwName := range g.GroupMap["/"].MiddleWare {
+			logger.Get().Info("Add middleware to [", "/", "] middleware name: ", mwName)
 			g.GroupMap["/"].Router.Use(g.MiddleWarePool[mwName])
 		}
 	}
@@ -137,6 +139,9 @@ func (g *ginControl) initializeRouterGroups() {
 }
 
 func (g *ginControl) initialize() {
+	cfg := cors.DefaultConfig()
+	cfg.AllowAllOrigins = true // 允许所有来源
+	g.root.Use(gin.Logger(), cors.New(cfg))
 	g.node("/", "")
 	g.LoadConfig()
 
