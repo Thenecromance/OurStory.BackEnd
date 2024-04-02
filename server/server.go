@@ -4,6 +4,7 @@ import (
 	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
+	"github.com/Thenecromance/OurStories/middleWare/TLS"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -54,11 +55,6 @@ func (s *Server) initializeRouter() error {
 // Run start up the gin Server
 func (s *Server) Run(addr string) {
 	defer Config.CloseIni()
-
-	/*	for _, controller := range s.controllers {
-		controller.CreateNodeGroups()
-	}*/
-
 	s.UpdateFuncMap()
 	s.initialize()
 
@@ -71,13 +67,6 @@ func (s *Server) Run(addr string) {
 		s.g.Run(addr)
 	}
 
-}
-
-func AppendFuncMap(functionMap template.FuncMap) {
-	/*s.funcMap[key] = function*/
-	for key, function := range functionMap {
-		funcMap[key] = function
-	}
 }
 
 func (s *Server) UpdateFuncMap() {
@@ -122,7 +111,7 @@ func New(opts ...Option) *Server {
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}             // 允许的请求方法
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"} // 允许的头部
 
-	svr.g.Use(cors.New(config))
+	svr.g.Use(TLS.TlsHandler(8080), cors.New(config))
 
 	for _, opt := range opts {
 		opt(&svr.option)

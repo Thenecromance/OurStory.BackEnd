@@ -9,3 +9,11 @@ type ServerOption struct {
 	TLS bool
 }
 type Option func(*ServerOption)
+
+func RunningWithCA(certFile string, keyFile string) Option {
+	return func(o *ServerOption) {
+		o.CertFile = certFile
+		o.KeyFile = keyFile
+		o.TLS = true
+	}
+}
