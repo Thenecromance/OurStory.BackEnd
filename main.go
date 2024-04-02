@@ -33,11 +33,10 @@ func loadServerComponent() *server.Server {
 	key := Config.GetStringWithDefault("JWT", "AuthKey", "putTheKeyHere")
 
 	//dashboard controller for control the dashboard text values' change
-	apiRoute := api.NewController()
 
 	list := AddMiddleWare(
 		gJWT.NewMiddleware(gJWT.WithExpireTime(time.Hour*24*15), gJWT.WithKey(key)),
-		apiRoute,
+		api.NewController(),
 		Location.NewController(),
 		Weather.NewController(),
 		Travel.NewController())

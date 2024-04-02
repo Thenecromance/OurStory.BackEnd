@@ -62,7 +62,15 @@ func (s *Server) Run(addr string) {
 	s.UpdateFuncMap()
 	s.initialize()
 
-	s.g.Run(addr)
+	if s.option.TLS {
+		logger.Get().Info("server is running on TLS , cert file is ", s.option.CertFile, " key file is ", s.option.KeyFile, " address is ", addr)
+		logger.Get().Info("please make sure the cert file and key file is correct and the address is correct")
+		s.g.RunTLS(addr, s.option.CertFile, s.option.KeyFile)
+	} else {
+		logger.Get().Info("server is running on ", addr)
+		s.g.Run(addr)
+	}
+
 }
 
 func AppendFuncMap(functionMap template.FuncMap) {

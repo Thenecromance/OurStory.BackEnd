@@ -50,7 +50,7 @@ type gJWT struct {
 }
 
 // SignedToken should only be called by the place where you want to sign the token to user
-func SignedToken(arg interface{}) (string, error) {
+func SignedToken(ctx *gin.Context, arg interface{}) (string, error) {
 
 	claim := Claim{
 		UserInfo: arg,
@@ -61,7 +61,10 @@ func SignedToken(arg interface{}) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	return token.SignedString([]byte(option.Key))
+
+	tokenString, err := token.SignedString([]byte(option.Key))
+	ctx.SetCookie("Authorization", tokenString, 1296000, "/", "localhost:8080", false, false)
+	return tokenString, err
 }
 
 // AuthToken will authenticate the token is valid or not if return not nil,means the token is invalid otherwise it is valid
@@ -113,12 +116,13 @@ func New(opts ...Option) {
 func NewMiddleware(opts ...Option) gin.HandlerFunc {
 	New(opts...)
 	return func(ctx *gin.Context) {
-		auth := ctx.Request.Header.Get("Authorization") // get the token from the header
-		if len(auth) == 0 {
+		auth, err := ctx.Cookie("Authorization")
+
+		if len(auth) == 0 || err != nil {
 			UnauthorizedResponse(ctx)
 			return
 		}
-		err := AuthToken(auth)
+		err = AuthToken(auth)
 		if err != nil {
 			UnauthorizedResponse(ctx)
 		}
