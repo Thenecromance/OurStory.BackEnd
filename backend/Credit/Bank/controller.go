@@ -8,7 +8,7 @@ import (
 )
 
 type Controller struct {
-	Interface.ControllerBase
+	group *Interface.GroupNode
 
 	Model
 }
@@ -17,8 +17,7 @@ type Controller struct {
 
 func NewController(i ...Interface.Controller) Interface.Controller {
 	c := &Controller{}
-	c.RouteNode = Interface.NewNode("credit", c.Name())
-	c.LoadChildren(i...)
+
 	return c
 }
 
@@ -26,27 +25,16 @@ func (c *Controller) Name() string {
 	return "bank"
 }
 
-func (c *Controller) LoadChildren(children ...Interface.Controller) {
-	c.Children = append(c.Children, children...)
-	//setup children groups
-	//c.ChildrenSetGroup(c.Group)
-}
-
-// Use adds middleware to the Controller's group
-func (c *Controller) PreLoadMiddleWare(middleware ...gin.HandlerFunc) {
-	c.CachedMiddleWare = append(c.CachedMiddleWare, middleware...)
-}
-func (c *Controller) ApplyMiddleWare() {
-	c.Use(c.CachedMiddleWare...)
+func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
+	c.group = cb(c.Name(), "/")
 }
 
 func (c *Controller) BuildRoutes() {
 	AMapToken.Instance()
-	c.GET("/", c.getUserCredits) // get current user's credits
+	c.group.Router.GET("/", c.getUserCredits) // get current user's credits
 	//c.POST("/", c.getLocationByIP)
-	c.PUT("/", c.updateCredits) // when a user buys something, update credits
-	c.DELETE("/", c.refund)     // when a user refunds something, update credits
-	c.ChildrenBuildRoutes()
+	c.group.Router.PUT("/", c.updateCredits) // when a user buys something, update credits
+	c.group.Router.DELETE("/", c.refund)     // when a user refunds something, update credits
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------

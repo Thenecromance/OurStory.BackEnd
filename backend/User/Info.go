@@ -16,10 +16,10 @@ type Info struct {
 	encrypted   atomic.Bool `db:"-" json:"-"`
 	Id          int         `db:"id" json:"id"`
 	Avatar      string      `db:"avatar" json:"avatar"` // the path of avatar
-	UserName    string      `db:"username,notnull" json:"username"`
-	Password    string      `db:"password" json:"password"`
-	Email       string      `db:"email"    json:"email"`
-	MBTI        string      `db:"mbti" json:"mbti"`
+	UserName    string      `db:"username,notnull" json:"username" form:"username"`
+	Password    string      `db:"password" json:"password" form:"password"`
+	Email       string      `db:"email"    json:"email" form:"email"`
+	MBTI        string      `db:"mbti" json:"mbti" form:"mbti"`
 	CreatedTime int64       `db:"created_time" json:"created_time"`
 	LastLogin   int64       `db:"last_login" json:"last_login"`
 	Gender      int         `db:"gender"`
