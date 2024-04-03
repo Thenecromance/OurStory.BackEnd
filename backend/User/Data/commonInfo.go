@@ -1,8 +1,9 @@
 package Data
 
 type CommonInfo struct {
-	Id          int    `db:"id"                    json:"id"`
-	Avatar      string `db:"avatar"                json:"avatar"            form:"avatar"`  // the path of avatar
+	Id     int    `db:"id"                    json:"id"`
+	Avatar string `db:"avatar"                json:"avatar"            form:"avatar"` // the path of avatar
+
 	NickName    string `db:"nickname"              json:"nickname"         form:"nickname"` // nickname is the name that show to others
 	Email       string `db:"email"                 json:"email"            form:"email"`
 	MBTI        string `db:"mbti"                  json:"mbti"             form:"mbti"`

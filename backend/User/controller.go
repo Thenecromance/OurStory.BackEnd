@@ -53,10 +53,9 @@ func (c *Controller) BuildRoutes() {
 	c.group.Router.POST("/register", c.register)
 
 	c.group.Router.GET("/:username", c.profile)
-	c.group.Router.POST("/:username", c.logout)
+	//c.group.Router.POST("/:username", c.logout)
 	c.group.Router.PUT("/:username", c.updateProfile)
 	//c.group.Router.DELETE("/:username", c.deleteProfile)
-	//c.group.Router.POST("/", c.preAuth)
 }
 
 //----------------------------Interface.Controller Implementation--------------------------------
@@ -78,8 +77,14 @@ func (c *Controller) login(ctx *gin.Context) {
 		resp.SetCode(http.StatusUnauthorized).AddData(err.Error())
 		return
 	}
+	var res struct {
+		Data.CommonInfo
+		UserName string `json:"username"`
+	}
+	res.CommonInfo = info.CommonInfo
+	res.UserName = info.UserName
 
-	resp.SetCode(response.SUCCESS).AddData(info.CommonInfo)
+	resp.SetCode(response.SUCCESS).AddData(res)
 
 	//generate a token
 	if c.signedToken == nil {
