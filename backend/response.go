@@ -88,31 +88,3 @@ func ResponseUnImplemented(ctx *gin.Context) {
 		})
 	return
 }
-
-/*
-{
-    "code": 0,
-    "meta": {
-        "count": 1
-    },
-    "data": [
-        {
-            "id": 0,
-            "state": 1,
-            "owner": 1,
-            "stamp": 1716711837000,
-            "location": "Travel Prepare 5",
-            "together": [
-                2,
-                3,
-                4,
-                5,
-                6
-            ],
-            "logs": "I can fly~",
-            "img": "www.baidu.com"
-        }
-    ]
-}
-
-*/

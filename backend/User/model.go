@@ -1,60 +1,118 @@
 package User
 
-import "errors"
+import (
+	"fmt"
+	"github.com/Thenecromance/OurStories/backend/User/Data"
+	"github.com/Thenecromance/OurStories/backend/User/Validator"
+	"github.com/Thenecromance/OurStories/backend/User/creator"
+	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/lru"
+	"time"
+)
 
 type Model struct {
+	cache     *lru.Cache
+	creator   *creator.Creator
+	validator *Validator.Validator
 }
 
+// initialize the model
 func (m *Model) init() {
-	BindInfoTable()
-}
-func (m *Model) authorize(i *Info) bool {
-	authUser := i.Copy()
+	Data.BindInfoTable()
 
-	err := authUser.GetFromSQLByUserName()
+	m.cache = lru.New(100)
+	m.creator = creator.New()
+	m.validator = Validator.New()
+
+}
+
+func (m *Model) RequestFromDatabase(username string) (*Data.Info, error) {
+	usr := &Data.Info{
+		AuthorizationInfo: Data.AuthorizationInfo{
+			UserName: username,
+		},
+	}
+	err := usr.GetFromSQLByUserName()
 	if err != nil {
-		return false
+		return nil, fmt.Errorf("could not find user: %s", username)
 	}
-
-	if authUser.UserName != i.UserName ||
-		authUser.Password != i.Password {
-		return false
-	}
-
-	return true
+	return usr, nil
 }
 
-func (m *Model) authUser(i *Info) error {
+func (m *Model) Login(data *Data.AuthorizationInfo) (*Data.Info, error) {
+	var err error
+	info, ok := m.cache.Get(data.UserName)
+	if !ok {
+		info, err = m.RequestFromDatabase(data.UserName)
+	}
 
-	//if i.Id == 0 {
-	//	return errors.New("User not exist")
-	//}
-	if i.UserName == "" {
-		return errors.New("User name is empty")
+	if info == nil || err != nil {
+		return nil, fmt.Errorf("could not find user: %s", data.UserName)
 	}
-	if i.Password == "" {
-		return errors.New("Password is empty")
+
+	if !m.validator.ValidateUser(data, info.(*Data.Info)) {
+		return nil, fmt.Errorf("username or password is wrong")
 	}
-	if !m.authorize(i) {
-		return errors.New("User name or password is wrong")
+
+	//valid user, update last login time
+
+	//update(or add to cache)
+	m.cache.Add(info.(*Data.Info).UserName, info, time.Now().Add(time.Hour*24))
+
+	return info.(*Data.Info), nil
+}
+
+func (m *Model) Register(data *Data.AuthorizationInfo, email string) error {
+	_, ok := m.cache.Get(data.UserName)
+	if ok {
+		return fmt.Errorf("username already exists")
 	}
+
+	err := m.creator.NewUser(data.UserName, email, data.Password)
+	if err != nil {
+		return err
+	}
+
+	usr := &Data.Info{
+		AuthorizationInfo: *data,
+	}
+
+	_ = usr.GetFromSQLByUserName()
+
+	m.cache.Add(data.UserName, usr, time.Now().Add(time.Hour*24))
 
 	return nil
 }
 
-func (m *Model) register(i *Info) error {
-	if i.UserName == "" {
-		return errors.New("User name is empty")
-	}
-	if i.Password == "" {
-		return errors.New("Password is empty")
-	}
+func (m *Model) Profile(username string) (*Data.Info, error) {
+	//check if the user is logged in
+	info, ok := m.cache.Get(username)
 
-	i.InsertToSQL()
-	return nil
+	if !ok {
+		return nil, fmt.Errorf("please login first")
+	}
+	return info.(*Data.Info), nil
 }
 
-func (m *Model) updateProfile(i *Info) error {
+func (m *Model) UpdateProfile(username string, newInfo *Data.CommonInfo) (*Data.Info, error) {
+	info, err := m.Profile(username)
 
-	return nil
+	if err != nil {
+		logger.Get().Errorf("update profile failed: %s", err)
+		return nil, err
+	}
+	info.ApplyNewInfo(newInfo)
+
+	err = info.UpdateToSQL()
+	if err != nil {
+		logger.Get().Errorf("update profile failed: %s", err)
+		return nil, fmt.Errorf("update profile failed: %s", err)
+	}
+
+	m.cache.Add(username, info, time.Now().Add(time.Hour*24))
+	return info, nil
+}
+
+func (m *Model) LogoutUser(username string) {
+	m.cache.Remove(username)
 }

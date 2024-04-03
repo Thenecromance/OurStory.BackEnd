@@ -46,7 +46,7 @@ func (c *core) runServer() {
 	defer c.svr.Close()
 
 	if c.isTls() {
-		logger.Get().Info("ListenAndServeTLS: ", c.option.CertFile, c.option.KeyFile)
+		logger.Get().Info("ListenAndServeTLS: ", c.cfg.Addr)
 		err := c.svr.ListenAndServeTLS(c.option.CertFile, c.option.KeyFile)
 		if err != nil {
 			logger.Get().Error("ListenAndServeTLS error: ", err)
