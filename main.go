@@ -40,6 +40,7 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
+
 	svr := server.New()
 	SQL.Initialize()
 	loadMiddleWare(svr)
