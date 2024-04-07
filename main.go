@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
 	"github.com/Thenecromance/OurStories/backend/Location"
 	"github.com/Thenecromance/OurStories/backend/Travel"
@@ -10,10 +12,11 @@ import (
 	"github.com/Thenecromance/OurStories/base/SQL"
 	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/middleWare/Auth/gJWT"
+	blacklist "github.com/Thenecromance/OurStories/middleWare/BlackList"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
 	"github.com/Thenecromance/OurStories/server"
 	"github.com/gin-contrib/cors"
-	"time"
+	"github.com/gin-gonic/gin"
 )
 
 func loadMiddleWare(svr *server.Server) {
@@ -25,6 +28,10 @@ func loadMiddleWare(svr *server.Server) {
 	svr.PreLoadMiddleWare("cors", cors.New(config))
 	key := Config.GetStringWithDefault("JWT", "AuthKey", "putTheKeyHere")
 	svr.PreLoadMiddleWare("jwt", gJWT.NewMiddleware(gJWT.WithExpireTime(time.Hour*24*15), gJWT.WithKey(key)))
+
+	svr.PreLoadMiddleWare("recovery", gin.Recovery())
+	svr.PreLoadMiddleWare("logger", gin.Logger())
+	svr.PreLoadMiddleWare("blacklist", blacklist.NewMiddleWare())
 	//svr.PreLoadMiddleWare(TLS.TlsHandler(8080))
 }
 
@@ -40,7 +47,9 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
-	svr := server.New()
+	svr := server.New(
+	// server.RunningWithCA("setting/cert.crt", "setting/key.key")
+	)
 	SQL.Initialize()
 	loadMiddleWare(svr)
 	loadController(svr)
