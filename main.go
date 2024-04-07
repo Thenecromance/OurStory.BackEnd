@@ -15,6 +15,7 @@ import (
 	blacklist "github.com/Thenecromance/OurStories/middleWare/BlackList"
 	"github.com/Thenecromance/OurStories/middleWare/Tracer"
 	"github.com/Thenecromance/OurStories/server"
+	"github.com/Thenecromance/OurStories/third_party/amap"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -47,6 +48,9 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
+	amap.TestCase()
+
+	return
 	svr := server.New(
 	// server.RunningWithCA("setting/cert.crt", "setting/key.key")
 	)

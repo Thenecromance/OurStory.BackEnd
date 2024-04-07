@@ -1,7 +1,6 @@
 package Location
 
 import (
-	"github.com/Thenecromance/OurStories/backend/AMapToken"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +27,7 @@ func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
 	c.group = cb(c.Name(), "api")
 }
 func (c *Controller) BuildRoutes() {
-	AMapToken.Instance()
+	// AMapToken.Instance()
 
 	c.group.Router.GET("/ip", c.getLocationByIP)
 }

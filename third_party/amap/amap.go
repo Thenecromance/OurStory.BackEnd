@@ -1,8 +1,11 @@
 package amap
 
 import (
+	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/Thenecromance/OurStories/base/lru"
@@ -20,12 +23,6 @@ type Amap struct {
 
 func (a *Amap) getToken() string {
 	return a.Token
-}
-
-func (a *Amap) GetWeatherByIp(address string) *data.Weather {
-	loc := a.getLocationByIP(address)
-
-	return a.getWeather(loc.Adcode)
 }
 
 func (a *Amap) request(url string) (buffer []byte) {
@@ -54,11 +51,56 @@ func (a *Amap) request(url string) (buffer []byte) {
 	return
 }
 
-func New() *Amap {
-	ptr := &Amap{
-		adcodeCache:  lru.New(0),
-		weatherCache: lru.New(0),
+// so far GetWeatherByIp only support the check the weather by it's Ip address. if want to support use city's name to get the weather
+func (a *Amap) GetWeatherByIp(address string) *data.Weather {
+	// prevent invalid operation before the config setup
+	if !a.allowToUse {
+		logger.Get().Warnf("missing shit config, please setup it then you can use it ")
+		return nil
 	}
 
+	// first get location's adcode , amap only support it's owned ad code
+	loc := a.getLocationByIP(address)
+	if loc == nil {
+		return nil
+	}
+	// then just directly return the weather data
+	return a.getWeather(loc.Adcode)
+}
+
+func New() *Amap {
+	ptr := &Amap{
+		adcodeCache:  lru.New(100),
+		weatherCache: lru.New(100),
+	}
+
+	ptr.initConfig()
+
 	return ptr
+}
+
+func TestCase() {
+	demo := New()
+
+	buildIp := func(slice *[]string, start string) {
+		// "1.2.0."
+		for i := 0; i <= 3; i++ {
+
+			*slice = append(*slice, start+strconv.Itoa(i))
+		}
+	}
+	ipList := make([]string, 0)
+
+	buildIp(&ipList, "1.2.0.")
+	buildIp(&ipList, "1.0.1.")
+	buildIp(&ipList, "1.12.0.")
+	buildIp(&ipList, "1.56.0.")
+	buildIp(&ipList, "1.12.0.")
+
+	for i := 0; i < 100; i++ {
+
+		fmt.Println(demo.GetWeatherByIp(ipList[rand.Intn(len(ipList))]))
+		fmt.Println()
+	}
+
 }

@@ -12,8 +12,9 @@ const (
 )
 
 func (a *Amap) initConfig() {
+	a.allowToUse = false
 	if _, err := os.Stat(file); err != nil {
-		a.allowToUse = true
+
 		logger.Get().Info("seems like you are first time to use this service")
 		a.saveConfig()
 		logger.Get().Infof("a new config file has been write to %s", file)
@@ -21,7 +22,9 @@ func (a *Amap) initConfig() {
 	}
 
 	logger.Get().Debugf("AMap found config file at %s start to load", file)
+	a.loadConfig()
 
+	a.allowToUse = true
 }
 
 func (a *Amap) loadConfig() {

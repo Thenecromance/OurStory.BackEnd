@@ -3,10 +3,10 @@ package Location
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Thenecromance/OurStories/backend/AMapToken"
-	"github.com/Thenecromance/OurStories/base/logger"
 	"io"
 	"net/http"
+
+	"github.com/Thenecromance/OurStories/base/logger"
 )
 
 const (
@@ -39,7 +39,7 @@ func (m *Model) requestFromAMap(ip string) (result Data) {
 		return loc
 	}
 
-	response, err := http.Get(fmt.Sprintf(ipLocationApi, AMapToken.Instance().Amap, ip))
+	response, err := http.Get(fmt.Sprintf(ipLocationApi /* AMapToken.Instance().Amap */, "", ip))
 	if err != nil {
 		logger.Get().Errorf("Ip location Request failed,%s   .... %s", ip, err.Error())
 		return

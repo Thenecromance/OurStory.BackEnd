@@ -14,6 +14,10 @@ type Weather struct {
 	HumidityFloat    string `json:"humidity_float"`
 }
 
+func (w Weather) Copy() *Weather {
+	return &w
+}
+
 // get current weather from AMap
 type WeatherReponse struct {
 	Status   string    `json:"status"`
