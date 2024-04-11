@@ -1,7 +1,7 @@
 package Travel
 
 import (
-	"github.com/Thenecromance/OurStories/backend"
+	response "github.com/Thenecromance/OurStories/backend/Response"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
@@ -48,6 +48,9 @@ func (c *Controller) BuildRoutes() {
 //----------------------------Interface.Controller Implementation--------------------------------
 
 func (c *Controller) addTravel(ctx *gin.Context) {
+	resp := response.New(ctx)
+	defer resp.Send()
+
 	var received ClientData
 
 	err := ctx.ShouldBind(&received)
@@ -67,13 +70,17 @@ func (c *Controller) addTravel(ctx *gin.Context) {
 		return
 	}
 
-	backend.Resp(ctx, "add travel complete!")
+	resp.SetCode(response.SUCCESS).AddData("add travel complete!")
 }
 
 func (c *Controller) removeTravel(ctx *gin.Context) {
+	resp := response.New(ctx)
+	defer resp.Send()
+
 	id := ctx.Query("id")
 	if id == "" {
-		backend.RespErr(ctx, "id is empty")
+		resp.AddData("id is empty")
+		//backend.RespErr(ctx, "id is empty")
 		return
 	}
 
@@ -86,13 +93,12 @@ func (c *Controller) removeTravel(ctx *gin.Context) {
 	err := c.model.RemoveTravel(id)
 	if err != nil {
 		logger.Get().Error(err.Error())
-		backend.RespErr(ctx,
+		resp.AddData(
 			"failed to remove travel",
 		)
 		return
 	}
-
-	backend.Resp(ctx, "success")
+	resp.SetCode(response.SUCCESS).AddData("success")
 }
 
 //1711952398
@@ -111,14 +117,17 @@ func (c *Controller) checkState(item *ClientData) {
 
 }
 func (c *Controller) getTravels(ctx *gin.Context) {
+	resp := response.New(ctx)
+	defer resp.Send()
+
 	usrId := ctx.Query("user")
 	if usrId == "" {
-		backend.RespErr(ctx, "usrId is empty")
+		resp.AddData("usrId is empty")
 		return
 	}
 	iid, err := strconv.Atoi(usrId)
 	if err != nil {
-		backend.RespErr(ctx, "usrId is not a number")
+		resp.AddData("usrId is not a number")
 		return
 
 	}
@@ -130,14 +139,16 @@ func (c *Controller) getTravels(ctx *gin.Context) {
 
 	if err != nil {
 		logger.Get().Error(err.Error())
-		backend.RespErr(ctx, "failed to get travel")
+		resp.AddData("failed to get travel")
 		return
 	}
-	backend.RespWithCount(ctx, data, len(data))
+	resp.AddData(data)
 }
 
 func (c *Controller) updateTravel(ctx *gin.Context) {
-	backend.ResponseUnImplemented(ctx)
+	resp := response.New(ctx)
+	defer resp.Send()
+
 	//data := UpdateData{}
 	//
 	//err := ctx.ShouldBind(&data)

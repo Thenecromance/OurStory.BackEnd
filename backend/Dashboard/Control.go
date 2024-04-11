@@ -1,8 +1,8 @@
 package Dashboard
 
 import (
-	"github.com/Thenecromance/OurStories/backend"
 	"github.com/Thenecromance/OurStories/backend/Location"
+	response "github.com/Thenecromance/OurStories/backend/Response"
 	"github.com/Thenecromance/OurStories/backend/Weather"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
@@ -54,9 +54,14 @@ func (c *Controller) getTitle(ctx *gin.Context) {
 }
 
 func (c *Controller) getTopCard(ctx *gin.Context) {
+	resp := response.New(ctx)
+	defer resp.Send()
+
 	var cardsInfo []topCardItem
 	cardsInfo = append(cardsInfo, c.getLocationWeather(ctx.ClientIP()))
-	backend.Resp(ctx, cardsInfo)
+	//backend.Resp(ctx, cardsInfo)
+	resp.SetCode(response.SUCCESS).AddData(cardsInfo)
+
 }
 
 // getLocationWeather get the location and weather info
@@ -86,5 +91,8 @@ func (c *Controller) getLocationWeather(ip string) (item topCardItem) {
 }
 
 func (c *Controller) getSideNavBar(ctx *gin.Context) {
-	backend.Resp(ctx, c.sNav.Navs)
+	//backend.Resp(ctx, c.sNav.Navs)
+	resp := response.New(ctx)
+	defer resp.Send()
+	resp.SetCode(response.SUCCESS).AddData(c.sNav.Navs)
 }

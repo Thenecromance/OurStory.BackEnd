@@ -2,6 +2,7 @@ package amap
 
 import (
 	"fmt"
+	"github.com/Thenecromance/OurStories/backend/third_party/amap/data"
 	"io"
 	"math/rand"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/Thenecromance/OurStories/base/lru"
-	"github.com/Thenecromance/OurStories/third_party/amap/data"
 )
 
 type Amap struct {
@@ -32,9 +32,10 @@ func (a *Amap) request(url string) (buffer []byte) {
 		logger.Get().Errorf("failed to request url : %s \nerror: %s", url, err.Error())
 		return
 	}
-	if resp != nil {
-		defer resp.Body.Close()
+	if resp == nil {
+		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		logger.Get().Errorf("target server don't want to answer you with status code:%d", resp.StatusCode)
