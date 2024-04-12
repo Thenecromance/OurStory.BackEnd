@@ -8,7 +8,6 @@ import (
 	"github.com/Thenecromance/OurStories/backend/Travel"
 	"github.com/Thenecromance/OurStories/backend/User"
 	"github.com/Thenecromance/OurStories/backend/api"
-	"github.com/Thenecromance/OurStories/base/SQL"
 	Config "github.com/Thenecromance/OurStories/base/config"
 	"github.com/Thenecromance/OurStories/middleWare/Auth/gJWT"
 	blacklist "github.com/Thenecromance/OurStories/middleWare/BlackList"
@@ -44,13 +43,10 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
-	anniversary.Test()
-	return
 
 	svr := server.New(
 		// server.RunningWithCA("setting/cert.crt", "setting/key.key")
 	)
-	SQL.Initialize()
 	loadMiddleWare(svr)
 	loadController(svr)
 	svr.Run()

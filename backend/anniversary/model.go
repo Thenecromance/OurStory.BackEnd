@@ -31,8 +31,12 @@ type model struct {
 }
 
 func (m *model) init() {
+	logger.Get().Info("start to init anniversary model")
+
 	m.handler = SQL.Default()
 	data.Anniversary{}.SetupTable(m.handler)
+
+	logger.Get().Info("init anniversary model success")
 }
 func (m *model) GetAnniversaryList() (result []ResponseAnniversary) {
 	anniversarys, err := m.handler.Select(data.Anniversary{}, "select * from anniversary")
@@ -52,18 +56,18 @@ func (m *model) GetAnniversaryList() (result []ResponseAnniversary) {
 
 func newModel() *model {
 	m := &model{}
+	m.init()
 	return m
 }
 
 func Test() {
 	a := ResponseAnniversary{
 		Anniversary: data.Anniversary{
-			Year:  2021,
-			Month: 1,
-			Day:   1,
+			Year:  1995,
+			Month: 8,
+			Day:   17,
 		},
 	}
 	a.calculate()
 	logger.Get().Infof("total spend: %d %d", a.TotalSpend, a.TimeToNext)
-
 }

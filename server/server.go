@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
@@ -48,5 +49,6 @@ func New(opts ...Option) *Server {
 		core: newCore(opts...),
 		gin:  newGinControl(),
 	}
+	SQL.Initialize()
 	return s
 }

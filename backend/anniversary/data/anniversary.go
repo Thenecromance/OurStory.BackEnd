@@ -17,7 +17,7 @@ type Anniversary struct {
 
 func (a Anniversary) SetupTable(db *gorp.DbMap) {
 	logger.Get().Info("start to binding anniversary with table travel")
-	tbl := db.AddTableWithName(a, "travel")
+	tbl := db.AddTableWithName(a, "anniversary")
 	tbl.SetKeys(false, "Id") // using snowflake to generate the id
 	tbl.ColMap("Id").SetNotNull(true)
 	tbl.ColMap("Owner").SetNotNull(true)
