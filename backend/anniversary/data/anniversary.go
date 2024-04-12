@@ -6,13 +6,11 @@ import (
 )
 
 type Anniversary struct {
-	Id    string `json:"id" db:"id"`
-	Owner string `json:"owner" db:"owner"`
-	Year  int    `json:"year" db:"year"`
-	Month int    `json:"month" db:"month"`
-	Day   int    `json:"day" db:"day"`
-	Title string `json:"title" db:"title"`
-	Info  string `json:"info" db:"info"`
+	Id        string `json:"id" db:"id"`
+	Owner     string `json:"owner" db:"owner"`
+	TimeStamp int64  `json:"time_stamp" db:"time_stamp"`
+	Title     string `json:"title" db:"title"`
+	Info      string `json:"info" db:"info"`
 }
 
 func (a Anniversary) SetupTable(db *gorp.DbMap) {
@@ -21,9 +19,7 @@ func (a Anniversary) SetupTable(db *gorp.DbMap) {
 	tbl.SetKeys(false, "Id") // using snowflake to generate the id
 	tbl.ColMap("Id").SetNotNull(true)
 	tbl.ColMap("Owner").SetNotNull(true)
-	tbl.ColMap("Year").SetNotNull(true)
-	tbl.ColMap("Month").SetNotNull(true)
-	tbl.ColMap("Day").SetNotNull(true)
+	tbl.ColMap("TimeStamp").SetNotNull(true)
 	tbl.ColMap("Title").SetNotNull(true)
 	tbl.ColMap("Info").SetNotNull(true)
 

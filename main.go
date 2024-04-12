@@ -43,7 +43,6 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
-
 	svr := server.New(
 		// server.RunningWithCA("setting/cert.crt", "setting/key.key")
 	)
@@ -52,3 +51,6 @@ func main() {
 	svr.Run()
 
 }
+
+//1625500800
+//834681600

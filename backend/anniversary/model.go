@@ -4,6 +4,7 @@ import (
 	"github.com/Thenecromance/OurStories/backend/anniversary/data"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/logger"
+	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gorp.v2"
 	"time"
 )
@@ -15,15 +16,17 @@ type ResponseAnniversary struct {
 }
 
 func (r *ResponseAnniversary) calculate() {
-	start := time.Date(r.Year, time.Month(r.Month), r.Day, 0, 0, 0, 0, time.Local)
+	start := time.Unix(r.TimeStamp, 0)
 	now := time.Now()
 	r.TotalSpend = int(now.Sub(start).Hours() / 24)
 
-	next := time.Date(now.Year(), time.Month(r.Month), r.Day, 0, 0, 0, 0, time.Local)
+	_, month, day := start.Date()
+	next := time.Date(now.Year(), month, day, 0, 0, 0, 0, time.Local)
 	if next.Before(now) {
 		next = next.AddDate(1, 0, 0)
 	}
 	r.TimeToNext = int(next.Sub(now).Hours() / 24)
+
 }
 
 type model struct {
@@ -47,11 +50,22 @@ func (m *model) GetAnniversaryList() (result []ResponseAnniversary) {
 
 	result = make([]ResponseAnniversary, 0, len(objects))
 	for _, v := range objects {
-		ani := ResponseAnniversary{Anniversary: v.(data.Anniversary)}
+		vv, _ := v.(*data.Anniversary)
+		ani := ResponseAnniversary{Anniversary: *vv}
 		ani.calculate()
 		result = append(result, ani)
 	}
 	return
+}
+
+func (m *model) AddAnniversary(ani data.Anniversary) error {
+	ani.Id = uuid.NewV4().String()
+	err := m.handler.Insert(&ani)
+	if err != nil {
+		logger.Get().Errorf("failed to insert anniversary with error: %s", err.Error())
+		return err
+	}
+	return nil
 }
 
 func newModel() *model {
@@ -61,11 +75,11 @@ func newModel() *model {
 }
 
 func Test() {
+	stamp := time.Date(1995, 8, 17, 0, 0, 0, 0, time.Local).Unix()
 	a := ResponseAnniversary{
 		Anniversary: data.Anniversary{
-			Year:  1995,
-			Month: 8,
-			Day:   17,
+			Title:     "birthday",
+			TimeStamp: stamp,
 		},
 	}
 	a.calculate()
