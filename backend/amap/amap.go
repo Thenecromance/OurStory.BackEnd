@@ -2,7 +2,7 @@ package amap
 
 import (
 	"fmt"
-	"github.com/Thenecromance/OurStories/backend/third_party/amap/data"
+	"github.com/Thenecromance/OurStories/backend/amap/data"
 	"io"
 	"math/rand"
 	"net/http"

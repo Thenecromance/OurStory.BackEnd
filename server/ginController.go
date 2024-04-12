@@ -31,7 +31,10 @@ type ginControl struct {
 func (g *ginControl) applyShadow(shadow *ginControl) {
 
 	for key, value := range shadow.GroupMap {
-		logger.Get().Info("apply shadow to ", key)
+		logger.Get().Infof("apply config to [%s]", key)
+		if g.GroupMap[key] == nil {
+			logger.Get().Errorf("create new node [%s]", key)
+		}
 		g.GroupMap[key].Parent = value.Parent
 		g.GroupMap[key].MiddleWare = value.MiddleWare
 	}

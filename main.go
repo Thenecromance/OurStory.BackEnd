@@ -32,7 +32,6 @@ func loadMiddleWare(svr *server.Server) {
 	svr.PreLoadMiddleWare("recovery", gin.Recovery())
 	svr.PreLoadMiddleWare("logger", gin.Logger())
 	svr.PreLoadMiddleWare("blacklist", blacklist.NewMiddleWare())
-	//svr.PreLoadMiddleWare(TLS.TlsHandler(8080))
 }
 
 func loadController(svr *server.Server) {

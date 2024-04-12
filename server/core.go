@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/Thenecromance/OurStories/base/fileWatcher"
 	"github.com/Thenecromance/OurStories/base/logger"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"log"
@@ -43,6 +44,7 @@ func (c *core) initServer(handler http.Handler) {
 
 // runServer starts the server
 func (c *core) runServer() {
+	defer fileWatcher.Close()
 	defer c.svr.Close()
 
 	if c.isTls() {

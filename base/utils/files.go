@@ -1,6 +1,9 @@
 package utils
 
-import "os"
+import (
+	"encoding/json"
+	"os"
+)
 
 func FileExists(path string) bool {
 	_, err := os.Stat(path)
@@ -24,4 +27,29 @@ func CreateIfNotExist(path string) error {
 		file.Close()
 	}
 	return nil
+}
+
+func SaveJson(path string, data interface{}) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	err = encoder.Encode(data)
+
+	return err
+}
+func LoadJson(path string, data interface{}) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(data)
+	return err
 }

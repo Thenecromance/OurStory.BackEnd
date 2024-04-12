@@ -3,7 +3,7 @@ package amap
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Thenecromance/OurStories/backend/third_party/amap/data"
+	"github.com/Thenecromance/OurStories/backend/amap/data"
 	"time"
 
 	"github.com/Thenecromance/OurStories/base/logger"
