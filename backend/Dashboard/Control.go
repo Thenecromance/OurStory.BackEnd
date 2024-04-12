@@ -41,8 +41,6 @@ func (c *Controller) BuildRoutes() {
 func (c *Controller) getNavBar(ctx *gin.Context) {
 	resp := response.New(ctx)
 	defer resp.Send()
-
 	resp.AddData(c.snbModel.Items(0)).SetCode(response.SUCCESS)
-
 	return
 }

@@ -33,7 +33,8 @@ func (g *ginControl) applyShadow(shadow *ginControl) {
 	for key, value := range shadow.GroupMap {
 		logger.Get().Infof("apply config to [%s]", key)
 		if g.GroupMap[key] == nil {
-			logger.Get().Errorf("create new node [%s]", key)
+			logger.Get().Errorf("node [%s] not exists", key)
+			continue
 		}
 		g.GroupMap[key].Parent = value.Parent
 		g.GroupMap[key].MiddleWare = value.MiddleWare

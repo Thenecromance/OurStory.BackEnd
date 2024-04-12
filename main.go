@@ -1,13 +1,12 @@
 package main
 
 import (
+	"github.com/Thenecromance/OurStories/backend/anniversary"
 	"time"
 
 	"github.com/Thenecromance/OurStories/backend/Dashboard"
-	"github.com/Thenecromance/OurStories/backend/Location"
 	"github.com/Thenecromance/OurStories/backend/Travel"
 	"github.com/Thenecromance/OurStories/backend/User"
-	"github.com/Thenecromance/OurStories/backend/Weather"
 	"github.com/Thenecromance/OurStories/backend/api"
 	"github.com/Thenecromance/OurStories/base/SQL"
 	Config "github.com/Thenecromance/OurStories/base/config"
@@ -39,13 +38,14 @@ func loadController(svr *server.Server) {
 		api.NewController(),
 		Dashboard.NewController(),
 		User.NewController(),
-		Location.NewController(),
-		Weather.NewController(),
 		Travel.NewController(),
+		anniversary.NewController(),
 	)
 }
 
 func main() {
+	anniversary.Test()
+	return
 
 	svr := server.New(
 		// server.RunningWithCA("setting/cert.crt", "setting/key.key")

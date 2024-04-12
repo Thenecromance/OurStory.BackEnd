@@ -74,7 +74,6 @@ func New() *Amap {
 		adcodeCache:  lru.New(100),
 		weatherCache: lru.New(100),
 	}
-
 	ptr.initConfig()
 
 	return ptr
