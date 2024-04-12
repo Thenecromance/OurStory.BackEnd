@@ -39,14 +39,14 @@ func (m *model) init() {
 	logger.Get().Info("init anniversary model success")
 }
 func (m *model) GetAnniversaryList() (result []ResponseAnniversary) {
-	anniversarys, err := m.handler.Select(data.Anniversary{}, "select * from anniversary")
+	objects, err := m.handler.Select(data.Anniversary{}, "select * from anniversary")
 	if err != nil {
 		logger.Get().Errorf("failed to get anniversary list with error: %s", err.Error())
 		return nil
 	}
 
-	result = make([]ResponseAnniversary, 0, len(anniversarys))
-	for _, v := range anniversarys {
+	result = make([]ResponseAnniversary, 0, len(objects))
+	for _, v := range objects {
 		ani := ResponseAnniversary{Anniversary: v.(data.Anniversary)}
 		ani.calculate()
 		result = append(result, ani)
