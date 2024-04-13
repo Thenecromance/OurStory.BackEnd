@@ -21,12 +21,10 @@ func loadMiddleWare(svr *server.Server) {
 	svr.PreLoadMiddleWare("tracer", Tracer.MiddleWare())
 
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true // 允许所有来源
-	//config.AllowOrigins = []string{"*"}
-	svr.PreLoadMiddleWare("cors", cors.New(config))
+	config.AllowAllOrigins = true
+	svr.PreLoadMiddleWare("cors", cors.New(config)) // support all origins
 	key := Config.GetStringWithDefault("JWT", "AuthKey", "putTheKeyHere")
 	svr.PreLoadMiddleWare("jwt", gJWT.NewMiddleware(gJWT.WithExpireTime(time.Hour*24*15), gJWT.WithKey(key)))
-
 	svr.PreLoadMiddleWare("recovery", gin.Recovery())
 	svr.PreLoadMiddleWare("logger", gin.Logger())
 	svr.PreLoadMiddleWare("blacklist", blacklist.NewMiddleWare())
@@ -49,7 +47,6 @@ func main() {
 	loadMiddleWare(svr)
 	loadController(svr)
 	svr.Run()
-
 }
 
 //1625500800
