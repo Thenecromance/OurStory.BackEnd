@@ -2,7 +2,7 @@ package Unit
 
 import (
 	"fmt"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"regexp"
 	"strings"
 )
@@ -36,7 +36,7 @@ func (u *Unit) appendArgs(args []any) {
 		return
 	}
 	if len(args) > u.argsCount {
-		logger.Get().Error("args count not match")
+		log.Error("args count not match")
 		return
 	}
 	// < u.argsCount
@@ -46,7 +46,7 @@ func (u *Unit) appendArgs(args []any) {
 func (u *Unit) SetArgs(idx int, args []any) {
 	// check the index is valid
 	if idx < u.index {
-		logger.Get().Errorf("index out of range current index is %d, but the index is %d", u.index, idx)
+		log.Errorf("index out of range current index is %d, but the index is %d", u.index, idx)
 		return
 	}
 	// if the index is equal to the current index, set the args
@@ -57,7 +57,7 @@ func (u *Unit) SetArgs(idx int, args []any) {
 	if u.next != nil {
 		u.next.SetArgs(idx, args)
 	} else {
-		logger.Get().Errorf("index out of range, the max index is %d, but the index is %d", u.index, idx)
+		log.Errorf("index out of range, the max index is %d, but the index is %d", u.index, idx)
 	}
 }
 
@@ -110,7 +110,7 @@ func (u *Unit) Command() string {
 		u.createPlacholder()
 		argCount := len(u.args)
 		if argCount%u.count != 0 {
-			logger.Get().Errorf("args count not match, the args count is %d, but the mask count is %d", argCount, u.count)
+			log.Errorf("args count not match, the args count is %d, but the mask count is %d", argCount, u.count)
 			panic("args count not match")
 			return u.command
 		}
@@ -123,11 +123,11 @@ func (u *Unit) Command() string {
 
 func (u *Unit) Args() []any {
 	if u.argsCount == Infinity && len(u.args) == 0 {
-		logger.Get().Error("args count is dynamic, but args is empty")
+		log.Error("args count is dynamic, but args is empty")
 		return nil
 	}
 	if u.argsCount > 0 && len(u.args) != u.argsCount {
-		logger.Get().Errorf("args count not match %d %d", u.argsCount, len(u.args))
+		log.Errorf("args count not match %d %d", u.argsCount, len(u.args))
 		return nil
 	}
 	return u.args

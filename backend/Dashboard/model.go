@@ -2,7 +2,7 @@ package Dashboard
 
 import (
 	Config "github.com/Thenecromance/OurStories/base/config"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 )
 
 type DynamicResource struct {
@@ -11,11 +11,11 @@ type DynamicResource struct {
 
 func (d *DynamicResource) load() {
 	if err := Config.MapSection("Argon", d); err != nil {
-		logger.Get().Errorf("%s faile to map section. ERROR:%s", "Tokens", err)
+		log.Errorf("%s faile to map section. ERROR:%s", "Tokens", err)
 		return
 	}
 	if err := Config.ReflectFrom("Argon", d); err != nil {
-		logger.Get().Errorf("%s faile to reflect section. ERROR:%s", "Tokens", err)
+		log.Errorf("%s faile to reflect section. ERROR:%s", "Tokens", err)
 		return
 	}
 }

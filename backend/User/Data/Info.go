@@ -3,7 +3,7 @@ package Data
 import (
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/hash"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"sync"
 	"time"
 )
@@ -23,7 +23,7 @@ func BindInfoTable() {
 		tbl.SetKeys(true, "Id")
 		err := SQL.Default().CreateTablesIfNotExists()
 		if err != nil {
-			logger.Get().Error("Create table user failed: ", err)
+			log.Error("Create table user failed: ", err)
 			return
 		}
 	})

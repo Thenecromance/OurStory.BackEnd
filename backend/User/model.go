@@ -5,7 +5,7 @@ import (
 	"github.com/Thenecromance/OurStories/backend/User/Data"
 	"github.com/Thenecromance/OurStories/backend/User/Validator"
 	"github.com/Thenecromance/OurStories/backend/User/creator"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"github.com/Thenecromance/OurStories/base/lru"
 	"time"
 )
@@ -98,14 +98,14 @@ func (m *Model) UpdateProfile(username string, newInfo *Data.CommonInfo) (*Data.
 	info, err := m.Profile(username)
 
 	if err != nil {
-		logger.Get().Errorf("update profile failed: %s", err)
+		log.Errorf("update profile failed: %s", err)
 		return nil, err
 	}
 	info.ApplyNewInfo(newInfo)
 
 	err = info.UpdateToSQL()
 	if err != nil {
-		logger.Get().Errorf("update profile failed: %s", err)
+		log.Errorf("update profile failed: %s", err)
 		return nil, fmt.Errorf("update profile failed: %s", err)
 	}
 

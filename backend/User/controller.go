@@ -3,7 +3,7 @@ package User
 import (
 	response "github.com/Thenecromance/OurStories/backend/Response"
 	"github.com/Thenecromance/OurStories/backend/User/Data"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -95,7 +95,7 @@ func (c *Controller) login(ctx *gin.Context) {
 		resp.SetCode(http.StatusInternalServerError).AddData(err.Error())
 		return
 	}
-	logger.Get().Infof("Signed token for user %s with token %s", info.UserName, token)
+	log.Infof("Signed token for user %s with token %s", info.UserName, token)
 }
 
 func (c *Controller) register(ctx *gin.Context) {
@@ -130,7 +130,7 @@ func (c *Controller) register(ctx *gin.Context) {
 		return
 	}
 
-	logger.Get().Infof("Signed token for user %s with token %s", userReg.UserName, token)
+	log.Infof("Signed token for user %s with token %s", userReg.UserName, token)
 }
 
 func (c *Controller) profile(ctx *gin.Context) {

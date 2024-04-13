@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Thenecromance/OurStories/base/SQL/Unit"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gorp.v2"
 )
@@ -35,9 +35,9 @@ func (s *SQL) getSafeHandler(db string) *gorp.DbMap {
 		return conn
 	}
 
-	logger.Get().Infof("could not find connection to [%s] prepare to create a new database", db)
+	log.Infof("could not find connection to [%s] prepare to create a new database", db)
 	if err := s.createDatabase(db); err != nil {
-		logger.Get().Errorf("could not create database [%s], Error:%s", db, err)
+		log.Errorf("could not create database [%s], Error:%s", db, err)
 		return nil
 	}
 
@@ -55,11 +55,11 @@ func (s *SQL) init() {
 func (s *SQL) connectTo(db string) *sql.DB {
 	handler, err := sql.Open(s.SqlType, s.connectStr(db))
 	if err != nil {
-		logger.Get().Errorf("failed to create handler to [%s] with error:%s", db, err)
+		log.Errorf("failed to create handler to [%s] with error:%s", db, err)
 		return nil
 	}
 	if err := handler.Ping(); err != nil {
-		logger.Get().Errorf("failed to ping handler to [%s] with error:%s", db, err)
+		log.Errorf("failed to ping handler to [%s] with error:%s", db, err)
 		return nil
 	}
 	return handler
@@ -78,12 +78,12 @@ func (s *SQL) initAllConnection() {
 			continue
 		}
 		if dbName == s.DefaultDb {
-			logger.Get().Infof("skip default db [%s] could not create self!!!", dbName)
+			log.Infof("skip default db [%s] could not create self!!!", dbName)
 			continue
 		}
 		if s.createDatabase(dbName) == nil {
 			s.handlerPool[dbName] = s.initGorpDb(dbName)
-			logger.Get().Infof("[%s] handler coneected!", dbName)
+			log.Infof("[%s] handler coneected!", dbName)
 		}
 	}
 
@@ -92,7 +92,7 @@ func (s *SQL) createDatabase(db string) error {
 	if s.defaultHandler == nil {
 		return errors.New("default handler is nil")
 	}
-	logger.Get().Debugf("start to create database [%s] ...", db)
+	log.Debugf("start to create database [%s] ...", db)
 	script := "CREATE DATABASE  IF NOT EXISTS %s  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 	unit := Unit.New(fmt.Sprintf(script, db))
 	exec, err := s.defaultHandler.Exec(unit.Command())
@@ -102,7 +102,7 @@ func (s *SQL) createDatabase(db string) error {
 	id, _ := exec.LastInsertId()
 	affected, _ := exec.RowsAffected()
 
-	logger.Get().Debugf("[%s] create success! LastInsertId:%d, RowsAffected:%d", db, id, affected)
+	log.Debugf("[%s] create success! LastInsertId:%d, RowsAffected:%d", db, id, affected)
 	return nil
 }
 
@@ -113,7 +113,7 @@ func (s *SQL) initGorpDb(dbName string) *gorp.DbMap {
 
 	db, err := sql.Open(s.SqlType, s.connectStr(dbName))
 	if err != nil {
-		logger.Get().Errorf("sql.Open failed: %s", err)
+		log.Errorf("sql.Open failed: %s", err)
 	}
 	// construct a gorp DbMap
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{
@@ -121,7 +121,7 @@ func (s *SQL) initGorpDb(dbName string) *gorp.DbMap {
 		Encoding: "utf8mb4",
 	}}
 
-	// dbmap.TraceOn("[gorp]", m.logger)
+	// dbmap.TraceOn("[gorp]", m.log)
 	return dbmap
 }
 

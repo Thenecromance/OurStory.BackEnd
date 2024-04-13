@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/backend/amap/data"
 	"time"
-
-	"github.com/Thenecromance/OurStories/base/logger"
 )
 
 const (
@@ -16,7 +14,7 @@ const (
 func (a *Amap) getWeather(adcode string) (result *data.Weather) {
 	// prevent invalid operation before the config setup
 	if !a.allowToUse {
-		logger.Get().Warnf("missing shit config, please setup it then you can use it ")
+		log.Warnf("missing shit config, please setup it then you can use it ")
 		return
 	}
 
@@ -27,23 +25,23 @@ func (a *Amap) getWeather(adcode string) (result *data.Weather) {
 	}
 
 	requestUri := fmt.Sprintf(weatherApi, adcode, a.getToken())
-	logger.Get().Debugf("start to request %s", requestUri)
+	log.Debugf("start to request %s", requestUri)
 	buffer := a.request(requestUri)
 	if buffer == nil {
-		logger.Get().Error("weather reuest failed")
+		log.Error("weather reuest failed")
 		return
 	}
 
 	resp := &data.WeatherReponse{}
 	if err := json.Unmarshal(buffer, resp); err != nil {
-		logger.Get().Errorf("fail to parse response ,%s", err)
+		log.Errorf("fail to parse response ,%s", err)
 		return
 	}
 
-	logger.Get().Debugf("%s \n response : %s", requestUri, string(buffer))
+	log.Debugf("%s \n response : %s", requestUri, string(buffer))
 
 	if resp.Status != "1" {
-		logger.Get().Error("fail to get the result ")
+		log.Error("fail to get the result ")
 		return
 	}
 

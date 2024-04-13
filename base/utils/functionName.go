@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/Thenecromance/OurStories/base/logger"
 	"reflect"
 	"runtime"
 	"strings"
@@ -43,7 +42,6 @@ func GetFunctionName(fn interface{} /*, seps ...rune*/) string {
 func GetPackageName(fn interface{}) string {
 
 	fullName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
-	logger.Get().Info(fullName)
 	parts := strings.Split(fullName, ".")
 	fullPath := parts[len(parts)-2]
 	parts = strings.Split(fullPath, "/")

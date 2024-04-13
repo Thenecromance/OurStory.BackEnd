@@ -3,7 +3,7 @@ package Config
 import (
 	"errors"
 	"fmt"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 
 	"gopkg.in/ini.v1"
 	"reflect"
@@ -44,12 +44,12 @@ func String2Bytes(s string) []byte {
 func LoadToObject(section string, obj interface{}) error {
 	//try to load the default config
 	if err := MapSection(section, obj); err != nil {
-		logger.Get().Errorf("%s faile to load. ERROR:%s", section, err)
+		log.Errorf("%s faile to load. ERROR:%s", section, err)
 		return errors.New("ini has no section")
 	}
 	// save the default config to file
 	if err := ReflectFrom(section, obj); err != nil {
-		logger.Get().Errorf("%s faile to save. ERROR:%s", section, err)
+		log.Errorf("%s faile to save. ERROR:%s", section, err)
 		return errors.New("faile to save section")
 	}
 	return nil
@@ -60,7 +60,7 @@ func AppendSection(section string, format string, args ...interface{}) error {
 		return nil
 	}
 	format = fmt.Sprintf(format, args...)
-	logger.Get().Debug("AppendSection: %s", format)
+	log.Debug("AppendSection: %s", format)
 	return defaultCfg.Append(String2Bytes(format))
 }
 

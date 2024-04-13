@@ -26,7 +26,7 @@ func loadMiddleWare(svr *server.Server) {
 	key := Config.GetStringWithDefault("JWT", "AuthKey", "putTheKeyHere")
 	svr.PreLoadMiddleWare("jwt", gJWT.NewMiddleware(gJWT.WithExpireTime(time.Hour*24*15), gJWT.WithKey(key)))
 	svr.PreLoadMiddleWare("recovery", gin.Recovery())
-	svr.PreLoadMiddleWare("logger", gin.Logger())
+	svr.PreLoadMiddleWare("log", gin.Logger())
 	svr.PreLoadMiddleWare("blacklist", blacklist.NewMiddleWare())
 }
 
@@ -41,6 +41,7 @@ func loadController(svr *server.Server) {
 }
 
 func main() {
+
 	svr := server.New(
 		// server.RunningWithCA("setting/cert.crt", "setting/key.key")
 	)

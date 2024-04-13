@@ -1,7 +1,7 @@
 package gJWT
 
 import (
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -126,7 +126,7 @@ func NewMiddleware(opts ...Option) gin.HandlerFunc {
 		if err != nil {
 			UnauthorizedResponse(ctx)
 		}
-		logger.Get().Debug("auth success")
+		log.Debug("auth success")
 		ctx.Next()
 	}
 }

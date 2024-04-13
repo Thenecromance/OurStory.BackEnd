@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	Config "github.com/Thenecromance/OurStories/base/config"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -31,9 +31,9 @@ type ginControl struct {
 func (g *ginControl) applyShadow(shadow *ginControl) {
 
 	for key, value := range shadow.GroupMap {
-		logger.Get().Infof("apply config to [%s]", key)
+		log.Infof("apply config to [%s]", key)
 		if g.GroupMap[key] == nil {
-			logger.Get().Errorf("node [%s] not exists", key)
+			log.Errorf("node [%s] not exists", key)
 			continue
 		}
 		g.GroupMap[key].Parent = value.Parent
@@ -52,7 +52,7 @@ func (g *ginControl) LoadConfig() {
 	_, err := os.Stat("setting/ginConfig.json")
 	if err != nil {
 		g.Save()
-		logger.Get().Error("config not exists ", err)
+		log.Error("config not exists ", err)
 		return
 	}
 	raw, err := os.ReadFile("setting/ginConfig.json")
@@ -64,7 +64,7 @@ func (g *ginControl) LoadConfig() {
 
 	err = json.Unmarshal(raw, shadow)
 	if err != nil {
-		logger.Get().Error("LoadConfig error: ", err)
+		log.Error("LoadConfig error: ", err)
 		return
 	}
 	g.applyShadow(shadow)
@@ -74,12 +74,12 @@ func (g *ginControl) Save() {
 
 	bytes, err := json.MarshalIndent(g, "", "    ")
 	if err != nil {
-		logger.Get().Error("Save error: ", err)
+		log.Error("Save error: ", err)
 		return
 	}
 	err = os.WriteFile("setting/ginConfig.json", bytes, 0644)
 	if err != nil {
-		logger.Get().Error("Save error: ", err)
+		log.Error("Save error: ", err)
 		return
 	}
 }
@@ -101,14 +101,14 @@ func (g *ginControl) findParentNode(path string) *Interface.GroupNode {
 	if g.GroupMap[path].Router == nil {
 		parent := g.findParentNode(g.GroupMap[path].Parent) //recursively find the parent node
 
-		//logger.Get().Debug("Start to build node : ", path, " with parent node : ", parent.Router.BasePath())
+		//log.Debug("Start to build node : ", path, " with parent node : ", parent.Router.BasePath())
 
 		curNode := g.GroupMap[path]
 		curNode.Router = parent.Router.Group(path)
-		logger.Get().Info("create group: ", curNode.Router.BasePath())
+		log.Info("create group: ", curNode.Router.BasePath())
 		if curNode.MiddleWare != nil {
 			for _, mwName := range g.GroupMap[path].MiddleWare {
-				logger.Get().Info("Add middleware to [", path, "] middleware name: ", mwName)
+				log.Info("Add middleware to [", path, "] middleware name: ", mwName)
 				g.GroupMap[path].Router.Use(g.MiddleWarePool[mwName])
 			}
 		}
@@ -120,10 +120,10 @@ func (g *ginControl) findParentNode(path string) *Interface.GroupNode {
 // after this,all group's should be initialized
 func (g *ginControl) initializeRouterGroups() {
 	{
-		logger.Get().Debug("Start to build root node")
+		log.Debug("Start to build root node")
 		g.GroupMap["/"].Router = g.root.Group("/")
 		for _, mwName := range g.GroupMap["/"].MiddleWare {
-			logger.Get().Info("Add middleware to [", "/", "] middleware name: ", mwName)
+			log.Info("Add middleware to [", "/", "] middleware name: ", mwName)
 			g.GroupMap["/"].Router.Use(g.MiddleWarePool[mwName])
 		}
 	}
@@ -135,7 +135,7 @@ func (g *ginControl) initializeRouterGroups() {
 		if g.GroupMap[path].Router != nil {
 			continue
 		} else {
-			//logger.Get().Debug("Start to build node: ", path)
+			//log.Debug("Start to build node: ", path)
 			g.findParentNode(path)
 
 		}
@@ -164,7 +164,7 @@ func (g *ginControl) initialize() {
 
 	if g.Redirect != nil && len(g.Redirect) != 0 {
 		for _, redirect := range g.Redirect {
-			logger.Get().Infof("redirect path %s to index.html", redirect)
+			log.Infof("redirect path %s to index.html", redirect)
 			g.root.GET(redirect, func(c *gin.Context) {
 				c.HTML(200, "index.html", gin.H{})
 			})

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/xuri/excelize/v2"
 	"io"
 	"net/http"
@@ -28,24 +27,24 @@ func writeToFile(codeList []Code) {
 	if os.IsNotExist(err) {
 		err := os.Mkdir("setting", os.ModePerm)
 		if err != nil {
-			logger.Get().Errorf("fail to create setting dir .... %s", err.Error())
+			log.Errorf("fail to create setting dir .... %s", err.Error())
 			return
 		}
 	}
 
 	file, err := os.Create("setting/cityCode.json")
 	if err != nil {
-		logger.Get().Errorf("fail to create cityCode.json .... %s", err.Error())
+		log.Errorf("fail to create cityCode.json .... %s", err.Error())
 		return
 	}
 	marshal, err := json.Marshal(codeList[2:]) // for skip the first two line of the excel file. first line is the title, second line is the China country code
 	if err != nil {
-		logger.Get().Errorf("fail to Marshal City code .... %s", err.Error())
+		log.Errorf("fail to Marshal City code .... %s", err.Error())
 		return
 	}
 	_, err = file.Write(marshal)
 	if err != nil {
-		logger.Get().Errorf("fail to Write City code .... %s", err.Error())
+		log.Errorf("fail to Write City code .... %s", err.Error())
 		return
 	}
 }
@@ -54,7 +53,7 @@ func requestCityCodeUpdate() []byte {
 
 	response, err := http.Get(downloadUrl)
 	if err != nil {
-		logger.Get().Errorf("fail to Request City code .... %s", err.Error())
+		log.Errorf("fail to Request City code .... %s", err.Error())
 		return nil
 	}
 	fmt.Println(response.StatusCode)
@@ -62,7 +61,7 @@ func requestCityCodeUpdate() []byte {
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		logger.Get().Errorf("fail to Read City code .... %s", err.Error())
+		log.Errorf("fail to Read City code .... %s", err.Error())
 		return nil
 	}
 	return body
@@ -71,7 +70,7 @@ func requestCityCodeUpdate() []byte {
 func ReadExcel(xlsxStream io.ReadCloser) (codeList []Code) {
 	f, err := excelize.OpenReader(xlsxStream)
 	if err != nil {
-		logger.Get().Errorf("fail to Xml Read City code .... %s", err.Error())
+		log.Errorf("fail to Xml Read City code .... %s", err.Error())
 		return
 	}
 	rows, err := f.GetRows("Sheet1")
@@ -104,7 +103,7 @@ func ReadExcel(xlsxStream io.ReadCloser) (codeList []Code) {
 func unZipCityCode(buffer []byte) io.ReadCloser {
 	zipFile, err := zip.NewReader(bytes.NewReader(buffer), int64(len(buffer)))
 	if err != nil {
-		logger.Get().Errorf("fail to Unzip City code .... %s", err.Error())
+		log.Errorf("fail to Unzip City code .... %s", err.Error())
 		return nil
 	}
 	for _, f := range zipFile.File {
@@ -124,19 +123,19 @@ func unZipCityCode(buffer []byte) io.ReadCloser {
 func Update() {
 	buffer := requestCityCodeUpdate()
 	if buffer == nil {
-		logger.Get().Error("fail to request City code from AMap, please check your network")
+		log.Error("fail to request City code from AMap, please check your network")
 		return
 	}
 	stream := unZipCityCode(buffer)
 	if stream == nil {
-		logger.Get().Error("fail to unzip City code from AMap")
+		log.Error("fail to unzip City code from AMap")
 		return
 	}
 	codeList := ReadExcel(stream)
 	if codeList == nil {
-		logger.Get().Error("fail to read City code from AMap")
+		log.Error("fail to read City code from AMap")
 		return
 	}
 	writeToFile(codeList)
-	logger.Get().Info("City code update success")
+	log.Info("City code update success")
 }

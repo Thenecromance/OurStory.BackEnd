@@ -1,7 +1,7 @@
 package blacklist
 
 import (
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +11,7 @@ func NewMiddleWare() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		if _, ok := blacklist[c.ClientIP()]; ok {
-			logger.Get().Error("blacklist ip:" + c.ClientIP())
+			log.Error("blacklist ip:" + c.ClientIP())
 			c.Abort()
 		}
 	}

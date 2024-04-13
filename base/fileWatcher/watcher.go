@@ -1,7 +1,7 @@
 package fileWatcher
 
 import (
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -12,7 +12,7 @@ var (
 func init() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		logger.Get().Error(err)
+		log.Error(err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (w *Watcher) watchThread() {
 				w.callbackList[event.Name].OnRenamed()
 			}
 		case err := <-w.ptr.Errors:
-			logger.Get().Error(err)
+			log.Error(err)
 		}
 	}
 }

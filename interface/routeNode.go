@@ -2,7 +2,7 @@
 //
 //import (
 //	"encoding/json"
-//	"github.com/Thenecromance/OurStories/base/logger"
+//	"github.com/Thenecromance/OurStories/base/log"
 //	"github.com/gin-gonic/gin"
 //)
 //
@@ -43,7 +43,7 @@
 //	//		if node.Parent == "/" {
 //	//			node.SetParent(rn)
 //	//		} else {
-//	//			logger.Get().Error(fmt.Sprintf("Parent node %s not found for node %s", node.Parent, node.Name))
+//	//			log.Error(fmt.Sprintf("Parent node %s not found for node %s", node.Parent, node.Name))
 //	//			return errors.New(fmt.Sprintf("Parent node %s not found for node %s", node.Parent, node.Name))
 //	//		}
 //	//	} else {
@@ -64,7 +64,7 @@
 //			if parentNode != nil {
 //				node.SetParent(parentNode)
 //			} else {
-//				logger.Get().Errorf("Parent node %s not found for node %s", node.Parent, node.Name)
+//				log.Errorf("Parent node %s not found for node %s", node.Parent, node.Name)
 //			}
 //		}
 //
@@ -73,7 +73,7 @@
 //}
 //
 //func (rn *RouteNode) CreateNodeGroups() {
-//	logger.Get().Info("Building routes for ", rn.Path())
+//	log.Info("Building routes for ", rn.Path())
 //	for _, node := range rn.Children {
 //		node.RouterGroup = rn.Group(node.Name)
 //		node.CreateNodeGroups()

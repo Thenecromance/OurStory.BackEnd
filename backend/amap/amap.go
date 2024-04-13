@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Thenecromance/OurStories/base/logger"
 	"github.com/Thenecromance/OurStories/base/lru"
 )
 
@@ -26,10 +25,10 @@ func (a *Amap) getToken() string {
 }
 
 func (a *Amap) request(url string) (buffer []byte) {
-	logger.Get().Debug("start to request :%s", url)
+	log.Debug("start to request :%s", url)
 	resp, err := http.Get(url)
 	if err != nil {
-		logger.Get().Errorf("failed to request url : %s \nerror: %s", url, err.Error())
+		log.Errorf("failed to request url : %s \nerror: %s", url, err.Error())
 		return
 	}
 	if resp == nil {
@@ -38,14 +37,14 @@ func (a *Amap) request(url string) (buffer []byte) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		logger.Get().Errorf("target server don't want to answer you with status code:%d", resp.StatusCode)
+		log.Errorf("target server don't want to answer you with status code:%d", resp.StatusCode)
 		return
 	}
 
 	buffer, err = io.ReadAll(resp.Body)
 
 	if err != nil {
-		logger.Get().Error("failed read response :%s", err.Error())
+		log.Error("failed read response :%s", err.Error())
 		return
 	}
 
@@ -56,7 +55,7 @@ func (a *Amap) request(url string) (buffer []byte) {
 func (a *Amap) GetWeatherByIp(address string) *data.Weather {
 	// prevent invalid operation before the config setup
 	if !a.allowToUse {
-		logger.Get().Warnf("missing shit config, please setup it then you can use it ")
+		log.Warnf("missing shit config, please setup it then you can use it ")
 		return nil
 	}
 

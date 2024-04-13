@@ -2,7 +2,7 @@ package Travel
 
 import (
 	"github.com/Thenecromance/OurStories/base/SQL"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gorp.v2"
 )
@@ -28,7 +28,7 @@ type ClientData struct {
 
 // binding the table with gorp
 func (d ClientData) setUpTable(db *gorp.DbMap) error {
-	logger.Get().Info("start to binding ClientData with table travel")
+	log.Info("start to binding ClientData with table travel")
 	tbl := db.AddTableWithName(d, "travel")
 	tbl.SetKeys(false, "Id") // using snowflake to generate the id
 	tbl.ColMap("Id").SetNotNull(true)
@@ -58,14 +58,14 @@ func (m *Model) initdb() error {
 func (m *Model) AddToSQL(data *ClientData) error {
 	err := m.initdb()
 	if err != nil {
-		logger.Get().Error(err)
+		log.Error(err)
 		return err
 	}
 
 	data.Id = uuid.NewV4().String()
 	err = m.db.Insert(data) //insert data into database
 	if err != nil {
-		logger.Get().Error(err)
+		log.Error(err)
 		return err
 	}
 
@@ -74,7 +74,7 @@ func (m *Model) AddToSQL(data *ClientData) error {
 
 func (m *Model) RemoveTravel(id string) error {
 	err := m.initdb()
-	logger.Get().Infof("start to remove travel %d", id)
+	log.Infof("start to remove travel %d", id)
 	if err != nil {
 		return err
 	}

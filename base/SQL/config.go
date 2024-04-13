@@ -3,7 +3,7 @@ package SQL
 import (
 	"fmt"
 	Config "github.com/Thenecromance/OurStories/base/config"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 )
 
 type config struct {
@@ -26,7 +26,7 @@ func (cfg *config) connectStr(db string) (res string) {
 		cfg.Port,
 		db,
 	)
-	logger.Get().Debugf("connect string is %s", res)
+	log.Debugf("connect string is %s", res)
 	return
 }
 
@@ -46,9 +46,9 @@ func defaultConfig() *config {
 	}
 	err := Config.LoadToObject(sectionName, cfg)
 	if err != nil {
-		logger.Get().Error(err.Error())
+		log.Error(err.Error())
 		return nil
 	}
-	logger.Get().Infof("Load config section to %s", sectionName)
+	log.Infof("Load config section to %s", sectionName)
 	return cfg
 }

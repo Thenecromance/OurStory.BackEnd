@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/Thenecromance/OurStories/base/SQL"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 )
@@ -14,13 +14,13 @@ type Server struct {
 
 func (s *Server) initialize() {
 	if s.core == nil || s.gin == nil {
-		logger.Get().Error("before initialize server ,please make sure the core and gin is not nil")
+		log.Error("before initialize server ,please make sure the core and gin is not nil")
 		return
 	}
 
 	s.gin.initialize()
 
-	logger.Get().Info("initialize the core")
+	log.Info("initialize the core")
 	// add gin.Engine to the core server
 	s.core.initServer(s.gin.root)
 }

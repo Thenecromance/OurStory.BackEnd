@@ -3,7 +3,7 @@ package anniversary
 import (
 	"github.com/Thenecromance/OurStories/backend/anniversary/data"
 	"github.com/Thenecromance/OurStories/base/SQL"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gorp.v2"
 	"time"
@@ -34,17 +34,17 @@ type model struct {
 }
 
 func (m *model) init() {
-	logger.Get().Info("start to init anniversary model")
+	log.Info("start to init anniversary model")
 
 	m.handler = SQL.Default()
 	data.Anniversary{}.SetupTable(m.handler)
 
-	logger.Get().Info("init anniversary model success")
+	log.Info("init anniversary model success")
 }
 func (m *model) GetAnniversaryList() (result []ResponseAnniversary) {
 	objects, err := m.handler.Select(data.Anniversary{}, "select * from anniversary")
 	if err != nil {
-		logger.Get().Errorf("failed to get anniversary list with error: %s", err.Error())
+		log.Errorf("failed to get anniversary list with error: %s", err.Error())
 		return nil
 	}
 
@@ -62,7 +62,7 @@ func (m *model) AddAnniversary(ani data.Anniversary) error {
 	ani.Id = uuid.NewV4().String()
 	err := m.handler.Insert(&ani)
 	if err != nil {
-		logger.Get().Errorf("failed to insert anniversary with error: %s", err.Error())
+		log.Errorf("failed to insert anniversary with error: %s", err.Error())
 		return err
 	}
 	return nil
@@ -83,5 +83,5 @@ func Test() {
 		},
 	}
 	a.calculate()
-	logger.Get().Infof("total spend: %d %d", a.TotalSpend, a.TimeToNext)
+	log.Infof("total spend: %d %d", a.TotalSpend, a.TimeToNext)
 }

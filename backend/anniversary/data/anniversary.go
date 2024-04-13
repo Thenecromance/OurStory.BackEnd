@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"gopkg.in/gorp.v2"
 )
 
@@ -14,7 +14,7 @@ type Anniversary struct {
 }
 
 func (a Anniversary) SetupTable(db *gorp.DbMap) {
-	logger.Get().Info("start to binding anniversary with table travel")
+	log.Info("start to binding anniversary with table travel")
 	tbl := db.AddTableWithName(a, "anniversary")
 	tbl.SetKeys(false, "Id") // using snowflake to generate the id
 	tbl.ColMap("Id").SetNotNull(true)
@@ -25,7 +25,7 @@ func (a Anniversary) SetupTable(db *gorp.DbMap) {
 
 	err := db.CreateTablesIfNotExists()
 	if err != nil {
-		logger.Get().Errorf("failed to create table anniversary with error: %s", err.Error())
+		log.Errorf("failed to create table anniversary with error: %s", err.Error())
 		return
 	}
 }

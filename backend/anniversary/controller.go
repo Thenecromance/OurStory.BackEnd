@@ -3,7 +3,7 @@ package anniversary
 import (
 	response "github.com/Thenecromance/OurStories/backend/Response"
 	"github.com/Thenecromance/OurStories/backend/anniversary/data"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -42,13 +42,13 @@ func (c *Controller) BuildRoutes() {
 //----------------------------Interface.Controller Implementation--------------------------------
 
 func (c *Controller) getAnniversaryList(ctx *gin.Context) {
-	logger.Get().Debug("sss")
+	log.Debug("sss")
 	resp := response.New(ctx)
 	defer resp.Send()
 
-	logger.Get().Debug("start to request Anniversary...")
+	log.Debug("start to request Anniversary...")
 	result := c.model.GetAnniversaryList()
-	logger.Get().Debug("get list complete!")
+	log.Debug("get list complete!")
 	if result == nil {
 		return
 	}
@@ -85,7 +85,7 @@ func (c *Controller) processCommon(common InputCommon) {
 }
 func (c *Controller) processUnix(unix InputUnix) {
 
-	logger.Get().Debug(unix.TimeStamp)
+	log.Debug(unix.TimeStamp)
 	ani := data.Anniversary{
 		Owner:     unix.Owner,
 		Title:     unix.Title,
@@ -104,9 +104,9 @@ func (c *Controller) addNewDate(ctx *gin.Context) {
 	var inputUnix InputUnix
 	var errCommon, errUnix error
 	if errCommon = ctx.ShouldBind(&input); errCommon == nil {
-		logger.Get().Debug("common")
+		log.Debug("common")
 		if input.Owner != userId {
-			logger.Get().Warnf("a genius is trying to update fake shit, input is %s , but the target user is %s", input.Owner, userId)
+			log.Warnf("a genius is trying to update fake shit, input is %s , but the target user is %s", input.Owner, userId)
 			resp.AddData("add failed").SetCode(response.FAIL)
 			return
 		}
@@ -114,18 +114,18 @@ func (c *Controller) addNewDate(ctx *gin.Context) {
 		resp.SetCode(response.SUCCESS).AddData("Done")
 
 	} else if errUnix = ctx.ShouldBind(&inputUnix); errUnix == nil {
-		logger.Get().Debug("Unix")
+		log.Debug("Unix")
 		if inputUnix.Owner != userId {
-			logger.Get().Warnf("a genius is trying to update fake shit, input is %s , but the target user is %s", inputUnix.Owner, userId)
+			log.Warnf("a genius is trying to update fake shit, input is %s , but the target user is %s", inputUnix.Owner, userId)
 			resp.AddData("add failed").SetCode(response.FAIL)
 			return
 		}
 		c.processUnix(inputUnix)
 		resp.SetCode(response.SUCCESS).AddData("Done")
 	} else {
-		logger.Get().Error(errCommon)
-		logger.Get().Error(errUnix)
-		logger.Get().Debug("None")
+		log.Error(errCommon)
+		log.Error(errUnix)
+		log.Debug("None")
 		return
 	}
 }

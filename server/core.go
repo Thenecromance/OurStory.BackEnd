@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/Thenecromance/OurStories/base/fileWatcher"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
-	"log"
+
 	"net/http"
 	"time"
 )
@@ -33,7 +33,7 @@ func (c *core) initServer(handler http.Handler) {
 		IdleTimeout:                  time.Duration(c.cfg.IdleTimeout) * time.Second,
 		MaxHeaderBytes:               c.cfg.MaxHeaderBytes,
 
-		ErrorLog: log.New(logger.GetWriter(), "[Server]", 0),
+		//ErrorLog: log.New(log.GetWriter(), "[Server]", 0),
 	}
 
 	//build each routes
@@ -48,18 +48,18 @@ func (c *core) runServer() {
 	defer c.svr.Close()
 
 	if c.isTls() {
-		logger.Get().Info("ListenAndServeTLS: ", c.cfg.Addr)
+		log.Info("ListenAndServeTLS: ", c.cfg.Addr)
 		err := c.svr.ListenAndServeTLS(c.option.CertFile, c.option.KeyFile)
 		if err != nil {
-			logger.Get().Error("ListenAndServeTLS error: ", err)
+			log.Error("ListenAndServeTLS error: ", err)
 			return
 		}
 
 	} else {
-		logger.Get().Info("ListenAndServe: ", c.cfg.Addr)
+		log.Info("ListenAndServe: ", c.cfg.Addr)
 		err := c.svr.ListenAndServe()
 		if err != nil {
-			logger.Get().Error("ListenAndServe error: ", err)
+			log.Error("ListenAndServe error: ", err)
 			return
 		}
 	}

@@ -2,7 +2,7 @@ package SideNavBar
 
 import (
 	"github.com/Thenecromance/OurStories/base/fileWatcher"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	"github.com/Thenecromance/OurStories/base/utils"
 )
 
@@ -30,17 +30,17 @@ func (m *Model) initialize() {
 
 func (m *Model) loadNavItems() {
 	if !utils.FileExists(file) {
-		logger.Get().Infof("%s not found, creating default", file)
+		log.Infof("%s not found, creating default", file)
 		m.demoItem()
 		utils.SaveJson(file, m.items)
 		return
 	}
 	err := utils.LoadJson(file, &m.items)
 	if err != nil {
-		logger.Get().Errorf("failed to load %s: %s", file, err)
+		log.Errorf("failed to load %s: %s", file, err)
 		return
 	}
-	logger.Get().Infof("loaded %s", file)
+	log.Infof("loaded %s", file)
 	return
 }
 

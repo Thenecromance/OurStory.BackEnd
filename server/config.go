@@ -2,7 +2,7 @@ package server
 
 import (
 	Config "github.com/Thenecromance/OurStories/base/config"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 )
 
 type config struct {
@@ -27,7 +27,7 @@ func (cfg *config) load() {
 	cfg.defaultConfig()
 	err := Config.LoadToObject("server", cfg)
 	if err != nil {
-		logger.Get().Error(err.Error())
+		log.Error(err.Error())
 		return
 	}
 

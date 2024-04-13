@@ -2,7 +2,7 @@ package Travel
 
 import (
 	response "github.com/Thenecromance/OurStories/backend/Response"
-	"github.com/Thenecromance/OurStories/base/logger"
+	"github.com/Thenecromance/OurStories/base/log"
 	Interface "github.com/Thenecromance/OurStories/interface"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -55,7 +55,7 @@ func (c *Controller) addTravel(ctx *gin.Context) {
 
 	err := ctx.ShouldBind(&received)
 	if err != nil {
-		logger.Get().Info(err.Error())
+		log.Info(err.Error())
 		ctx.JSON(http.StatusOK, gin.H{
 			"info": err.Error(),
 		})
@@ -85,14 +85,14 @@ func (c *Controller) removeTravel(ctx *gin.Context) {
 	}
 
 	//iid, err := strconv.ParseInt(id, 10, 64)
-	//logger.Get().Info(iid)
+	//log.Info(iid)
 	//if err != nil {
 	//	backend.RespErr(ctx, "id is not a number")
 	//	return
 	//}
 	err := c.model.RemoveTravel(id)
 	if err != nil {
-		logger.Get().Error(err.Error())
+		log.Error(err.Error())
 		resp.AddData(
 			"failed to remove travel",
 		)
@@ -138,7 +138,7 @@ func (c *Controller) getTravels(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		logger.Get().Error(err.Error())
+		log.Error(err.Error())
 		resp.AddData("failed to get travel")
 		return
 	}

@@ -20,6 +20,7 @@ func DirExists(path string) bool {
 
 func CreateIfNotExist(path string) error {
 	if !FileExists(path) {
+		os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 		file, err := os.Create(path)
 		if err != nil {
 			return err
