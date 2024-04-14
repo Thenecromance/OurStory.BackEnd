@@ -48,8 +48,8 @@ func (u *UserInDb) SetUpTable() {
 	})
 }
 
-func (u *UserInDb) ToUserClaim() *UserClaim {
-	return &UserClaim{
+func (u *UserInDb) ToUserClaim() UserClaim {
+	return UserClaim{
 		Id:       u.Id,
 		UserName: u.UserName,
 	}

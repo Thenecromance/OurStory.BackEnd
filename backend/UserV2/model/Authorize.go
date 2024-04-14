@@ -5,19 +5,28 @@ import (
 	"github.com/Thenecromance/OurStories/base/SQL"
 	"github.com/Thenecromance/OurStories/base/hash"
 	"github.com/Thenecromance/OurStories/base/log"
+	"github.com/Thenecromance/OurStories/base/lru"
+	"time"
 )
 
 type Authorization struct {
+	usrCache   *lru.Cache
 	tokenCache store
 }
 
 func (auth *Authorization) ValidByUserName(username, password string) (usr *data.UserInDb) {
-	log.Debug("ValidByUserName: ", username, password)
+
 	usr = &data.UserInDb{}
-	err := SQL.Default().SelectOne(usr, "SELECT * FROM user WHERE username=? or email=?", username, username)
-	if err != nil {
-		log.Error(err)
-		return nil
+	ptr, ok := auth.usrCache.Get(username)
+	if !ok {
+		err := SQL.Default().SelectOne(usr, "SELECT * FROM user WHERE username=? or email=?", username, username)
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
+		auth.usrCache.Add(username, usr, time.Now().Add(15*time.Minute))
+	} else {
+		usr = ptr.(*data.UserInDb)
 	}
 
 	if hash.Hash(password) != usr.Password {
@@ -27,5 +36,8 @@ func (auth *Authorization) ValidByUserName(username, password string) (usr *data
 }
 
 func NewAuth() *Authorization {
-	return &Authorization{}
+
+	return &Authorization{
+		usrCache: lru.New(100),
+	}
 }

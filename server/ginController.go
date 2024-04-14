@@ -188,10 +188,11 @@ func (g *ginControl) initialize() {
 func setupGinMode() {
 	mode := Config.GetBool("Server", "ReleaseMode")
 	if mode {
+		log.Info("Set gin mode to release")
 		gin.SetMode(gin.ReleaseMode)
-	} else if mode {
+	} /*else if mode {
 		Config.SetBool("Server", "ReleaseMode", false)
-	}
+	}*/
 }
 
 func newGinControl() *ginControl {
