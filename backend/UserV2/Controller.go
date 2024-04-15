@@ -50,6 +50,7 @@ func (c *Controller) BuildRoutes() {
 	})
 }
 
+// Middle ware for gin framework
 func (c *Controller) Middleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 

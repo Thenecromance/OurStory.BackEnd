@@ -36,7 +36,6 @@ func (auth *Authorization) ValidByUserName(username, password string) (usr *data
 }
 
 func NewAuth() *Authorization {
-
 	return &Authorization{
 		usrCache: lru.New(100),
 	}
