@@ -19,7 +19,7 @@ func (auth *Authorization) ValidByUserName(username, password string) (usr *data
 	usr = &data.UserInDb{}
 	ptr, ok := auth.usrCache.Get(username)
 	if !ok {
-		err := SQL.Default().SelectOne(usr, "SELECT * FROM user WHERE username=? or email=?", username, username)
+		err := SQL.Default().SelectOne(usr, "SELECT * FROM user WHERE username=? or email=?", username, username) // cost 10 ms just because sql is not local :P
 		if err != nil {
 			log.Error(err)
 			return nil

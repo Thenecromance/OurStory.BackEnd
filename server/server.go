@@ -25,8 +25,8 @@ func (s *Server) initialize() {
 	s.core.initServer(s.gin.root)
 }
 
-// Load controller to the server, but it will not start the services
-func (s *Server) Load(controller ...Interface.Controller) {
+// LoadController controller to the server, but it will not start the services
+func (s *Server) LoadController(controller ...Interface.Controller) {
 	s.core.appendControllers(controller...)
 
 	for _, c := range controller {
@@ -34,7 +34,7 @@ func (s *Server) Load(controller ...Interface.Controller) {
 	}
 }
 
-func (s *Server) PreLoadMiddleWare(name string, middleware gin.HandlerFunc) {
+func (s *Server) RegisterMiddleWare(name string, middleware gin.HandlerFunc) {
 	s.gin.PreLoadMiddleWare(name, middleware)
 }
 

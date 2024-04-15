@@ -74,7 +74,6 @@ func (c *Controller) Middleware() gin.HandlerFunc {
 
 func (c *Controller) login(ctx *gin.Context) {
 
-	log.Debug(ctx.RemoteIP(), " start login request")
 	resp := response.New(ctx)
 	defer resp.Send()
 

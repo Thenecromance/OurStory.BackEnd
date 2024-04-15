@@ -49,6 +49,6 @@ func defaultConfig() *config {
 		log.Error(err.Error())
 		return nil
 	}
-	log.Infof("Load config section to %s", sectionName)
+	log.Infof("LoadController config section to %s", sectionName)
 	return cfg
 }

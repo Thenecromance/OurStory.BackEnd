@@ -26,7 +26,7 @@
 //	parent.Children[rn.Name] = rn
 //}
 //
-//func (rn *RouteNode) Load(node ...*RouteNode) {
+//func (rn *RouteNode) LoadController(node ...*RouteNode) {
 //	if rn.unHandled == nil {
 //		rn.unHandled = make(map[string]*RouteNode)
 //	}

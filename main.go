@@ -14,28 +14,29 @@ import (
 )
 
 func loadMiddleWare(svr *server.Server) {
-	svr.PreLoadMiddleWare("tracer", Tracer.MiddleWare())
+	svr.RegisterMiddleWare("tracer", Tracer.MiddleWare())
 
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	svr.PreLoadMiddleWare("cors", cors.New(config)) // support all origins
+	svr.RegisterMiddleWare("cors", cors.New(config)) // support all origins
 
-	svr.PreLoadMiddleWare("recovery", gin.Recovery())
-	svr.PreLoadMiddleWare("log", gin.Logger())
-	svr.PreLoadMiddleWare("blacklist", blacklist.NewMiddleWare())
+	svr.RegisterMiddleWare("recovery", gin.Recovery())
+	svr.RegisterMiddleWare("log", gin.Logger())
+	svr.RegisterMiddleWare("blacklist", blacklist.NewMiddleWare())
 }
 
 func loadController(svr *server.Server) {
 
-	userC := UserV2.NewController()
-	svr.PreLoadMiddleWare("jwt", userC.Middleware())
+	user := UserV2.NewController()
+	svr.RegisterMiddleWare("jwt", user.Middleware())
 
-	svr.Load(
+	svr.LoadController(
 		api.NewController(),
 		Dashboard.NewController(),
-		userC,
+		user,
 		Travel.NewController(),
 		anniversary.NewController(),
+		//filestore.NewController(),
 	)
 }
 
@@ -48,6 +49,3 @@ func main() {
 	loadController(svr)
 	svr.Run()
 }
-
-//1625500800
-//834681600

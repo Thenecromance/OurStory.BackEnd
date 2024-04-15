@@ -38,6 +38,7 @@ type UserInDb struct {
 
 func (u *UserInDb) SetUpTable() {
 	bindInfoTable.Do(func() {
+
 		tbl := SQL.Default().AddTableWithName(UserInDb{}, "user")
 		tbl.SetKeys(true, "Id")
 		err := SQL.Default().CreateTablesIfNotExists()

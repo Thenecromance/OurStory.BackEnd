@@ -106,6 +106,13 @@ func (s *SQL) createDatabase(db string) error {
 	return nil
 }
 
+type gLogger struct {
+}
+
+func (g *gLogger) Printf(format string, v ...interface{}) {
+	log.Debugf(format, v...)
+}
+
 // initialize a dbmap
 func (s *SQL) initGorpDb(dbName string) *gorp.DbMap {
 	// connect to db using standard Go database/sql API
@@ -121,7 +128,7 @@ func (s *SQL) initGorpDb(dbName string) *gorp.DbMap {
 		Encoding: "utf8mb4",
 	}}
 
-	// dbmap.TraceOn("[gorp]", m.log)
+	dbmap.TraceOn("[gorp]", &gLogger{})
 	return dbmap
 }
 

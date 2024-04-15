@@ -131,13 +131,11 @@ func (g *ginControl) initializeRouterGroups() {
 	g.Save()
 
 	for path, _ := range g.GroupMap {
-
 		if g.GroupMap[path].Router != nil {
 			continue
 		} else {
 			//log.Debug("Start to build node: ", path)
 			g.findParentNode(path)
-
 		}
 	}
 }
