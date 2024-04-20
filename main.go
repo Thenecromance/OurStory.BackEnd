@@ -36,7 +36,7 @@ func loadController(svr *server.Server) {
 		user,
 		Travel.NewController(),
 		anniversary.NewController(),
-		//filestore.NewController(),
+		//Respository.NewController(),
 	)
 }
 

@@ -36,9 +36,7 @@ func (c *Controller) RequestGroup(cb Interface.NodeCallback) {
 
 func (c *Controller) BuildRoutes() {
 
-	/*	c.Group.POST("/addTravel", c.addTravel)
-		c.Group.POST("/removeTravel", c.removeTravel)*/
-	// I want to use the RESTful API
+	// I want to use the RESTFUL API
 	c.group.Router.GET("/", c.getTravels)
 	c.group.Router.POST("/", c.addTravel)
 	c.group.Router.PUT("/", c.updateTravel)

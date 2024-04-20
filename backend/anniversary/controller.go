@@ -56,6 +56,7 @@ func (c *Controller) getAnniversaryList(ctx *gin.Context) {
 	resp.AddData(result).SetCode(response.SUCCESS)
 }
 
+// InputCommon for support client update data with common date format
 type InputCommon struct {
 	Owner        string `form:"owner"   json:"owner,omitempty"    binding:"required"`
 	Year         int    `form:"year"    json:"year,omitempty"     binding:"required"`
@@ -65,6 +66,8 @@ type InputCommon struct {
 	Info         string `form:"info"    json:"info,omitempty"     `
 	ShareToOther bool   `form:"shared"  json:"shared" `
 }
+
+// InputUnix support client update data with unix date format
 type InputUnix struct {
 	Owner        string `form:"owner"       json:"owner,omitempty"      binding:"required"`
 	TimeStamp    int64  `form:"time_stamp"  json:"time_stamp,omitempty" binding:"required"`
