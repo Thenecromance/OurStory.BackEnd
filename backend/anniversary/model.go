@@ -68,20 +68,17 @@ func (m *model) AddAnniversary(ani data.Anniversary) error {
 	return nil
 }
 
+// GetAnniversaryById get anniversary by uid from database
+func (m *model) GetAnniversaryById(id string) *data.Anniversary {
+	anni, err := m.handler.Get(data.Anniversary{}, id)
+	if err != nil {
+		return nil
+	}
+	return anni.(*data.Anniversary)
+}
+
 func newModel() *model {
 	m := &model{}
 	m.init()
 	return m
-}
-
-func Test() {
-	stamp := time.Date(1995, 8, 17, 0, 0, 0, 0, time.Local).Unix()
-	a := ResponseAnniversary{
-		Anniversary: data.Anniversary{
-			Title:     "birthday",
-			TimeStamp: stamp,
-		},
-	}
-	a.calculate()
-	log.Infof("total spend: %d %d", a.TotalSpend, a.TimeToNext)
 }

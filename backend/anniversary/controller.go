@@ -34,7 +34,7 @@ func (c *Controller) Name() string {
 func (c *Controller) BuildRoutes() {
 	c.group.Router.GET("/:id", c.getAnniversaryList)
 	c.group.Router.POST("/:id", c.addNewDate)
-	c.group.Router.PUT("/:id", c.updateDate)
+	c.group.Router.PUT("/:id", c.updateAnniversary)
 	c.group.Router.DELETE("/:id", c.deleteDate)
 
 }
@@ -84,10 +84,13 @@ func (c *Controller) processCommon(common InputCommon) {
 		Info:      common.Info,
 	}
 
-	c.model.AddAnniversary(ani)
+	err := c.model.AddAnniversary(ani)
+	if err != nil {
+		log.Debug(err)
+		return
+	}
 }
 func (c *Controller) processUnix(unix InputUnix) {
-
 	log.Debug(unix.TimeStamp)
 	ani := data.Anniversary{
 		Owner:     unix.Owner,
@@ -95,7 +98,11 @@ func (c *Controller) processUnix(unix InputUnix) {
 		Info:      unix.Info,
 		TimeStamp: unix.TimeStamp,
 	}
-	c.model.AddAnniversary(ani)
+	err := c.model.AddAnniversary(ani)
+	if err != nil {
+		log.Debug(err)
+		return
+	}
 }
 
 func (c *Controller) addNewDate(ctx *gin.Context) {
@@ -133,10 +140,13 @@ func (c *Controller) addNewDate(ctx *gin.Context) {
 	}
 }
 
-func (c *Controller) updateDate(ctx *gin.Context) {
+func (c *Controller) updateAnniversary(ctx *gin.Context) {
 	resp := response.New(ctx)
 	defer resp.Send()
-	resp.AddData("updateDate ")
+
+	c.model.GetAnniversaryById()
+
+	resp.AddData("updateAnniversary ")
 }
 func (c *Controller) deleteDate(ctx *gin.Context) {
 	resp := response.New(ctx)
