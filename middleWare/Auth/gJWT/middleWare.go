@@ -1,7 +1,7 @@
 package gJWT
 
 import (
-	"github.com/Thenecromance/OurStories/base/log"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -41,7 +41,7 @@ func WithKey(key string) Option {
 // Claim is a struct that will be used to store the user information
 type Claim struct {
 	UserInfo             interface{} `json:"info"` // the user information
-	jwt.RegisteredClaims                           // embedded unmodified `jwt.RegisteredClaims`
+	jwt.RegisteredClaims             // embedded unmodified `jwt.RegisteredClaims`
 }
 
 type gJWT struct {

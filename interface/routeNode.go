@@ -2,7 +2,7 @@
 //
 //import (
 //	"encoding/json"
-//	"github.com/Thenecromance/OurStories/base/log"
+//	"github.com/Thenecromance/OurStories/utility/log"
 //	"github.com/gin-gonic/gin"
 //)
 //

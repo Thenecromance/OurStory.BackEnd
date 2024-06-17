@@ -3,12 +3,13 @@ package amap
 import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/backend/amap/data"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"io"
 	"math/rand"
 	"net/http"
 	"strconv"
 
-	"github.com/Thenecromance/OurStories/base/lru"
+	"github.com/Thenecromance/OurStories/utility/lru"
 )
 
 type Amap struct {

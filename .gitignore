@@ -8,7 +8,8 @@ out
 gen
 dist
 setting
-log
+backend
+# log
 bin
 
 *.ini
@@ -17,7 +18,8 @@ bin
 
 .DS_Store
 node_modules
-/dist
+
+
 
 
 # local env files

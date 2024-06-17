@@ -1,83 +1,17 @@
 package server
 
 import (
-	"github.com/Thenecromance/OurStories/base/fileWatcher"
-	Log "github.com/Thenecromance/OurStories/base/log"
-	Interface "github.com/Thenecromance/OurStories/interface"
-	"log"
-
-	"net/http"
-	"time"
+	"github.com/Thenecromance/OurStories/server/Interface"
 )
 
 type core struct {
-	option      CoreOption
-	controllers []Interface.Controller
-	svr         *http.Server
-
-	cfg config
+	routerController      Interface.RouterController
+	middlerWareController Interface.GlobalMiddleWareController // all middlewares will be registered here which will be used by all routers
 }
 
-func (c *core) isTls() bool {
-	return c.option.CertFile != "" && c.option.KeyFile != ""
-}
-
-func (c *core) initServer(handler http.Handler) {
-	c.cfg.load()
-
-	c.svr = &http.Server{
-		Addr:    c.cfg.Addr, //
-		Handler: handler,
-
-		DisableGeneralOptionsHandler: c.cfg.DisableGeneralOptionsHandler,
-		ReadTimeout:                  time.Duration(c.cfg.ReadTimeout) * time.Second,
-		WriteTimeout:                 time.Duration(c.cfg.WriteTimeout) * time.Second,
-		IdleTimeout:                  time.Duration(c.cfg.IdleTimeout) * time.Second,
-		MaxHeaderBytes:               c.cfg.MaxHeaderBytes,
-
-		ErrorLog: log.New(Log.Instance.GetWriter(), "", 0),
+func NewCore(routerController Interface.RouterController, middlerWareController Interface.GlobalMiddleWareController) *core {
+	return &core{
+		routerController:      routerController,
+		middlerWareController: middlerWareController,
 	}
-
-	//build each routes
-	for _, controller := range c.controllers {
-		controller.BuildRoutes()
-	}
-}
-
-// runServer starts the server
-func (c *core) runServer() {
-	defer fileWatcher.Close()
-	defer c.svr.Close()
-
-	if c.isTls() {
-		Log.Info("ListenAndServeTLS: ", c.cfg.Addr)
-		err := c.svr.ListenAndServeTLS(c.option.CertFile, c.option.KeyFile)
-		if err != nil {
-			Log.Error("ListenAndServeTLS error: ", err)
-			return
-		}
-
-	} else {
-		Log.Info("ListenAndServe: ", c.cfg.Addr)
-		err := c.svr.ListenAndServe()
-		if err != nil {
-			Log.Error("ListenAndServe error: ", err)
-			return
-		}
-	}
-
-}
-
-func (c *core) appendControllers(controllers ...Interface.Controller) {
-	c.controllers = append(c.controllers, controllers...)
-}
-
-func newCore(opts ...Option) *core {
-	c := &core{}
-
-	for _, opt := range opts {
-		opt(&c.option)
-	}
-
-	return c
 }
