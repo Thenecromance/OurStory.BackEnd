@@ -1,14 +1,7 @@
 package response
 
-/*
-	type ginCtx struct {
-		statuCode int          `json:"-"`
-		ctx       *gin.Context `json:"-"`
-	}
-*/
 type meta struct {
-	TraceId string `json:"trace_id"`
-	Count   int    `json:"count"`
+	Count int `json:"count"`
 }
 
 type Response struct {
