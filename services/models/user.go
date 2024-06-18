@@ -1,11 +1,17 @@
 package models
 
+// UserClaim only for signature JWT Token or other token that need to be signed
+type UserClaim struct {
+	Id       int    `json:"id"`
+	UserName string `json:"username"`
+}
+
 // UserBasicDTO is the basic information of user
 type UserBasicDTO struct {
-	Id       int    `json:"id"`
-	UserName string `json:"username"         ` // username is the name that use to login
-	Avatar   string `json:"avatar"           ` // the path of avatar
-	NickName string `json:"nickname"         ` // nickname is the name that show to others
+	Id       int    `json:"id"               db:"id"`
+	UserName string `json:"username"         db:"username"` // username is the name that use to login
+	Avatar   string `json:"avatar"           db:"avatar"`   // the path of avatar
+	NickName string `json:"nickname"         db:"nickname"` // nickname is the name that show to others
 }
 
 // UserAdvancedDTO is the advanced information of user
@@ -19,12 +25,6 @@ type UserAdvancedDTO struct {
 	LastLogin   int64  `db:"last_login"            json:"last_login"        `
 }
 
-// UserClaim only for signature JWT Token or other token that need to be signed
-type UserClaim struct {
-	Id       int    `json:"id"`
-	UserName string `json:"username"`
-}
-
 // User is full user information
 type User struct {
 	UserAdvancedDTO
@@ -35,4 +35,10 @@ type User struct {
 type UserLogin struct {
 	UserName string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
+}
+
+type UserRegister struct {
+	UserName string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+	Email    string `json:"email"    form:"email"   `
 }

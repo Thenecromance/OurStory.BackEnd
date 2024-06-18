@@ -11,6 +11,20 @@ type UserRepository interface {
 	GetUser(id int) (models.User, error)
 	GetUsers() ([]models.User, error)
 	GetUserByUsername(username string) (models.User, error)
+
+	//Insert a user to the database
+	// this method won't check if the user is exist or not
+	InsertUser(user *models.User) error
+
+	//Check if the user is exist
+	// if the user is exist, return true
+	// other wise return false
+	HasUser(username string)
+
+	//Check if the user and email is exist
+	// if the user or email is exist, return true
+	// other wise return false
+	HasUserAndEmail(username, email string) bool
 }
 
 type user struct {
@@ -32,7 +46,6 @@ func (u *user) initTable() error {
 		log.Errorf("failed to create table user with error: %s", err.Error())
 		return err
 	}
-
 	return nil
 }
 
