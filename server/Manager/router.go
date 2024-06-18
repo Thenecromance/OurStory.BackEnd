@@ -3,6 +3,7 @@ package Manager
 import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/Interface"
+	Log "github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,6 +20,7 @@ type routerManager struct {
 }
 
 func (r *routerManager) RegisterRouter(routerProxy Interface.Router) error {
+
 	r.routeMap[routerProxy.GetPath()] = routerProxy
 	return nil
 }
@@ -32,8 +34,9 @@ func (r *routerManager) GetRouter(name string) (Interface.Router, error) {
 }
 
 func (r *routerManager) ApplyRouter() error {
+	Log.Info(r.routeMap)
 	for _, router := range r.routeMap {
-
+		Log.Infof("Registering router %s", router.GetPath())
 		if router.IsRESTFUL() {
 			r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 			r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)
@@ -44,6 +47,7 @@ func (r *routerManager) ApplyRouter() error {
 		}
 
 	}
+	Log.Infof("All routers registered")
 	return nil
 }
 
@@ -53,6 +57,9 @@ func (r *routerManager) Close() error {
 	return nil
 }
 
-func NewRouterManager() Interface.RouterController {
-	return &routerManager{}
+func NewRouterManager(g *gin.Engine) Interface.RouterController {
+	return &routerManager{
+		gin:      g,
+		routeMap: make(map[string]Interface.Router),
+	}
 }

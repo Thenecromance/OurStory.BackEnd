@@ -101,5 +101,7 @@ func (r *rest) GetHandler() []gin.HandlerFunc {
 }
 
 func NewREST() Interface.Router {
-	return &rest{}
+	return &rest{
+		handlers: make([]gin.HandlerFunc, 4),
+	}
 }

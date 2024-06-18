@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,15 +23,16 @@ func (s *Server) setTLS(tls Interface.TLS) {
 	s.core.Tls = tls
 }
 
-func (s *Server) initiliaze() {
-	s.core.setupServer(s.gin)
+func (s *Server) initialize() {
+	log.Infof("Initializing the server")
+	s.core.initializeCore(s.gin)
+	log.Infof("Server initialized")
 }
 
 func (s *Server) Run() {
 	if s.core == nil {
 		s.core = newCore()
 	}
-	s.initiliaze()
 	s.core.Run()
 
 }
@@ -40,8 +42,11 @@ func (s *Server) Close() error {
 }
 
 func New() *Server {
-	return &Server{
+	svr := &Server{
 		gin:  gin.Default(),
 		core: newCore(),
 	}
+	svr.initialize()
+
+	return svr
 }

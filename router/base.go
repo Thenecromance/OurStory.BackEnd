@@ -68,7 +68,10 @@ func (r *Router) handler(c *gin.Context) {
 }
 
 func NewRouter() Interface.Router {
-	return &Router{}
+	return &Router{
+		realHandler: defaultFunc,
+		available:   true,
+	}
 }
 
 type handler struct {
