@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,14 +10,13 @@ type Server struct {
 }
 
 func (s *Server) initiliaze() {
-
-}
-
-func (s *Server) RegisterRouter(routerProxy Interface.Router) error {
-	return s.core.RegisterRouter(routerProxy)
+	s.core.setupServer(s.gin)
 }
 
 func (s *Server) Run() {
+	if s.core == nil {
+		s.core = newCore()
+	}
 	s.initiliaze()
 	s.core.Run()
 
@@ -30,6 +28,7 @@ func (s *Server) Close() error {
 
 func New() *Server {
 	return &Server{
-		gin: gin.Default(),
+		gin:  gin.Default(),
+		core: newCore(),
 	}
 }

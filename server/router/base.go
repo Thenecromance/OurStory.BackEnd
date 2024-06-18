@@ -70,3 +70,7 @@ func (r *Router) handler(c *gin.Context) {
 func NewRouter() Interface.Router {
 	return &Router{}
 }
+
+type handler struct {
+	h gin.HandlerFunc
+}

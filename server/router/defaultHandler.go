@@ -1,6 +1,9 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/gin-gonic/gin"
+)
 
 //func defaultFunc(c *gin.Context) {
 //	c.JSON(200, gin.H{
@@ -16,9 +19,14 @@ import "github.com/gin-gonic/gin"
 //}
 
 func defaultFunc(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "service is not available now.",
-	})
+	resp := response.New()
+	defer response.Send(c, resp)
+
+	resp.Code = response.NotAcceptable
+	resp.Meta.Count = 0
+	resp.Data = gin.H{
+		"system": "service not found",
+	}
 }
 
 func defaultHandler() gin.HandlerFunc {

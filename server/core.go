@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/Thenecromance/OurStories/server/Interface"
 	Log "github.com/Thenecromance/OurStories/utility/log"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
@@ -13,12 +12,27 @@ type core struct {
 	routerController     Interface.RouterController
 	middleWareController Interface.MiddleWareController // all middlewares will be registered here which will be used by all routers
 
+	Tls Interface.TLS
 	cfg *config
 	svr *http.Server
 }
 
 func (c *core) Run() {
-	c.svr.ListenAndServe()
+	if c.Tls != nil {
+		Log.Infof("Server is running on %s with TLS.\ncertificate file %s\nKey file path:%s", c.cfg.Addr, c.Tls.GetCertificate(), c.Tls.GetKey())
+		err := c.svr.ListenAndServeTLS(c.Tls.GetCertificate(), c.Tls.GetKey())
+		if err != nil {
+			Log.Errorf("Error while running the server with TLS: %s", err.Error())
+			return
+		}
+	} else {
+		Log.Infof("Server is running on %s without TLS. use http to request", c.cfg.Addr)
+		err := c.svr.ListenAndServe()
+		if err != nil {
+			Log.Errorf("Error while running the server: %s", err.Error())
+			return
+		}
+	}
 }
 
 func (c *core) setupServer(handler http.Handler) {
@@ -42,16 +56,10 @@ func (c *core) setupServer(handler http.Handler) {
 	}
 }
 
-func (c *core) RegisterRouter(routerProxy Interface.Router) error {
-	return c.routerController.RegisterRouter(routerProxy)
-}
-
-func (c *core) RegisterMiddleWare(name string, handler gin.HandlerFunc) {
-	c.middleWareController.RegisterMiddleWare(name, handler)
-}
-
 func newCore() *core {
-	c := &core{}
+	c := &core{
+		cfg: new(config),
+	}
 	c.cfg.load()
 	return c
 }

@@ -30,5 +30,4 @@ func (cfg *config) load() {
 		log.Error(err.Error())
 		return
 	}
-
 }
