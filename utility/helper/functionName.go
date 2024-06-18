@@ -25,16 +25,6 @@ func GetFunctionName(fn interface{} /*, seps ...rune*/) string {
 		name = name[:len(name)-3]
 	}
 
-	/*	if len(seps) > 0 {
-		return strings.Map(func(r rune) rune {
-			for _, sep := range seps {
-				if r == sep {
-					return sep
-				}
-			}
-			return -1
-		}, name)
-	}*/
 	return name
 }
 
