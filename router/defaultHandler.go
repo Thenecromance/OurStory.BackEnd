@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/Thenecromance/OurStories/server/response"
+	response2 "github.com/Thenecromance/OurStories/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,10 +19,10 @@ import (
 //}
 
 func defaultFunc(c *gin.Context) {
-	resp := response.New()
-	defer response.Send(c, resp)
+	resp := response2.New()
+	defer response2.Send(c, resp)
 
-	resp.Code = response.NotAcceptable
+	resp.Code = response2.NotAcceptable
 	resp.Meta.Count = 0
 	resp.Data = gin.H{
 		"system": "service not found",

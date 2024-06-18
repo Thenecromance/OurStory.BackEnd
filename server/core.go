@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/Thenecromance/OurStories/server/Interface"
+	Interface2 "github.com/Thenecromance/OurStories/Interface"
 	Log "github.com/Thenecromance/OurStories/utility/log"
 	"log"
 	"net/http"
@@ -9,10 +9,10 @@ import (
 )
 
 type core struct {
-	routerController     Interface.RouterController
-	middleWareController Interface.MiddleWareController // all middlewares will be registered here which will be used by all routers
+	routerController     Interface2.RouterController
+	middleWareController Interface2.MiddleWareController // all middlewares will be registered here which will be used by all routers
 
-	Tls Interface.TLS
+	Tls Interface2.TLS
 	cfg *config
 	svr *http.Server
 }
