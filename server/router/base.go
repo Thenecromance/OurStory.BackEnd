@@ -41,3 +41,46 @@ func New(path, method string) Interface.RouterProxy {
 		Handler: defaultFunc,
 	}
 }
+
+// real router
+type ProxyRouter struct {
+	Router *Router
+}
+
+func (p *ProxyRouter) GetPath() string {
+	//return p.Router.GetPath()
+	if p.Router == nil {
+		return ""
+	}
+	return p.Router.GetPath()
+}
+
+func (p *ProxyRouter) GetMethod() string {
+
+	if p.Router == nil {
+		return ""
+	}
+
+	return p.Router.GetMethod()
+}
+
+func (p *ProxyRouter) IsRESTFUL() bool {
+	if p.Router == nil {
+		return false
+	}
+	return p.Router.IsRESTFUL()
+}
+
+func (p *ProxyRouter) GetMiddleWare() gin.HandlersChain {
+	return p.Router.GetMiddleWare()
+}
+
+func (p *ProxyRouter) GetHandler() gin.HandlerFunc {
+	return p.Router.GetHandler()
+}
+
+func NewProxyRouter(router *Router) Interface.RouterProxy {
+	return &ProxyRouter{
+		Router: router,
+	}
+}

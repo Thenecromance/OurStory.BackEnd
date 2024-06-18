@@ -33,7 +33,7 @@ func (c *core) setupServer(handler http.Handler) {
 		WriteTimeout:                 time.Duration(c.cfg.WriteTimeout) * time.Second,
 		IdleTimeout:                  time.Duration(c.cfg.IdleTimeout) * time.Second,
 		MaxHeaderBytes:               c.cfg.MaxHeaderBytes,
-		ErrorLog:                     log.New(Log.Instance.GetWriter(), "", 0),
+		ErrorLog:                     log.New(Log.Instance.GetWriter(), "Core", 0),
 
 		/*TLSNextProto:                 nil,
 		ConnState:                    nil,
