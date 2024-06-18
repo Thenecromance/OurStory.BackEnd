@@ -9,7 +9,7 @@ gen
 dist
 setting
 backend
-log
+#log
 bin
 
 *.ini
