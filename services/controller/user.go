@@ -21,17 +21,7 @@ type UserController struct {
 	routers     userRouters
 }
 
-func (uc *UserController) RegisterRoutes(engine *gin.Engine) {
-	/*	userGroup := engine.Group("/user")
-		{
-			userGroup.POST("/login", uc.login)
-			userGroup.POST("/register", uc.register)
-			userGroup.POST("/logout", uc.logout)
-		}
-		{
-			userGroup.GET("/:username", uc.getProfile)
-			userGroup.PUT("/:username", uc.updateProfile)
-		}*/
+func (uc *UserController) SetupRouters() {
 
 	{
 		uc.routers.login = router.NewRouter()
@@ -102,7 +92,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 		return
 	}
 
-	resp.SetCode(response.Accepted).AddData(usr.ToUserResponse())
+	resp.SetCode(response.OK).AddData(usr.ToUserResponse())
 	token := c.auth.SignedToken(usr.ToUserClaim())
 	uc.setTokenCookie(ctx, token)
 }
@@ -124,7 +114,7 @@ func (uc *UserController) logout(ctx *gin.Context) {
 
 	//delete the token
 	ctx.SetCookie("Authorization", "", -1, "/", "", false, true)
-	resp.SetCode(response.Accepted).AddData("Logout success")
+	resp.SetCode(response.OK).AddData("Logout success")
 }
 
 func (uc *UserController) getProfile(ctx *gin.Context) {
@@ -146,7 +136,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	}
 
 	usrProfile := c.profile.GetProfile(username)
-	resp.SetCode(response.SUCCESS).AddData(usrProfile)
+	resp.SetCode(response.OK).AddData(usrProfile)
 }
 
 func (uc *UserController) updateProfile(ctx *gin.Context) {

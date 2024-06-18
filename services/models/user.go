@@ -1,27 +1,38 @@
 package models
 
-type UserResponse struct {
+// UserBasicDTO is the basic information of user
+type UserBasicDTO struct {
 	Id       int    `json:"id"`
 	UserName string `json:"username"         ` // username is the name that use to login
 	Avatar   string `json:"avatar"           ` // the path of avatar
 	NickName string `json:"nickname"         ` // nickname is the name that show to others
-
 }
+
+// UserAdvancedDTO is the advanced information of user
+type UserAdvancedDTO struct {
+	UserBasicDTO
+	Email       string `db:"email"                 json:"email"             `
+	MBTI        string `db:"mbti"                  json:"mbti"              `
+	Birthday    int64  `db:"birthday"              json:"birthday"          `
+	Gender      int    `db:"gender"                json:"gender"            `
+	CreatedTime int64  `db:"created_time"          json:"created_time"      `
+	LastLogin   int64  `db:"last_login"            json:"last_login"        `
+}
+
+// UserClaim only for signature JWT Token or other token that need to be signed
 type UserClaim struct {
 	Id       int    `json:"id"`
 	UserName string `json:"username"`
 }
 
-type UserInDb struct {
-	Id          int    `db:"id"                    json:"id"`
-	Password    string `db:"password"              json:"password"         `
-	UserName    string `db:"username,notnull"      json:"username"         ` // username is the name that use to login
-	Avatar      string `db:"avatar"                json:"avatar"           ` // the path of avatar
-	NickName    string `db:"nickname"              json:"nickname"         ` // nickname is the name that show to others
-	Email       string `db:"email"                 json:"email"            `
-	MBTI        string `db:"mbti"                  json:"mbti"             `
-	Birthday    int64  `db:"birthday"              json:"birthday"         `
-	CreatedTime int64  `db:"created_time"          json:"created_time"`
-	LastLogin   int64  `db:"last_login"            json:"last_login"`
-	Gender      int    `db:"gender"                json:"gender"           `
+// User is full user information
+type User struct {
+	UserAdvancedDTO
+	Password string `db:"password"              json:"password"          `
+}
+
+// when user login, they need to provide username and password
+type UserLogin struct {
+	UserName string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }
