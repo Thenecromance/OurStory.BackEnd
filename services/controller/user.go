@@ -9,10 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type userRouters struct {
+	login    Interface.Router
+	register Interface.Router
+	logout   Interface.Router
+	profile  Interface.Router
+}
+
 type UserController struct {
 	userService *services.UserService
-
-	loginRouter Interface.Router
+	routers     userRouters
 }
 
 func (uc *UserController) RegisterRoutes(engine *gin.Engine) {
@@ -27,11 +33,36 @@ func (uc *UserController) RegisterRoutes(engine *gin.Engine) {
 			userGroup.PUT("/:username", uc.updateProfile)
 		}*/
 
-	uc.loginRouter = router.NewRouter()
 	{
-		uc.loginRouter.SetPath("/api/user/login")
-		uc.loginRouter.SetMethod("POST")
-		uc.loginRouter.SetHandler(uc.login)
+		uc.routers.login = router.NewRouter()
+		{
+			uc.routers.login.SetPath("/api/user/login")
+			uc.routers.login.SetMethod("POST")
+			uc.routers.login.SetHandler(uc.login)
+		}
+	}
+	{
+		uc.routers.register = router.NewRouter()
+		{
+			uc.routers.register.SetPath("/api/user/register")
+			uc.routers.register.SetMethod("POST")
+			uc.routers.register.SetHandler(uc.register)
+		}
+	}
+	{
+		uc.routers.logout = router.NewRouter()
+		{
+			uc.routers.logout.SetPath("/api/user/logout")
+			uc.routers.logout.SetMethod("POST")
+			uc.routers.logout.SetHandler(uc.logout)
+		}
+	}
+	{
+		uc.routers.profile = router.NewREST()
+		{
+			uc.routers.profile.SetPath("/api/user/:username")
+			uc.routers.profile.SetHandler(uc.getProfile, nil, uc.updateProfile)
+		}
 	}
 
 }

@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"github.com/Thenecromance/OurStories/services/model"
+	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
 
 type Anniversary interface {
-	CreateAnniversary(anniversary *model.Anniversary) error
-	RemoveAnniversary(anniversary *model.Anniversary) error
-	UpdateAnniversary(anniversary *model.Anniversary) error
-	GetAnniversaryById(id int64) (*model.Anniversary, error)
-	GetAnniversaryList(user string) ([]model.Anniversary, error)
+	CreateAnniversary(anniversary *models.Anniversary) error
+	RemoveAnniversary(anniversary *models.Anniversary) error
+	UpdateAnniversary(anniversary *models.Anniversary) error
+	GetAnniversaryById(id int64) (*models.Anniversary, error)
+	GetAnniversaryList(user string) ([]models.Anniversary, error)
 }
 
 type anniversaryRepository struct {
@@ -25,7 +25,7 @@ func (ar *anniversaryRepository) initTable() {
 	}
 
 	log.Info("start to binding anniversary with table travel")
-	tbl := ar.db.AddTableWithName(model.Anniversary{}, "anniversary")
+	tbl := ar.db.AddTableWithName(models.Anniversary{}, "anniversary")
 	tbl.SetKeys(false, "Id") // using snowflake to generate the id
 	tbl.ColMap("Id").SetNotNull(true)
 	tbl.ColMap("Owner").SetNotNull(true)

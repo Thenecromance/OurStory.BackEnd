@@ -1,4 +1,4 @@
-package model
+package models
 
 type TravelInfo struct {
 	Id        string `json:"id"          db:"id"`

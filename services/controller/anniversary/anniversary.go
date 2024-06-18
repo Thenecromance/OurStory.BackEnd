@@ -145,7 +145,7 @@ func (c *Controller) updateAnniversary(ctx *gin.Context) {
 	resp := response.New(ctx)
 	defer resp.Send()
 
-	//c.model.GetAnniversaryById()
+	//c.models.GetAnniversaryById()
 
 	resp.AddData("updateAnniversary ")
 }

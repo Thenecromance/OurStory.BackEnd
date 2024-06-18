@@ -1,4 +1,4 @@
-package model
+package models
 
 type UserResponse struct {
 	Id       int    `json:"id"`

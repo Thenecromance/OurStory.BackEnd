@@ -1,6 +1,6 @@
 package services
 
-import "github.com/Thenecromance/OurStories/application/repository"
+import "github.com/Thenecromance/OurStories/services/repository"
 
 type TravelService struct {
 	repo repository.TravelRepository

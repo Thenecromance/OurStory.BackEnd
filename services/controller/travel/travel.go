@@ -155,7 +155,7 @@ func (c *Controller) updateTravel(ctx *gin.Context) {
 	//	return
 	//}
 	//
-	//err = c.model.updateToDatabase(data)
+	//err = c.models.updateToDatabase(data)
 	//if err != nil {
 	//	backend.RespErr(ctx, "failed to update travel")
 	//
