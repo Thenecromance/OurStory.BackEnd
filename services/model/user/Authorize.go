@@ -3,9 +3,9 @@ package user
 import (
 	"github.com/Thenecromance/OurStories/backend/UserV2/data"
 	"github.com/Thenecromance/OurStories/utility/SQL"
+	"github.com/Thenecromance/OurStories/utility/cache/lru"
 	"github.com/Thenecromance/OurStories/utility/hash"
 	"github.com/Thenecromance/OurStories/utility/log"
-	"github.com/Thenecromance/OurStories/utility/lru"
 	"time"
 )
 
