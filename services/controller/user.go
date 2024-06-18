@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/server/Interface"
-	"github.com/Thenecromance/OurStories/server/response"
-	"github.com/Thenecromance/OurStories/server/router"
+	"github.com/Thenecromance/OurStories/Interface"
+	response2 "github.com/Thenecromance/OurStories/response"
+	router2 "github.com/Thenecromance/OurStories/router"
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -25,7 +25,7 @@ type UserController struct {
 func (uc *UserController) SetupRouters() {
 
 	{
-		uc.routers.login = router.NewRouter()
+		uc.routers.login = router2.NewRouter()
 		{
 			uc.routers.login.SetPath("/api/user/login")
 			uc.routers.login.SetMethod("POST")
@@ -33,7 +33,7 @@ func (uc *UserController) SetupRouters() {
 		}
 	}
 	{
-		uc.routers.register = router.NewRouter()
+		uc.routers.register = router2.NewRouter()
 		{
 			uc.routers.register.SetPath("/api/user/register")
 			uc.routers.register.SetMethod("POST")
@@ -41,7 +41,7 @@ func (uc *UserController) SetupRouters() {
 		}
 	}
 	{
-		uc.routers.logout = router.NewRouter()
+		uc.routers.logout = router2.NewRouter()
 		{
 			uc.routers.logout.SetPath("/api/user/logout")
 			uc.routers.logout.SetMethod("POST")
@@ -49,7 +49,7 @@ func (uc *UserController) SetupRouters() {
 		}
 	}
 	{
-		uc.routers.profile = router.NewREST()
+		uc.routers.profile = router2.NewREST()
 		{
 			uc.routers.profile.SetPath("/api/user/:username")
 			uc.routers.profile.SetHandler(uc.getProfile, nil, uc.updateProfile)
@@ -64,7 +64,7 @@ func (uc *UserController) SetupRouters() {
 
 func (uc *UserController) login(ctx *gin.Context) {
 
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
 
 	//usrToken, _ := ctx.Cookie("Authorization")
@@ -83,7 +83,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 	err := ctx.ShouldBind(&info)
 	if err != nil {
 		log.Error("params binding failed :", err)
-		resp.SetCode(response.BadRequest).AddData("Invalid request")
+		resp.SetCode(response2.BadRequest).AddData("Invalid request")
 		return
 	}
 
@@ -92,7 +92,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 	usr, err := uc.userService.AuthorizeUser(&info)
 	if err != nil {
 		log.Error("authorize user failed :", err)
-		resp.SetCode(response.BadRequest).AddData("Invalid username or password")
+		resp.SetCode(response2.BadRequest).AddData("Invalid username or password")
 		return
 	}
 
@@ -101,19 +101,19 @@ func (uc *UserController) login(ctx *gin.Context) {
 	uc.signTokenToClient(ctx, token)
 
 	// when login success, return the basic user info to the client
-	resp.SetCode(response.OK).AddData(usr.UserBasicDTO)
+	resp.SetCode(response2.OK).AddData(usr.UserBasicDTO)
 }
 
 func (uc *UserController) register(ctx *gin.Context) {
 	// prebuild the response and use defer to send the response
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
 
 	// get the user info from the request
 	info := models.UserRegister{}
 	if err := ctx.ShouldBind(&info); err != nil {
 		log.Error("params binding failed :", err)
-		resp.SetCode(response.BadRequest).AddData("Invalid request")
+		resp.SetCode(response2.BadRequest).AddData("Invalid request")
 		return
 	}
 
@@ -121,29 +121,29 @@ func (uc *UserController) register(ctx *gin.Context) {
 
 	// before added to the database, check if the user or email is already exist
 	if uc.userService.HasUserAndEmail(info.UserName, info.Email) {
-		resp.SetCode(response.BadRequest).AddData("User or email already exist")
+		resp.SetCode(response2.BadRequest).AddData("User or email already exist")
 		return
 	}
 
 	// add the user to the database
 	if err := uc.userService.AddUser(&info); err != nil {
 		log.Error("add user failed :", err)
-		resp.SetCode(response.BadRequest).AddData("Register failed")
+		resp.SetCode(response2.BadRequest).AddData("Register failed")
 		return
 	}
 
 	// generate the token to client and save it to the cookie
 	uc.signTokenToClient(ctx, info.UserName)
-	resp.SetCode(response.OK).AddData("Register success")
+	resp.SetCode(response2.OK).AddData("Register success")
 }
 
 func (uc *UserController) logout(ctx *gin.Context) {
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
 
 	//delete the token
 	ctx.SetCookie("Authorization", "", -1, "/", "", false, true)
-	resp.SetCode(response.OK).AddData("Logout success")
+	resp.SetCode(response2.OK).AddData("Logout success")
 }
 
 //-----------------------------------------------------------
@@ -152,7 +152,7 @@ func (uc *UserController) logout(ctx *gin.Context) {
 
 // getProfile is the method to get the user profile
 func (uc *UserController) getProfile(ctx *gin.Context) {
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
 
 	//username := ctx.Param("username")
@@ -174,7 +174,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 }
 
 func (uc *UserController) updateProfile(ctx *gin.Context) {
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
 
 }

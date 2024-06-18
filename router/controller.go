@@ -2,13 +2,13 @@ package router
 
 import (
 	"fmt"
-	"github.com/Thenecromance/OurStories/server/Interface"
+	Interface2 "github.com/Thenecromance/OurStories/Interface"
 	Log "github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
 type entry struct {
-	router            Interface.Router
+	router            Interface2.Router
 	hasBeenRegistered bool
 }
 
@@ -17,14 +17,14 @@ type controller struct {
 	proxy map[string]entry
 }
 
-func (c *controller) GetRouter(name string) (Interface.Router, error) {
+func (c *controller) GetRouter(name string) (Interface2.Router, error) {
 	if router, ok := c.proxy[name]; ok {
 		return router.router, nil
 	}
 	return nil, fmt.Errorf("router %s not found", name)
 }
 
-func (c *controller) RegisterRouter(routerProxy Interface.Router) error {
+func (c *controller) RegisterRouter(routerProxy Interface2.Router) error {
 	c.proxy[routerProxy.GetPath()] = entry{
 		router:            routerProxy,
 		hasBeenRegistered: false,
@@ -53,6 +53,6 @@ func (c *controller) ApplyRouter() error {
 	return nil
 }
 
-func NewController() Interface.RouterController {
+func NewController() Interface2.RouterController {
 	return &controller{}
 }

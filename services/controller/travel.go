@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/server/Interface"
-	"github.com/Thenecromance/OurStories/server/router"
+	"github.com/Thenecromance/OurStories/Interface"
+	router2 "github.com/Thenecromance/OurStories/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ type TravelController struct {
 }
 
 func (tc *TravelController) SetupRouters() {
-	tc.groups.travel = router.NewREST()
+	tc.groups.travel = router2.NewREST()
 	{
 		tc.groups.travel.SetPath("/api/travel/:id")
 		tc.groups.travel.SetHandler(
@@ -26,7 +26,7 @@ func (tc *TravelController) SetupRouters() {
 			tc.deleteTravel, // DELETE
 		)
 	}
-	tc.groups.travelList = router.NewRouter()
+	tc.groups.travelList = router2.NewRouter()
 	{
 		tc.groups.travelList.SetPath("/api/travel")
 		tc.groups.travelList.SetHandler(tc.getTravelList)
