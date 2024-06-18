@@ -1,1 +1,0 @@
-# all services' sql operations  should be implemented here 

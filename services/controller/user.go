@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )

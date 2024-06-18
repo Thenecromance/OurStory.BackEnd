@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/Thenecromance/OurStories/application/model"
+	"github.com/Thenecromance/OurStories/services/model"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
