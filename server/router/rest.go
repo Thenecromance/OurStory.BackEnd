@@ -68,7 +68,7 @@ func (r *rest) SetMiddleWare(middleware gin.HandlersChain) {
 	r.middleWare = middleware
 }
 
-func (r *rest) SetHandler(handler []gin.HandlerFunc) {
+func (r *rest) SetHandler(handler ...gin.HandlerFunc) {
 	for i, h := range handler {
 		if h == nil {
 			continue

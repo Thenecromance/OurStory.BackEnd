@@ -6,7 +6,7 @@ type RouterSetter interface {
 	SetPath(path string)
 	SetMethod(method string)
 	SetMiddleWare(middleware gin.HandlersChain)
-	SetHandler(handler []gin.HandlerFunc)
+	SetHandler(handler ...gin.HandlerFunc)
 }
 type RouterGetter interface {
 	GetPath() string

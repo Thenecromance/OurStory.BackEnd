@@ -39,7 +39,7 @@ func (r *Router) SetMiddleWare(middleware gin.HandlersChain) {
 	r.middleWare = middleware
 }
 
-func (r *Router) SetHandler(handler []gin.HandlerFunc) {
+func (r *Router) SetHandler(handler ...gin.HandlerFunc) {
 	r.realHandler = handler[0]
 }
 

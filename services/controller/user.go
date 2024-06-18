@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/server/router"
 	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
@@ -9,25 +11,35 @@ import (
 
 type UserController struct {
 	userService *services.UserService
+
+	loginRouter Interface.Router
 }
 
 func (uc *UserController) RegisterRoutes(engine *gin.Engine) {
-	userGroup := engine.Group("/user")
+	/*	userGroup := engine.Group("/user")
+		{
+			userGroup.POST("/login", uc.login)
+			userGroup.POST("/register", uc.register)
+			userGroup.POST("/logout", uc.logout)
+		}
+		{
+			userGroup.GET("/:username", uc.getProfile)
+			userGroup.PUT("/:username", uc.updateProfile)
+		}*/
+
+	uc.loginRouter = router.NewRouter()
 	{
-		userGroup.POST("/login", uc.login)
-		userGroup.POST("/register", uc.register)
-		userGroup.POST("/logout", uc.logout)
+		uc.loginRouter.SetPath("/api/user/login")
+		uc.loginRouter.SetMethod("POST")
+		uc.loginRouter.SetHandler(uc.login)
 	}
-	{
-		userGroup.GET("/:username", uc.getProfile)
-		userGroup.PUT("/:username", uc.updateProfile)
-	}
+
 }
 
 func (uc *UserController) login(ctx *gin.Context) {
 
-	resp := response.New(ctx)
-	defer resp.Send()
+	resp := response.New()
+	defer resp.Send(ctx)
 
 	usrToken, _ := ctx.Cookie("Authorization")
 	if usrToken == "" {
@@ -59,7 +71,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 		return
 	}
 
-	resp.SetCode(response.SUCCESS).AddData(usr.ToUserResponse())
+	resp.SetCode(response.Accepted).AddData(usr.ToUserResponse())
 	token := c.auth.SignedToken(usr.ToUserClaim())
 	uc.setTokenCookie(ctx, token)
 }
@@ -70,23 +82,23 @@ func (uc *UserController) setTokenCookie(ctx *gin.Context, token string) {
 }
 
 func (uc *UserController) register(ctx *gin.Context) {
-	resp := response.New(ctx)
-	defer resp.Send()
+	resp := response.New()
+	defer resp.Send(ctx)
 
 }
 
 func (uc *UserController) logout(ctx *gin.Context) {
-	resp := response.New(ctx)
-	defer resp.Send()
+	resp := response.New()
+	defer resp.Send(ctx)
 
 	//delete the token
 	ctx.SetCookie("Authorization", "", -1, "/", "", false, true)
-	resp.SetCode(response.SUCCESS).AddData("Logout success")
+	resp.SetCode(response.Accepted).AddData("Logout success")
 }
 
 func (uc *UserController) getProfile(ctx *gin.Context) {
-	resp := response.New(ctx)
-	defer resp.Send()
+	resp := response.New()
+	defer resp.Send(ctx)
 
 	username := ctx.Param("username")
 	auth, err := ctx.Cookie("Authorization")
@@ -107,8 +119,9 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 }
 
 func (uc *UserController) updateProfile(ctx *gin.Context) {
-	resp := response.New(ctx)
-	defer resp.Send()
+	resp := response.New()
+	defer resp.Send(ctx)
+
 }
 
 func NewUserController(userService *services.UserService) *UserController {
