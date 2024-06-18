@@ -6,81 +6,67 @@ import (
 )
 
 type Router struct {
-	Path   string
-	Method string
+	path   string
+	method string
 
-	MiddleWare gin.HandlersChain
-	Handler    gin.HandlerFunc
-}
+	middleWare  gin.HandlersChain
+	realHandler gin.HandlerFunc
 
-func (r *Router) GetPath() string {
-	return r.Path
-}
-
-func (r *Router) GetMethod() string {
-	return r.Method
+	available bool
 }
 
 func (r *Router) IsRESTFUL() bool {
 	return false
 }
 
+func (r *Router) Enable() {
+	r.available = true
+}
+
+func (r *Router) Disable() {
+	r.available = false
+}
+
+func (r *Router) SetPath(path string) {
+	r.path = path
+}
+
+func (r *Router) SetMethod(method string) {
+	r.method = method
+}
+
+func (r *Router) SetMiddleWare(middleware gin.HandlersChain) {
+	r.middleWare = middleware
+}
+
+func (r *Router) SetHandler(handler []gin.HandlerFunc) {
+	r.realHandler = handler[0]
+}
+
+func (r *Router) GetPath() string {
+	return r.path
+}
+
+func (r *Router) GetMethod() string {
+	return r.method
+}
+
 func (r *Router) GetMiddleWare() gin.HandlersChain {
-	return r.MiddleWare
+	return r.middleWare
 }
 
-func (r *Router) GetHandler() gin.HandlerFunc {
-	return r.Handler
+func (r *Router) GetHandler() []gin.HandlerFunc {
+	return []gin.HandlerFunc{r.handler}
 }
 
-func New(path, method string) Interface.RouterProxy {
-	return &Router{
-		Path:   path,
-		Method: method,
-
-		Handler: defaultFunc,
+func (r *Router) handler(c *gin.Context) {
+	if r.realHandler == nil || !r.available {
+		defaultFunc(c)
+	} else {
+		r.realHandler(c)
 	}
 }
 
-// real router
-type ProxyRouter struct {
-	Router *Router
-}
-
-func (p *ProxyRouter) GetPath() string {
-	//return p.Router.GetPath()
-	if p.Router == nil {
-		return ""
-	}
-	return p.Router.GetPath()
-}
-
-func (p *ProxyRouter) GetMethod() string {
-
-	if p.Router == nil {
-		return ""
-	}
-
-	return p.Router.GetMethod()
-}
-
-func (p *ProxyRouter) IsRESTFUL() bool {
-	if p.Router == nil {
-		return false
-	}
-	return p.Router.IsRESTFUL()
-}
-
-func (p *ProxyRouter) GetMiddleWare() gin.HandlersChain {
-	return p.Router.GetMiddleWare()
-}
-
-func (p *ProxyRouter) GetHandler() gin.HandlerFunc {
-	return p.Router.GetHandler()
-}
-
-func NewProxyRouter(router *Router) Interface.RouterProxy {
-	return &ProxyRouter{
-		Router: router,
-	}
+func NewRouter() Interface.Router {
+	return &Router{}
 }

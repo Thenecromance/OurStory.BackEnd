@@ -5,45 +5,101 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type REST struct {
-	Path string
+type rest struct {
+	path string
 
-	MiddleWare gin.HandlersChain
+	middleWare gin.HandlersChain
 
-	GETHandler    gin.HandlerFunc
-	POSTHandler   gin.HandlerFunc
-	PUTHandler    gin.HandlerFunc
-	DELETEHandler gin.HandlerFunc
+	handlers []gin.HandlerFunc // GET ,POST , PUT , DELETE
+
+	available bool
 }
 
-func (R *REST) GetPath() string {
-	return R.Path
+func (r *rest) getHandler(c *gin.Context) {
+	if r.handlers[0] != nil || !r.available {
+		r.handlers[0](c)
+	} else {
+		r.handlers[0](c)
+	}
+}
+func (r *rest) postHandler(c *gin.Context) {
+	if r.handlers[1] != nil || !r.available {
+		r.handlers[1](c)
+	} else {
+		r.handlers[1](c)
+	}
+}
+func (r *rest) putHandler(c *gin.Context) {
+	if r.handlers[2] != nil || !r.available {
+		r.handlers[2](c)
+	} else {
+		r.handlers[2](c)
+	}
+}
+func (r *rest) deleteHandler(c *gin.Context) {
+	if r.handlers[3] != nil || !r.available {
+		r.handlers[3](c)
+	} else {
+		r.handlers[3](c)
+	}
 }
 
-func (R *REST) GetMethod() string {
-	return ""
-}
-
-func (R *REST) IsRESTFUL() bool {
+func (r *rest) IsRESTFUL() bool {
 	return true
 }
 
-func (R *REST) GetMiddleWare() gin.HandlersChain {
-	return R.MiddleWare
+func (r *rest) Enable() {
+	r.available = true
 }
 
-func (R *REST) GetHandler() gin.HandlerFunc {
-	return nil
+func (r *rest) Disable() {
+	r.available = false
 }
 
-func NewREST(path string) Interface.RouterProxy {
-	return &REST{
-		Path:       path,
-		MiddleWare: nil,
+func (r *rest) SetPath(path string) {
+	r.path = path
+}
 
-		GETHandler:    defaultFunc,
-		POSTHandler:   defaultFunc,
-		PUTHandler:    defaultFunc,
-		DELETEHandler: defaultFunc,
+func (r *rest) SetMethod(method string) {
+	// empty method for rest
+}
+
+func (r *rest) SetMiddleWare(middleware gin.HandlersChain) {
+	r.middleWare = middleware
+}
+
+func (r *rest) SetHandler(handler []gin.HandlerFunc) {
+	for i, h := range handler {
+		if h == nil {
+			continue
+		} else {
+			r.handlers[i] = h
+		}
 	}
+}
+
+func (r *rest) GetPath() string {
+	return r.path
+}
+
+func (r *rest) GetMethod() string {
+	// empty method for rest
+	return ""
+}
+
+func (r *rest) GetMiddleWare() gin.HandlersChain {
+	return r.middleWare
+}
+
+func (r *rest) GetHandler() []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		r.getHandler,
+		r.postHandler,
+		r.putHandler,
+		r.deleteHandler,
+	}
+}
+
+func NewREST() Interface.Router {
+	return &rest{}
 }

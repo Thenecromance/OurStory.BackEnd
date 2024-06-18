@@ -42,7 +42,7 @@ func (c *core) setupServer(handler http.Handler) {
 	}
 }
 
-func (c *core) RegisterRouter(routerProxy Interface.RouterProxy) error {
+func (c *core) RegisterRouter(routerProxy Interface.Router) error {
 	return c.routerController.RegisterRouter(routerProxy)
 }
 

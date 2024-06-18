@@ -9,7 +9,7 @@ type ServiceDemo struct {
 }
 
 type ControllerDemo struct {
-	Router Interface.RouterProxy
+	Router Interface.Router
 }
 
 type ModelDemo struct {
