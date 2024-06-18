@@ -1,12 +1,17 @@
 package server
 
 import (
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
 	gin  *gin.Engine
 	core *core
+}
+
+func (s *Server) setTLS(tls Interface.TLS) {
+	s.core.Tls = tls
 }
 
 func (s *Server) initiliaze() {
