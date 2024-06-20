@@ -11,8 +11,8 @@ type Server struct {
 	core *core
 }
 
-func (s *Server) RegisterRouter(router Interface.Router) error {
-	return s.core.routerController.RegisterRouter(router)
+func (s *Server) RegisterRouter(routers ...Interface.Router) error {
+	return s.core.routerController.RegisterRouter(routers...)
 }
 
 func (s *Server) RegisterMiddleWare(name string, handler gin.HandlerFunc) {

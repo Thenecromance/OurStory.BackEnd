@@ -2,13 +2,13 @@ package router
 
 import (
 	"fmt"
-	Interface2 "github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/Interface"
 	Log "github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
 type entry struct {
-	router            Interface2.Router
+	router            Interface.Router
 	hasBeenRegistered bool
 }
 
@@ -17,17 +17,28 @@ type controller struct {
 	proxy map[string]entry
 }
 
-func (c *controller) GetRouter(name string) (Interface2.Router, error) {
+func (c *controller) GetRouter(name string) (Interface.Router, error) {
 	if router, ok := c.proxy[name]; ok {
 		return router.router, nil
 	}
 	return nil, fmt.Errorf("router %s not found", name)
 }
 
-func (c *controller) RegisterRouter(routerProxy Interface2.Router) error {
-	c.proxy[routerProxy.GetPath()] = entry{
+func (c *controller) RegisterRouter(routerProxy ...Interface.Router) error {
+	/*c.proxy[routerProxy.GetPath()] = entry{
 		router:            routerProxy,
 		hasBeenRegistered: false,
+	}*/
+
+	for _, router := range routerProxy {
+		_, ok := c.proxy[router.GetPath()]
+		if ok {
+			return fmt.Errorf("router %s already registered", router.GetPath())
+		}
+		c.proxy[router.GetPath()] = entry{
+			router:            router,
+			hasBeenRegistered: false,
+		}
 	}
 
 	return nil
@@ -53,6 +64,6 @@ func (c *controller) ApplyRouter() error {
 	return nil
 }
 
-func NewController() Interface2.RouterController {
+func NewController() Interface.RouterController {
 	return &controller{}
 }

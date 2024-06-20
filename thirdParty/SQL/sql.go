@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/Thenecromance/OurStories/utility/SQL/Unit"
+
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
@@ -97,8 +97,8 @@ func (s *SQLManager) createDatabase(db string) error {
 	}
 	log.Debugf("start to create database [%s] ...", db)
 	script := "CREATE DATABASE  IF NOT EXISTS %s  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-	unit := Unit.New(fmt.Sprintf(script, db))
-	exec, err := s.defaultHandler.Exec(unit.Command())
+
+	exec, err := s.defaultHandler.Exec(fmt.Sprintf(script, db))
 	if err != nil {
 		return err
 	}

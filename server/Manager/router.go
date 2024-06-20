@@ -19,9 +19,16 @@ type routerManager struct {
 	routeMap map[string]Interface.Router
 }
 
-func (r *routerManager) RegisterRouter(routerProxy Interface.Router) error {
+func (r *routerManager) RegisterRouter(routerProxy ...Interface.Router) error {
 
-	r.routeMap[routerProxy.GetPath()] = routerProxy
+	//r.routeMap[routerProxy.GetPath()] = routerProxy
+	for _, router := range routerProxy {
+		_, ok := r.routeMap[router.GetPath()]
+		if ok {
+			return fmt.Errorf("router %s already registered", router.GetPath())
+		}
+		r.routeMap[router.GetPath()] = router
+	}
 	return nil
 }
 
@@ -36,7 +43,7 @@ func (r *routerManager) GetRouter(name string) (Interface.Router, error) {
 func (r *routerManager) ApplyRouter() error {
 	Log.Info(r.routeMap)
 	for _, router := range r.routeMap {
-		Log.Infof("Registering router %s", router.GetPath())
+		//Log.Infof("Registering router %s", router.GetPath())
 		if router.IsRESTFUL() {
 			r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 			r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)

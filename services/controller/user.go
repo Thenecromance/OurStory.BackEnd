@@ -23,7 +23,11 @@ type UserController struct {
 	routers     userRouters
 }
 
-func (uc *UserController) SetupRouters() {
+func (uc *UserController) GetRoutes() []Interface.Router {
+	return []Interface.Router{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
+}
+
+func (uc *UserController) setupRouters() {
 
 	{
 		uc.routers.login = router.NewRouter()
@@ -165,7 +169,10 @@ func (uc *UserController) signTokenToClient(ctx *gin.Context, token string) {
 }
 
 func NewUserController(userService *services.UserService) *UserController {
-	return &UserController{
+
+	uc := &UserController{
 		userService: userService,
 	}
+	uc.setupRouters()
+	return uc
 }

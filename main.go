@@ -3,8 +3,19 @@ package main
 import (
 	"github.com/Thenecromance/OurStories/router"
 	"github.com/Thenecromance/OurStories/server"
+	"github.com/Thenecromance/OurStories/services/controller"
+	"github.com/Thenecromance/OurStories/services/repository"
+	"github.com/Thenecromance/OurStories/services/services"
+	"github.com/Thenecromance/OurStories/thirdParty/SQL"
 	"github.com/gin-gonic/gin"
 )
+
+func newUserController() *controller.UserController {
+	repo := repository.NewUserRepository(SQL.Get("user"))
+	s := services.NewUserService(repo)
+	return controller.NewUserController(s)
+
+}
 
 func main() {
 	svr := server.New()
@@ -17,6 +28,8 @@ func main() {
 				"message": "pong",
 			})
 		})*/
+	uc := newUserController()
+	svr.RegisterRouter(uc.GetRoutes()...)
 
 	r := router.NewREST()
 	r.SetPath("/rest")
