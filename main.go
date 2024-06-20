@@ -8,6 +8,7 @@ import (
 	"github.com/Thenecromance/OurStories/thirdParty/SQL"
 )
 
+// dependency injection
 func newUserController() *controller.UserController {
 	repo := repository.NewUserRepository(SQL.Get("user"))
 	s := services.NewUserService(repo)
@@ -18,7 +19,7 @@ func newUserController() *controller.UserController {
 func main() {
 	svr := server.New()
 
-	/*	r := router.NewDefaultRouter()
+	/*	r := route.NewDefaultRouter()
 		r.SetMethod("PUT")
 		r.SetPath("/test")
 		r.SetHandler(func(c *gin.Context) {
@@ -29,7 +30,10 @@ func main() {
 	uc := newUserController()
 	svr.RegisterRouter(uc.GetRoutes()...)
 
-	/*	r := router.NewREST("/rest")
+	ec := controller.NewExampleController()
+	svr.RegisterRouter(ec.GetRoutes()...)
+
+	/*	r := route.NewREST("/rest")
 		r.SetHandler(func(c *gin.Context) {
 			c.JSON(200, gin.H{"Type": "GET"})
 		}, func(c *gin.Context) {
@@ -41,7 +45,7 @@ func main() {
 			func(c *gin.Context) {
 				c.JSON(200, gin.H{"Type": "DELETE"})
 			})
-		r2 := router.NewDefaultRouter()
+		r2 := route.NewDefaultRouter()
 		r2.SetMethod("GET")
 		r2.SetPath("/test")
 		r2.SetHandler(func(c *gin.Context) {

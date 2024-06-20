@@ -1,4 +1,4 @@
-package router
+package route
 
 import (
 	"github.com/Thenecromance/OurStories/response"
@@ -11,7 +11,7 @@ var (
 
 func _defaultHandler(ctx *gin.Context) {
 	resp := response.New()
-	defer response.Send(ctx, resp)
+	defer resp.Send(ctx)
 	resp.Code = response.NotAcceptable
 	resp.Meta.Count = 0
 	resp.Data = gin.H{
@@ -19,7 +19,7 @@ func _defaultHandler(ctx *gin.Context) {
 	}
 }
 
-// _DefaultHandler is the default handler of the router
+// _DefaultHandler is the default handler of the route
 func _DefaultHandler(ctx *gin.Context) {
 	handler(ctx)
 }
@@ -33,7 +33,7 @@ func DefaultRESTHandlers() []gin.HandlerFunc {
 	}
 }
 
-// DefaultHandler will be used to set the default handler of the router
+// DefaultHandler will be used to set the default handler of the route
 func DefaultHandler() gin.HandlerFunc {
 	return _DefaultHandler
 }
@@ -46,7 +46,7 @@ func _defaultMiddleware(ctx *gin.Context) {
 	ctx.Next() // just use ctx.Next() to skip the middleware
 }
 
-// DefaultMiddleware is the default middleware of the router
+// DefaultMiddleware is the default middleware of the route
 func DefaultMiddleware() gin.HandlersChain {
 	return gin.HandlersChain{
 		_defaultMiddleware,

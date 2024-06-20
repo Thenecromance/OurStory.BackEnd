@@ -10,32 +10,32 @@ import (
 
 /*
 	type entry struct {
-		router Interface.Router
+		route Interface.Route
 		loaded bool
 	}
 */
 type routerManager struct {
 	gin      *gin.Engine
-	routeMap map[string]Interface.Router
+	routeMap map[string]Interface.Route
 }
 
-func (r *routerManager) RegisterRouter(routerProxy ...Interface.Router) error {
+func (r *routerManager) RegisterRouter(routerProxy ...Interface.Route) error {
 
 	//r.routeMap[routerProxy.GetPath()] = routerProxy
 	for _, router := range routerProxy {
 		_, ok := r.routeMap[router.GetPath()]
 		if ok {
-			return fmt.Errorf("router %s already registered", router.GetPath())
+			return fmt.Errorf("route %s already registered", router.GetPath())
 		}
 		r.routeMap[router.GetPath()] = router
 	}
 	return nil
 }
 
-func (r *routerManager) GetRouter(name string) (Interface.Router, error) {
+func (r *routerManager) GetRouter(name string) (Interface.Route, error) {
 	router, ok := r.routeMap[name]
 	if !ok {
-		return nil, fmt.Errorf("router %s not found", name)
+		return nil, fmt.Errorf("route %s not found", name)
 	}
 	return router, nil
 }
@@ -43,7 +43,7 @@ func (r *routerManager) GetRouter(name string) (Interface.Router, error) {
 func (r *routerManager) ApplyRouter() error {
 	Log.Info(r.routeMap)
 	for _, router := range r.routeMap {
-		//Log.Infof("Registering router %s", router.GetPath())
+		//Log.Infof("Registering route %s", route.GetPath())
 		if router.IsRESTFUL() {
 			r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 			r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)
@@ -67,6 +67,6 @@ func (r *routerManager) Close() error {
 func NewRouterManager(g *gin.Engine) Interface.RouterController {
 	return &routerManager{
 		gin:      g,
-		routeMap: make(map[string]Interface.Router),
+		routeMap: make(map[string]Interface.Route),
 	}
 }

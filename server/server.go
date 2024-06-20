@@ -12,7 +12,7 @@ type Server struct {
 	core *core
 }
 
-func (s *Server) RegisterRouter(routers ...Interface.Router) error {
+func (s *Server) RegisterRouter(routers ...Interface.Route) error {
 	return s.core.routerController.RegisterRouter(routers...)
 }
 

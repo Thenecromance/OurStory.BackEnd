@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/response"
-	"github.com/Thenecromance/OurStories/router"
+	"github.com/Thenecromance/OurStories/route"
 
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/services"
@@ -12,25 +12,25 @@ import (
 )
 
 type userRouters struct {
-	login    Interface.Router
-	register Interface.Router
-	logout   Interface.Router
-	profile  Interface.Router
+	login    Interface.Route
+	register Interface.Route
+	logout   Interface.Route
+	profile  Interface.Route
 }
 
 type UserController struct {
-	userService *services.UserService
-	routers     userRouters
+	service services.UserService
+	routers userRouters
 }
 
-func (uc *UserController) GetRoutes() []Interface.Router {
-	return []Interface.Router{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
+func (uc *UserController) GetRoutes() []Interface.Route {
+	return []Interface.Route{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
 }
 
 func (uc *UserController) setupRouters() {
 
 	{
-		uc.routers.login = router.NewDefaultRouter()
+		uc.routers.login = route.NewDefaultRouter()
 		{
 			uc.routers.login.SetPath("/api/user/login")
 			uc.routers.login.SetMethod("POST")
@@ -38,7 +38,7 @@ func (uc *UserController) setupRouters() {
 		}
 	}
 	{
-		uc.routers.register = router.NewDefaultRouter()
+		uc.routers.register = route.NewDefaultRouter()
 		{
 			uc.routers.register.SetPath("/api/user/register")
 			uc.routers.register.SetMethod("POST")
@@ -46,13 +46,13 @@ func (uc *UserController) setupRouters() {
 		}
 	}
 	{
-		uc.routers.logout = router.NewRouter("/api/user/logout", "POST")
+		uc.routers.logout = route.NewRouter("/api/user/logout", "POST")
 		{
 			uc.routers.logout.SetHandler(uc.logout)
 		}
 	}
 	{
-		uc.routers.profile = router.NewREST("/api/user/:username")
+		uc.routers.profile = route.NewREST("/api/user/:username")
 		{
 			uc.routers.profile.SetHandler(uc.getProfile, nil, uc.updateProfile)
 		}
@@ -86,7 +86,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 
 	log.Debugf("here should be add a precheck method for the user info incase some one might use the shit names")
 
-	usr, err := uc.userService.AuthorizeUser(&info)
+	usr, err := uc.service.AuthorizeUser(&info)
 	if err != nil {
 		log.Error("authorize user failed :", err)
 		resp.SetCode(response.BadRequest).AddData("Invalid username or password")
@@ -94,7 +94,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 	}
 
 	// generate the token to client and save it to the cookie
-	token := uc.userService.SignedTokenToUser(usr.UserName)
+	token := uc.service.SignedTokenToUser(usr.UserName)
 	uc.signTokenToClient(ctx, token)
 
 	// when login success, return the basic user info to the client
@@ -117,13 +117,13 @@ func (uc *UserController) register(ctx *gin.Context) {
 	log.Debugf("here should be add a precheck method for the user info")
 
 	// before added to the database, check if the user or email is already exist
-	if uc.userService.HasUserAndEmail(info.UserName, info.Email) {
+	if uc.service.HasUserAndEmail(info.UserName, info.Email) {
 		resp.SetCode(response.BadRequest).AddData("User or email already exist")
 		return
 	}
 
 	// add the user to the database
-	if err := uc.userService.AddUser(&info); err != nil {
+	if err := uc.service.AddUser(&info); err != nil {
 		log.Error("add user failed :", err)
 		resp.SetCode(response.BadRequest).AddData("Register failed")
 		return
@@ -152,6 +152,12 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
+	usr, err := uc.service.GetUserByUsername(ctx.Param("username"))
+	if err != nil {
+		return
+	}
+
+	resp.SetCode(response.OK).AddData(usr.UserAdvancedDTO)
 }
 
 func (uc *UserController) updateProfile(ctx *gin.Context) {
@@ -165,10 +171,10 @@ func (uc *UserController) signTokenToClient(ctx *gin.Context, token string) {
 	ctx.SetCookie("Authorization", token, 3600, "/", "", false, true)
 }
 
-func NewUserController(userService *services.UserService) *UserController {
+func NewUserController(userService services.UserService) *UserController {
 
 	uc := &UserController{
-		userService: userService,
+		service: userService,
 	}
 	uc.setupRouters()
 	return uc

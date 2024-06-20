@@ -1,4 +1,4 @@
-package router
+package route
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 type entry struct {
-	router            Interface.Router
+	router            Interface.Route
 	hasBeenRegistered bool
 }
 
@@ -17,23 +17,23 @@ type controller struct {
 	proxy map[string]entry
 }
 
-func (c *controller) GetRouter(name string) (Interface.Router, error) {
+func (c *controller) GetRouter(name string) (Interface.Route, error) {
 	if router, ok := c.proxy[name]; ok {
 		return router.router, nil
 	}
-	return nil, fmt.Errorf("router %s not found", name)
+	return nil, fmt.Errorf("route %s not found", name)
 }
 
-func (c *controller) RegisterRouter(routerProxy ...Interface.Router) error {
+func (c *controller) RegisterRouter(routerProxy ...Interface.Route) error {
 	/*c.proxy[routerProxy.GetPath()] = entry{
-		router:            routerProxy,
+		route:            routerProxy,
 		hasBeenRegistered: false,
 	}*/
 
 	for _, router := range routerProxy {
 		_, ok := c.proxy[router.GetPath()]
 		if ok {
-			return fmt.Errorf("router %s already registered", router.GetPath())
+			return fmt.Errorf("route %s already registered", router.GetPath())
 		}
 		c.proxy[router.GetPath()] = entry{
 			router:            router,
@@ -52,7 +52,7 @@ func (c *controller) ApplyRouter() error {
 	Log.Debugf("Applying all routers to the server")
 	for _, r := range c.proxy {
 		if r.hasBeenRegistered {
-			Log.Debugf("Router %s has already been registered", r.router.GetPath())
+			Log.Debugf("Route %s has already been registered", r.router.GetPath())
 			continue
 		}
 

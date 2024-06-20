@@ -5,30 +5,37 @@ import (
 	"github.com/Thenecromance/OurStories/services/repository"
 )
 
-type AnniversaryService struct {
+type AnniversaryService interface {
+	CreateAnniversary(anniversary *models.Anniversary) error
+	GetAnniversaryById(id int64) (*models.Anniversary, error)
+	UpdateAnniversary(anniversary *models.Anniversary) error
+	RemoveAnniversary(anniversary *models.Anniversary) error
+}
+
+type anniversaryServiceImpl struct {
 	repo repository.Anniversary
 }
 
-func (as *AnniversaryService) CreateAnniversary(anniversary *models.Anniversary) error {
+func (as *anniversaryServiceImpl) CreateAnniversary(anniversary *models.Anniversary) error {
 	return as.repo.CreateAnniversary(anniversary)
 }
 
-func (as *AnniversaryService) RemoveAnniversary(anniversary *models.Anniversary) error {
+func (as *anniversaryServiceImpl) RemoveAnniversary(anniversary *models.Anniversary) error {
 	return as.repo.RemoveAnniversary(anniversary)
 }
 
-func (as *AnniversaryService) UpdateAnniversary(anniversary *models.Anniversary) error {
+func (as *anniversaryServiceImpl) UpdateAnniversary(anniversary *models.Anniversary) error {
 	return as.repo.UpdateAnniversary(anniversary)
 }
 
-func (as *AnniversaryService) GetAnniversaryById(id int64) (*models.Anniversary, error) {
+func (as *anniversaryServiceImpl) GetAnniversaryById(id int64) (*models.Anniversary, error) {
 	return as.repo.GetAnniversaryById(id)
 }
 
-func (as *AnniversaryService) GetAnniversaryList(user string) ([]models.Anniversary, error) {
+func (as *anniversaryServiceImpl) GetAnniversaryList(user string) ([]models.Anniversary, error) {
 	return as.repo.GetAnniversaryList(user)
 }
 
-func NewAnniversaryService(repo repository.Anniversary) *AnniversaryService {
-	return &AnniversaryService{repo}
+func NewAnniversaryService(repo repository.Anniversary) AnniversaryService {
+	return &anniversaryServiceImpl{repo}
 }

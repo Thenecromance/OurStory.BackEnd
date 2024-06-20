@@ -1,4 +1,4 @@
-package router
+package route
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
@@ -11,9 +11,9 @@ type Router struct {
 
 	middleWare gin.HandlersChain
 
-	realHandler gin.HandlerFunc // the real handler of the router
+	realHandler gin.HandlerFunc // the real handler of the route
 
-	// control the router's active status
+	// control the route's active status
 	active bool
 }
 
@@ -69,14 +69,14 @@ func (r *Router) handler(ctx *gin.Context) {
 	}
 }
 
-func NewDefaultRouter() Interface.Router {
+func NewDefaultRouter() Interface.Route {
 	return &Router{
 		realHandler: DefaultHandler(),
 		active:      true,
 	}
 }
 
-func NewRouter(path_, method_ string) Interface.Router {
+func NewRouter(path_, method_ string) Interface.Route {
 	return &Router{
 		path:   path_,
 		method: method_,

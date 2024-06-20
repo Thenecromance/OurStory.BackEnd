@@ -65,9 +65,9 @@ func (c *core) initializeCore(g *gin.Engine) {
 	Log.Info("Initializing the core")
 	c.setupServer(g)
 	{
-		Log.Info("Initializing the router manager")
+		Log.Info("Initializing the route manager")
 		c.routerController = Manager.NewRouterManager(g)
-		Log.Info("Router manager initialized")
+		Log.Info("Route manager initialized")
 	}
 
 	//{

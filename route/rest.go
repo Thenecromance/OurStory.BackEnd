@@ -1,4 +1,4 @@
-package router
+package route
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
@@ -100,7 +100,7 @@ func (r *rest) GetHandler() []gin.HandlerFunc {
 	}
 }
 
-func NewREST(path_ string) Interface.Router {
+func NewREST(path_ string) Interface.Route {
 	return &rest{
 		path:       path_,
 		handlers:   DefaultRESTHandlers(),

@@ -3,21 +3,24 @@ package controller
 import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/response"
-	"github.com/Thenecromance/OurStories/router"
+	"github.com/Thenecromance/OurStories/route"
+	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/gin-gonic/gin"
 )
 
 type travelRouter struct {
-	travel     Interface.Router
-	travelList Interface.Router
+	travel     Interface.Route
+	travelList Interface.Route
 }
 
 type TravelController struct {
 	groups travelRouter
+
+	service *services.TravelService
 }
 
 func (tc *TravelController) SetupRouters() {
-	tc.groups.travel = router.NewREST("/api/travel/:id")
+	tc.groups.travel = route.NewREST("/api/travel/:id")
 	{
 		tc.groups.travel.SetHandler(
 			tc.getTravel,    // GET
@@ -26,7 +29,7 @@ func (tc *TravelController) SetupRouters() {
 			tc.deleteTravel, // DELETE
 		)
 	}
-	tc.groups.travelList = router.NewRouter("/api/travel", "POST")
+	tc.groups.travelList = route.NewRouter("/api/travel", "POST")
 	{
 		tc.groups.travelList.SetHandler(tc.getTravelList)
 	}

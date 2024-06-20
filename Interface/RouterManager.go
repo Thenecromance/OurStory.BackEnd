@@ -1,11 +1,11 @@
 package Interface
 
 type RouterController interface {
-	// RegisterRouter registers a router to the controller and returns an error if the router is already registered.
-	RegisterRouter(routerProxy ...Router) error
+	// RegisterRouter registers a route to the controller and returns an error if the route is already registered.
+	RegisterRouter(routerProxy ...Route) error
 
-	// GetRouter returns a router by its name.
-	GetRouter(name string) (Router, error)
+	// GetRouter returns a route by its name.
+	GetRouter(name string) (Route, error)
 
 	// ApplyRouter applies all the routers to the gin.Engine.
 	ApplyRouter() error
