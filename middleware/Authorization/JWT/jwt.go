@@ -12,6 +12,7 @@ import (
 
 const (
 	AuthObject = "AuthObject"
+	constKey   = "M0nkey_Cl1cker"
 )
 
 var (
@@ -46,11 +47,11 @@ func (s *Service) AuthorizeToken(token string) (interface{}, error) {
 	if v, ok := s.cache.Get(token); ok {
 		return v, nil
 	}
-	return s.parseToken(token, "secret")
+	return s.parseToken(token, constKey)
 }
 
 func (s *Service) TokenExpired(token string) (bool, error) {
-	claims, err := s.parseToken(token, "secret")
+	claims, err := s.parseToken(token, constKey)
 	if err != nil {
 		return false, err
 	}
@@ -59,11 +60,11 @@ func (s *Service) TokenExpired(token string) (bool, error) {
 
 func (s *Service) RefreshToken(oldToken string) (string, error) {
 
-	claims, err := s.parseToken(oldToken, "secret")
+	claims, err := s.parseToken(oldToken, constKey)
 	if err != nil {
 		return "", err
 	}
-	return s.authToken(claims.Obj, 1, "secret")
+	return s.authToken(claims.Obj, 1, constKey)
 }
 
 func (s *Service) parseToken(token, key string) (*Claim, error) {
@@ -138,6 +139,7 @@ func New() Authorization.IAuth {
 	}
 }
 
+// Instance will return the singleton instance of the Authorization.IAuth
 func Instance() Authorization.IAuth {
 	if inst == nil {
 		inst = New()
