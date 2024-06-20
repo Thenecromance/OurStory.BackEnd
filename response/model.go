@@ -18,8 +18,8 @@ func (r *Response) Reset() {
 	r.Data = nil
 }
 
-func (r *Response) Send(g *gin.Context) {
-	g.JSON(r.Code, r)
+func (r *Response) Send(ctx *gin.Context) {
+	ctx.JSON(r.Code, r)
 }
 
 func (r *Response) AddData(data interface{}) {

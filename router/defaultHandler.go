@@ -1,46 +1,54 @@
 package router
 
 import (
-	response2 "github.com/Thenecromance/OurStories/response"
+	"github.com/Thenecromance/OurStories/response"
 	"github.com/gin-gonic/gin"
 )
 
-//func defaultFunc(c *gin.Context) {
-//	c.JSON(200, gin.H{
-//		"message": "pong",
-//	})
-//}
-//
-//func defaultHandler() *gin.HandlersChain {
-//	return &gin.HandlersChain{
-//		defaultFunc,
-//	}
-//
-//}
+var (
+	handler = _defaultHandler
+)
 
-func defaultFunc(c *gin.Context) {
-	resp := response2.New()
-	defer response2.Send(c, resp)
-
-	resp.Code = response2.NotAcceptable
+func _defaultHandler(ctx *gin.Context) {
+	resp := response.New()
+	defer response.Send(ctx, resp)
+	resp.Code = response.NotAcceptable
 	resp.Meta.Count = 0
 	resp.Data = gin.H{
 		"system": "service not found",
 	}
 }
 
-func defaultHandler() gin.HandlerFunc {
-	return defaultFunc
+// _DefaultHandler is the default handler of the router
+func _DefaultHandler(ctx *gin.Context) {
+	handler(ctx)
 }
-func defaultRESTHandlers() []gin.HandlerFunc {
+
+func DefaultRESTHandlers() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		defaultFunc,
-		defaultFunc,
-		defaultFunc,
-		defaultFunc,
+		_DefaultHandler,
+		_DefaultHandler,
+		_DefaultHandler,
+		_DefaultHandler,
 	}
 }
 
-func defaultMiddleWare() gin.HandlersChain {
-	return gin.HandlersChain{}
+// DefaultHandler will be used to set the default handler of the router
+func DefaultHandler() gin.HandlerFunc {
+	return _DefaultHandler
+}
+
+//--------------------------------------------
+// DefaultMiddleware
+//--------------------------------------------
+
+func _defaultMiddleware(ctx *gin.Context) {
+	ctx.Next() // just use ctx.Next() to skip the middleware
+}
+
+// DefaultMiddleware is the default middleware of the router
+func DefaultMiddleware() gin.HandlersChain {
+	return gin.HandlersChain{
+		_defaultMiddleware,
+	}
 }

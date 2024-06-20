@@ -9,10 +9,12 @@ type Router struct {
 	path   string
 	method string
 
-	middleWare  gin.HandlersChain
-	realHandler gin.HandlerFunc
+	middleWare gin.HandlersChain
 
-	available bool
+	realHandler gin.HandlerFunc // the real handler of the router
+
+	// control the router's active status
+	active bool
 }
 
 func (r *Router) IsRESTFUL() bool {
@@ -20,11 +22,11 @@ func (r *Router) IsRESTFUL() bool {
 }
 
 func (r *Router) Enable() {
-	r.available = true
+	r.active = true
 }
 
 func (r *Router) Disable() {
-	r.available = false
+	r.active = false
 }
 
 func (r *Router) SetPath(path string) {
@@ -59,21 +61,27 @@ func (r *Router) GetHandler() []gin.HandlerFunc {
 	return []gin.HandlerFunc{r.handler}
 }
 
-func (r *Router) handler(c *gin.Context) {
-	if r.realHandler == nil || !r.available {
-		defaultFunc(c)
+func (r *Router) handler(ctx *gin.Context) {
+	if r.realHandler == nil || !r.active {
+		DefaultHandler()(ctx)
 	} else {
-		r.realHandler(c)
+		r.realHandler(ctx)
 	}
 }
 
-func NewRouter() Interface.Router {
+func NewDefaultRouter() Interface.Router {
 	return &Router{
-		realHandler: defaultFunc,
-		available:   true,
+		realHandler: DefaultHandler(),
+		active:      true,
 	}
 }
 
-type handler struct {
-	h gin.HandlerFunc
+func NewRouter(path_, method_ string) Interface.Router {
+	return &Router{
+		path:   path_,
+		method: method_,
+
+		realHandler: DefaultHandler(),
+		active:      true,
+	}
 }

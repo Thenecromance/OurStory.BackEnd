@@ -30,7 +30,7 @@ func (uc *UserController) GetRoutes() []Interface.Router {
 func (uc *UserController) setupRouters() {
 
 	{
-		uc.routers.login = router.NewRouter()
+		uc.routers.login = router.NewDefaultRouter()
 		{
 			uc.routers.login.SetPath("/api/user/login")
 			uc.routers.login.SetMethod("POST")
@@ -38,7 +38,7 @@ func (uc *UserController) setupRouters() {
 		}
 	}
 	{
-		uc.routers.register = router.NewRouter()
+		uc.routers.register = router.NewDefaultRouter()
 		{
 			uc.routers.register.SetPath("/api/user/register")
 			uc.routers.register.SetMethod("POST")
@@ -46,17 +46,14 @@ func (uc *UserController) setupRouters() {
 		}
 	}
 	{
-		uc.routers.logout = router.NewRouter()
+		uc.routers.logout = router.NewRouter("/api/user/logout", "POST")
 		{
-			uc.routers.logout.SetPath("/api/user/logout")
-			uc.routers.logout.SetMethod("POST")
 			uc.routers.logout.SetHandler(uc.logout)
 		}
 	}
 	{
-		uc.routers.profile = router.NewREST()
+		uc.routers.profile = router.NewREST("/api/user/:username")
 		{
-			uc.routers.profile.SetPath("/api/user/:username")
 			uc.routers.profile.SetHandler(uc.getProfile, nil, uc.updateProfile)
 		}
 	}

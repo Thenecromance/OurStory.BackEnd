@@ -13,9 +13,9 @@ var (
 )
 
 const (
-	logDir  = "log"
-	logFile = logDir + "/" + "log.log"
-	errFile = logDir + "/" + "err.log"
+	logDir  = "logs"
+	logFile = logDir + "/" + "server.log"
+	errFile = logDir + "/" + "err_server.log"
 
 	skiplevel  = 2
 	resetlevel = -2

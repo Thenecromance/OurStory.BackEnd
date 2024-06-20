@@ -17,9 +17,8 @@ type TravelController struct {
 }
 
 func (tc *TravelController) SetupRouters() {
-	tc.groups.travel = router.NewREST()
+	tc.groups.travel = router.NewREST("/api/travel/:id")
 	{
-		tc.groups.travel.SetPath("/api/travel/:id")
 		tc.groups.travel.SetHandler(
 			tc.getTravel,    // GET
 			tc.createTravel, // POST
@@ -27,9 +26,8 @@ func (tc *TravelController) SetupRouters() {
 			tc.deleteTravel, // DELETE
 		)
 	}
-	tc.groups.travelList = router.NewRouter()
+	tc.groups.travelList = router.NewRouter("/api/travel", "POST")
 	{
-		tc.groups.travelList.SetPath("/api/travel")
 		tc.groups.travelList.SetHandler(tc.getTravelList)
 	}
 }
