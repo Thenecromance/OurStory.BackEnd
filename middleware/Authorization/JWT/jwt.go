@@ -2,9 +2,20 @@ package JWT
 
 import (
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
+	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/utility/cache/lru"
+	"github.com/Thenecromance/OurStories/utility/log"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
+)
+
+const (
+	AuthObject = "AuthObject"
+)
+
+var (
+	inst = New()
 )
 
 // Claim is a struct that will be used to store the user information
@@ -60,6 +71,7 @@ func (s *Service) parseToken(token, key string) (*Claim, error) {
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(key), nil
 	})
+	log.Info("claims ", claims)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +90,61 @@ func (s *Service) authToken(obj interface{}, expireTime int64, key string) (stri
 	return token.SignedString([]byte(key))
 }
 
+func (s *Service) Middleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := c.Cookie("Authorization")
+
+		if token == "" {
+			log.Warn("token is empty")
+			resp := response.New()
+			resp.SetCode(response.NotAcceptable).AddData("token is invalid")
+			c.Abort()
+			resp.Send(c)
+			return
+		}
+
+		token = token[7:]
+
+		expired, err := s.TokenExpired(token)
+		log.Info("token  ", token, expired)
+		if expired == true || err != nil {
+			log.Warn("token is expired")
+			resp := response.New()
+			resp.SetCode(response.NotAcceptable).AddData("token is invalid")
+			c.Abort()
+			resp.Send(c)
+			return
+		}
+
+		obj, err := s.AuthorizeToken(token)
+		if err != nil {
+			log.Warn("token is invalid", err)
+			resp := response.New()
+			resp.SetCode(response.NotAcceptable).AddData("token is invalid")
+			c.Abort()
+			resp.Send(c)
+			return
+		}
+		log.Info("obj ", obj)
+
+		c.Set(AuthObject, obj.(*Claim).Obj)
+		c.Next()
+	}
+}
+
 func New() Authorization.IAuth {
 	return &Service{
 		cache: lru.New(0),
 	}
+}
+
+func Instance() Authorization.IAuth {
+	if inst == nil {
+		inst = New()
+	}
+	return inst
+}
+
+func Middleware() gin.HandlerFunc {
+	return inst.Middleware()
 }

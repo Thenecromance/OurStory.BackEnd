@@ -1,15 +1,19 @@
 package services
 
 import (
+	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/repository"
+	"github.com/Thenecromance/OurStories/utility/hash"
+	"github.com/Thenecromance/OurStories/utility/log"
 )
 
 type UserService interface {
-	GetUser(id int) (models.User, error)
-	GetUserByUsername(username string) (models.User, error)
-	AuthorizeUser(login *models.UserLogin) (models.User, error)
-	SignedTokenToUser(info string) string
+	GetUserIdByName(username string) (int, error)
+	GetUser(id int) (*models.User, error)
+	GetUserByUsername(username string) (*models.User, error)
+	AuthorizeUser(login *models.UserLogin) (*models.User, error)
+	SignedTokenToUser(info interface{}) string
 	AddUser(user *models.UserRegister) error
 	HasUserAndEmail(username, email string) bool
 }
@@ -18,21 +22,28 @@ type userServiceImpl struct {
 	repo repository.UserRepository
 }
 
-func (us *userServiceImpl) GetUser(id int) (models.User, error) {
+func (us *userServiceImpl) GetUserIdByName(username string) (int, error) {
+	return us.repo.GetUserIdByName(username)
+}
+
+func (us *userServiceImpl) GetUser(id int) (*models.User, error) {
 	return us.repo.GetUser(id)
 }
 
-func (us *userServiceImpl) GetUserByUsername(username string) (models.User, error) {
+func (us *userServiceImpl) GetUserByUsername(username string) (*models.User, error) {
 	return us.repo.GetUserByUsername(username)
 }
-func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (models.User, error) {
-	panic("token has not been implemented")
-	return models.User{}, nil
+func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (*models.User, error) {
+	return us.repo.GetUserByUsername(login.UserName)
 }
 
-func (us *userServiceImpl) SignedTokenToUser(info string) string {
-	panic("token has not been implemented")
-	return ""
+func (us *userServiceImpl) SignedTokenToUser(info interface{}) string {
+	token, err := JWT.Instance().AuthorizeUser(info)
+	if err != nil {
+		log.Error("error in signing token", err)
+		return ""
+	}
+	return token
 }
 
 func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
@@ -43,7 +54,7 @@ func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
 			},
 			Email: user.Email,
 		},
-		Password: user.Password,
+		Password: hash.Hash(user.Password),
 	}
 	return us.repo.InsertUser(fullInfo)
 }

@@ -1,5 +1,7 @@
 package Authorization
 
+import "github.com/gin-gonic/gin"
+
 type IAuth interface {
 	AuthorizeUser(claim interface{}) (string, error)
 
@@ -10,4 +12,6 @@ type IAuth interface {
 	RefreshToken(oldToken string) (string, error)
 
 	MarkTokenExpired(token string) error
+
+	Middleware() gin.HandlerFunc
 }

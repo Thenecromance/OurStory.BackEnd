@@ -43,7 +43,7 @@ func (r *routerManager) GetRouter(name string) (Interface.IRoute, error) {
 func (r *routerManager) ApplyRouter() error {
 	Log.Info(r.routeMap)
 	for _, router := range r.routeMap {
-		//Log.Infof("Registering route %s", route.GetPath())
+		//Logger.Infof("Registering route %s", route.GetPath())
 		if router.IsRESTFUL() {
 			r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 			r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	Instance *Log
+	Instance *Logger
 )
 
 const (
@@ -21,19 +21,19 @@ const (
 	resetlevel = -2
 )
 
-type Log struct {
-	logger  *zap.SugaredLogger
+type Logger struct {
+	_logger *zap.SugaredLogger
 	writers *writerContainer
 }
 
-func (l *Log) initCore() {
+func (l *Logger) initCore() {
 	core := zapcore.NewCore(
 		//zapcore.NewJSONEncoder(setupEncoderConfig()),
 		zapcore.NewConsoleEncoder(setupEncoderConfig()),
 		zapcore.AddSync(l.writers),
 		zapcore.DebugLevel)
 
-	l.logger = zap.New(core, zap.AddCaller()).Sugar()
+	l._logger = zap.New(core, zap.AddCaller()).Sugar()
 
 	// let log output to the console
 	l.writers.addWriter(os.Stderr)
@@ -53,28 +53,32 @@ func (l *Log) initCore() {
 
 // AppendWriter when log need to place to more place, just add the target to here
 // just like if I want to log the data to the database, just need to wrap the sql
-func (l *Log) AppendWriter(writer io.Writer) {
+func (l *Logger) AppendWriter(writer io.Writer) {
 	l.writers.addWriter(writer)
 }
 
-func (l *Log) GetWriter() io.Writer {
+func (l *Logger) GetWriter() io.Writer {
 	return l.writers
 }
 
-func (l *Log) WithOptions(opts ...zap.Option) *Log {
-	l.logger.WithOptions(opts...)
+func (l *Logger) WithOptions(opts ...zap.Option) *Logger {
+	l._logger.WithOptions(opts...)
 	return l
 }
 
-func (l *Log) addCallerSkip() {
-	l.logger = l.logger.WithOptions(zap.AddCallerSkip(skiplevel))
+func (l *Logger) addCallerSkip() {
+	l._logger = l._logger.WithOptions(zap.AddCallerSkip(skiplevel))
 }
-func (l *Log) resetCallerSkip() {
-	l.logger = l.logger.WithOptions(zap.AddCallerSkip(resetlevel))
+func (l *Logger) resetCallerSkip() {
+	l._logger = l._logger.WithOptions(zap.AddCallerSkip(resetlevel))
 }
 
-func New() *Log {
-	l := &Log{
+func (l *Logger) Printf(format string, v ...interface{}) {
+	l._logger.Infof(format, v...)
+}
+
+func New() *Logger {
+	l := &Logger{
 		writers: newWriterContainer(),
 	}
 	l.initCore()

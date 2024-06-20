@@ -71,9 +71,9 @@ func (c *core) initializeCore(g *gin.Engine) {
 	}
 
 	//{
-	//	Log.Info("Registering routers to gin")
+	//	Logger.Info("Registering routers to gin")
 	//	c.routerController.ApplyRouter()
-	//	Log.Info("Routers registered to gin")
+	//	Logger.Info("Routers registered to gin")
 	//}
 
 	Log.Info("Core initialized")

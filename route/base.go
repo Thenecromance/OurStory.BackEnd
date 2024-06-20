@@ -37,8 +37,8 @@ func (r *Router) SetMethod(method string) {
 	r.method = method
 }
 
-func (r *Router) SetMiddleWare(middleware gin.HandlersChain) {
-	r.middleWare = middleware
+func (r *Router) SetMiddleWare(middleware gin.HandlerFunc) {
+	r.middleWare = append(r.middleWare, middleware)
 }
 
 func (r *Router) SetHandler(handler ...gin.HandlerFunc) {

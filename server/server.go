@@ -17,6 +17,7 @@ func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
 }
 
 func (s *Server) RegisterMiddleWare(name string, handler gin.HandlerFunc) {
+	return
 	s.core.middleWareController.RegisterMiddleWare(name, handler)
 }
 
@@ -33,9 +34,11 @@ func (s *Server) initialize() {
 func (s *Server) Run() {
 	Config.Flush()
 	defer Config.CloseIni()
+	defer log.Infof("Server is closing")
 	if s.core == nil {
 		s.core = newCore()
 	}
+	log.Info("Server is running")
 	s.core.Run()
 
 }

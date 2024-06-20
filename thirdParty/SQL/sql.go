@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
 	"github.com/Thenecromance/OurStories/utility/log"
+	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gorp.v2"
 )
 
@@ -124,7 +124,7 @@ func (s *SQLManager) initGorpDb(dbName string) *gorp.DbMap {
 		Encoding: "utf8mb4",
 	}}
 
-	dbmap.TraceOn("[gorp]", &gLogger{})
+	dbmap.TraceOn("[gorp]", log.Instance)
 	return dbmap
 }
 

@@ -8,20 +8,21 @@ import (
 )
 
 type UserRepository interface {
-	GetUser(id int) (models.User, error)
+	GetUser(id int) (*models.User, error)
 	GetUsers() ([]models.User, error)
-	GetUserByUsername(username string) (models.User, error)
+	GetUserByUsername(username string) (*models.User, error)
 
-	//Insert a user to the database
+	GetUserIdByName(username string) (int, error)
+	// InsertUser Insert a user to the database
 	// this method won't check if the user is exist or not
 	InsertUser(user *models.User) error
 
-	//Check if the user is exist
+	// HasUser Check if the user is exist
 	// if the user is exist, return true
 	// other wise return false
 	HasUser(username string)
 
-	//Check if the user and email is exist
+	// HasUserAndEmail Check if the user and email is exist
 	// if the user or email is exist, return true
 	// other wise return false
 	HasUserAndEmail(username, email string) bool
@@ -31,9 +32,21 @@ type user struct {
 	db *gorp.DbMap
 }
 
-func (u *user) GetUser(id int) (models.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *user) GetUserIdByName(username string) (int, error) {
+	selectInt, err := u.db.SelectInt("select id from user where username = ?", username)
+	if err != nil {
+		return -1, err
+	}
+	return int(selectInt), nil
+}
+
+func (u *user) GetUser(id int) (*models.User, error) {
+	//models.User
+	obj, err := u.db.Select(models.User{}, "select * from user where id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+	return obj[0].(*models.User), nil
 }
 
 func (u *user) GetUsers() ([]models.User, error) {
@@ -41,24 +54,48 @@ func (u *user) GetUsers() ([]models.User, error) {
 	panic("implement me")
 }
 
-func (u *user) GetUserByUsername(username string) (models.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *user) GetUserByUsername(username string) (*models.User, error) {
+
+	obj, err := u.db.Select(models.User{}, "select * from user where username = ?", username)
+	if err != nil {
+		return nil, err
+	}
+	if len(obj) == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+	return obj[0].(*models.User), nil
 }
 
 func (u *user) InsertUser(user *models.User) error {
-	//TODO implement me
-	panic("implement me")
+	err := u.db.Insert(user)
+	if err != nil {
+		log.Errorf("failed to insert user with error: %s", err.Error())
+		return err
+	}
+	return nil
 }
 
 func (u *user) HasUser(username string) {
-	//TODO implement me
-	panic("implement me")
+	obj, err := u.db.SelectInt("select count(*) from user where username = ?", username)
+	if err != nil {
+		return
+	}
+	if obj > 0 {
+		return
+
+	}
+
 }
 
 func (u *user) HasUserAndEmail(username, email string) bool {
-	//TODO implement me
-	panic("implement me")
+	obj, err := u.db.SelectInt("select count(*) from user where username = ? or email = ?", username, email)
+	if err != nil {
+		return false
+	}
+	if obj > 0 {
+		return true
+	}
+	return false
 }
 
 func (u *user) initTable() error {

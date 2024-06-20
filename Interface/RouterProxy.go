@@ -8,7 +8,7 @@ type IRouterSetter interface {
 	// SetMethod Set the method of the route if the route is RESTFUL, this method will not be used
 	SetMethod(method string)
 	// SetMiddleWare Set the middleware of the route, the middleware will be used before the handler
-	SetMiddleWare(middleware gin.HandlersChain)
+	SetMiddleWare(middleware gin.HandlerFunc)
 	// SetHandler Set the handler of the route, the handler will be used to handle the request
 	// if the route is RESTFUL, this method will be followed by GET, POST, PUT, DELETE
 	SetHandler(handler ...gin.HandlerFunc)

@@ -64,8 +64,8 @@ func (r *rest) SetMethod(method string) {
 	// empty method for rest
 }
 
-func (r *rest) SetMiddleWare(middleware gin.HandlersChain) {
-	r.middleWare = middleware
+func (r *rest) SetMiddleWare(middleware gin.HandlerFunc) {
+	r.middleWare = append(r.middleWare, middleware)
 }
 
 func (r *rest) SetHandler(handler ...gin.HandlerFunc) {
