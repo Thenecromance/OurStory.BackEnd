@@ -1,6 +1,6 @@
 package Interface
 
-type TLS interface {
+type ITLs interface {
 	GetCertificate() string
 	GetKey() string
 }

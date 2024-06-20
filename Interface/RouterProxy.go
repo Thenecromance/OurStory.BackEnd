@@ -2,7 +2,7 @@ package Interface
 
 import "github.com/gin-gonic/gin"
 
-type RouterSetter interface {
+type IRouterSetter interface {
 	// SetPath Set the path of the route
 	SetPath(path string)
 	// SetMethod Set the method of the route if the route is RESTFUL, this method will not be used
@@ -13,7 +13,7 @@ type RouterSetter interface {
 	// if the route is RESTFUL, this method will be followed by GET, POST, PUT, DELETE
 	SetHandler(handler ...gin.HandlerFunc)
 }
-type RouterGetter interface {
+type IRouterGetter interface {
 	// GetPath Get the path of the route
 	GetPath() string
 	// GetMethod Get the method of the route
@@ -24,20 +24,20 @@ type RouterGetter interface {
 	GetHandler() []gin.HandlerFunc // if the subject is RESTFUL, this should be 4 handlers
 }
 
-// RouterControl is the interface that wraps the basic methods of a route control.
-type RouterControl interface {
+// IRouterControl is the interface that wraps the basic methods of a route control.
+type IRouterControl interface {
 	// Enable the route , the route will be used
 	Enable()
 	// Disable the route , the route will not be used
 	Disable()
 }
 
-// Route is the interface that wraps the basic methods of a route.
-type Route interface {
+// IRoute is the interface that wraps the basic methods of a route.
+type IRoute interface {
 	IsRESTFUL() bool
 
-	RouterControl
+	IRouterControl
 
-	RouterSetter
-	RouterGetter
+	IRouterSetter
+	IRouterGetter
 }

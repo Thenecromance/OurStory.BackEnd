@@ -100,7 +100,7 @@ func (r *rest) GetHandler() []gin.HandlerFunc {
 	}
 }
 
-func NewREST(path_ string) Interface.Route {
+func NewREST(path_ string) Interface.IRoute {
 	return &rest{
 		path:       path_,
 		handlers:   DefaultRESTHandlers(),

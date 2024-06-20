@@ -11,10 +11,10 @@ import (
 )
 
 type core struct {
-	routerController     Interface.RouterController
-	middleWareController Interface.MiddleWareController // all middlewares will be registered here which will be used by all routers
+	routerController     Interface.IRouterController
+	middleWareController Interface.IMiddleWareController // all middlewares will be registered here which will be used by all routers
 
-	Tls Interface.TLS
+	Tls Interface.ITLs
 	cfg *config
 	svr *http.Server
 }
@@ -24,14 +24,14 @@ func (c *core) Run() {
 	c.routerController.ApplyRouter()
 
 	if c.Tls != nil {
-		Log.Infof("Server is running on %s with TLS.\ncertificate file %s\nKey file path:%s", c.cfg.Addr, c.Tls.GetCertificate(), c.Tls.GetKey())
+		Log.Infof("Server is running on %s with ITLs.\ncertificate file %s\nKey file path:%s", c.cfg.Addr, c.Tls.GetCertificate(), c.Tls.GetKey())
 		err := c.svr.ListenAndServeTLS(c.Tls.GetCertificate(), c.Tls.GetKey())
 		if err != nil {
-			Log.Errorf("Error while running the server with TLS: %s", err.Error())
+			Log.Errorf("Error while running the server with ITLs: %s", err.Error())
 			return
 		}
 	} else {
-		Log.Infof("Server is running on %s without TLS. use http to request", c.cfg.Addr)
+		Log.Infof("Server is running on %s without ITLs. use http to request", c.cfg.Addr)
 		err := c.svr.ListenAndServe()
 		if err != nil {
 			Log.Errorf("Error while running the server: %s", err.Error())
@@ -67,7 +67,7 @@ func (c *core) initializeCore(g *gin.Engine) {
 	{
 		Log.Info("Initializing the route manager")
 		c.routerController = Manager.NewRouterManager(g)
-		Log.Info("Route manager initialized")
+		Log.Info("IRoute manager initialized")
 	}
 
 	//{

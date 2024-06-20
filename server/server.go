@@ -12,7 +12,7 @@ type Server struct {
 	core *core
 }
 
-func (s *Server) RegisterRouter(routers ...Interface.Route) error {
+func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
 	return s.core.routerController.RegisterRouter(routers...)
 }
 
@@ -20,7 +20,7 @@ func (s *Server) RegisterMiddleWare(name string, handler gin.HandlerFunc) {
 	s.core.middleWareController.RegisterMiddleWare(name, handler)
 }
 
-func (s *Server) setTLS(tls Interface.TLS) {
+func (s *Server) setTLS(tls Interface.ITLs) {
 	s.core.Tls = tls
 }
 

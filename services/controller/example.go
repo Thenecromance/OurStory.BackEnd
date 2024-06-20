@@ -9,12 +9,12 @@ import (
 )
 
 type ExampleController struct {
-	basicRoute Interface.Route
-	restRoute  Interface.Route
+	basicRoute Interface.IRoute
+	restRoute  Interface.IRoute
 }
 
-func (ec *ExampleController) GetRoutes() []Interface.Route {
-	return []Interface.Route{ec.basicRoute, ec.restRoute}
+func (ec *ExampleController) GetRoutes() []Interface.IRoute {
+	return []Interface.IRoute{ec.basicRoute, ec.restRoute}
 }
 
 func (ec *ExampleController) setupRouters() {

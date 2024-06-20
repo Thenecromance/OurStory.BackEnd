@@ -9,8 +9,8 @@ import (
 )
 
 type travelRouter struct {
-	travel     Interface.Route
-	travelList Interface.Route
+	travel     Interface.IRoute
+	travelList Interface.IRoute
 }
 
 type TravelController struct {

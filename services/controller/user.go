@@ -12,10 +12,10 @@ import (
 )
 
 type userRouters struct {
-	login    Interface.Route
-	register Interface.Route
-	logout   Interface.Route
-	profile  Interface.Route
+	login    Interface.IRoute
+	register Interface.IRoute
+	logout   Interface.IRoute
+	profile  Interface.IRoute
 }
 
 type UserController struct {
@@ -23,8 +23,8 @@ type UserController struct {
 	routers userRouters
 }
 
-func (uc *UserController) GetRoutes() []Interface.Route {
-	return []Interface.Route{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
+func (uc *UserController) GetRoutes() []Interface.IRoute {
+	return []Interface.IRoute{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
 }
 
 func (uc *UserController) setupRouters() {

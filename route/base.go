@@ -69,14 +69,14 @@ func (r *Router) handler(ctx *gin.Context) {
 	}
 }
 
-func NewDefaultRouter() Interface.Route {
+func NewDefaultRouter() Interface.IRoute {
 	return &Router{
 		realHandler: DefaultHandler(),
 		active:      true,
 	}
 }
 
-func NewRouter(path_, method_ string) Interface.Route {
+func NewRouter(path_, method_ string) Interface.IRoute {
 	return &Router{
 		path:   path_,
 		method: method_,

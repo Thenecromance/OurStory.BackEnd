@@ -8,7 +8,7 @@ import (
 )
 
 type entry struct {
-	router            Interface.Route
+	router            Interface.IRoute
 	hasBeenRegistered bool
 }
 
@@ -17,14 +17,14 @@ type controller struct {
 	proxy map[string]entry
 }
 
-func (c *controller) GetRouter(name string) (Interface.Route, error) {
+func (c *controller) GetRouter(name string) (Interface.IRoute, error) {
 	if router, ok := c.proxy[name]; ok {
 		return router.router, nil
 	}
 	return nil, fmt.Errorf("route %s not found", name)
 }
 
-func (c *controller) RegisterRouter(routerProxy ...Interface.Route) error {
+func (c *controller) RegisterRouter(routerProxy ...Interface.IRoute) error {
 	/*c.proxy[routerProxy.GetPath()] = entry{
 		route:            routerProxy,
 		hasBeenRegistered: false,
@@ -52,7 +52,7 @@ func (c *controller) ApplyRouter() error {
 	Log.Debugf("Applying all routers to the server")
 	for _, r := range c.proxy {
 		if r.hasBeenRegistered {
-			Log.Debugf("Route %s has already been registered", r.router.GetPath())
+			Log.Debugf("IRoute %s has already been registered", r.router.GetPath())
 			continue
 		}
 
@@ -64,6 +64,6 @@ func (c *controller) ApplyRouter() error {
 	return nil
 }
 
-func NewController() Interface.RouterController {
+func NewController() Interface.IRouterController {
 	return &controller{}
 }

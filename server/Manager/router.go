@@ -10,16 +10,16 @@ import (
 
 /*
 	type entry struct {
-		route Interface.Route
+		route Interface.IRoute
 		loaded bool
 	}
 */
 type routerManager struct {
 	gin      *gin.Engine
-	routeMap map[string]Interface.Route
+	routeMap map[string]Interface.IRoute
 }
 
-func (r *routerManager) RegisterRouter(routerProxy ...Interface.Route) error {
+func (r *routerManager) RegisterRouter(routerProxy ...Interface.IRoute) error {
 
 	//r.routeMap[routerProxy.GetPath()] = routerProxy
 	for _, router := range routerProxy {
@@ -32,7 +32,7 @@ func (r *routerManager) RegisterRouter(routerProxy ...Interface.Route) error {
 	return nil
 }
 
-func (r *routerManager) GetRouter(name string) (Interface.Route, error) {
+func (r *routerManager) GetRouter(name string) (Interface.IRoute, error) {
 	router, ok := r.routeMap[name]
 	if !ok {
 		return nil, fmt.Errorf("route %s not found", name)
@@ -64,9 +64,9 @@ func (r *routerManager) Close() error {
 	return nil
 }
 
-func NewRouterManager(g *gin.Engine) Interface.RouterController {
+func NewRouterManager(g *gin.Engine) Interface.IRouterController {
 	return &routerManager{
 		gin:      g,
-		routeMap: make(map[string]Interface.Route),
+		routeMap: make(map[string]Interface.IRoute),
 	}
 }
