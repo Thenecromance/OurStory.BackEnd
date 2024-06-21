@@ -33,10 +33,12 @@ type user struct {
 }
 
 func (u *user) GetUserIdByName(username string) (int, error) {
+
 	selectInt, err := u.db.SelectInt("select id from user where username = ?", username)
 	if err != nil {
 		return -1, err
 	}
+
 	return int(selectInt), nil
 }
 
@@ -67,12 +69,18 @@ func (u *user) GetUserByUsername(username string) (*models.User, error) {
 }
 
 func (u *user) InsertUser(user *models.User) error {
-	err := u.db.Insert(user)
+	transaction, err := u.db.Begin()
 	if err != nil {
+		return err
+	}
+	err = transaction.Insert(user)
+	if err != nil {
+		transaction.Rollback()
 		log.Errorf("failed to insert user with error: %s", err.Error())
 		return err
 	}
-	return nil
+
+	return transaction.Commit()
 }
 
 func (u *user) HasUser(username string) {

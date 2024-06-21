@@ -2,6 +2,7 @@ package models
 
 type Anniversary struct {
 	Id        string `json:"id"         db:"id"`
+	OwnerId   int    `json:"owner_id"   db:"owner_id"`
 	Owner     string `json:"owner"      db:"owner"`
 	TimeStamp int64  `json:"time_stamp" db:"time_stamp"`
 	Title     string `json:"title"      db:"title"`

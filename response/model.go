@@ -1,6 +1,8 @@
 package response
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type meta struct {
 	Count int `json:"count"`
@@ -30,4 +32,22 @@ func (r *Response) AddData(data interface{}) {
 func (r *Response) SetCode(code int) *Response {
 	r.Code = code
 	return r
+}
+
+func (r *Response) Error(errMsg string) {
+	r.SetCode(BadRequest)
+	r.AddData(errMsg)
+}
+
+func (r *Response) Success(data interface{}) {
+	r.SetCode(OK).AddData(data)
+}
+
+func (r *Response) NotFound() {
+	r.SetCode(NotFound)
+}
+
+func (r *Response) Unauthorized(msg string) {
+
+	r.SetCode(Unauthorized).AddData(msg)
 }

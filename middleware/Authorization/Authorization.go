@@ -2,6 +2,10 @@ package Authorization
 
 import "github.com/gin-gonic/gin"
 
+const (
+	AuthObject = "UserData"
+)
+
 type IAuth interface {
 	AuthorizeUser(claim interface{}) (string, error)
 

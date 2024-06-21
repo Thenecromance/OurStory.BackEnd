@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	AuthObject = "AuthObject"
-	constKey   = "M0nkey_Cl1cker"
+	constKey = "M0nkey_Cl1cker"
 )
 
 var (
@@ -128,7 +127,7 @@ func (s *Service) Middleware() gin.HandlerFunc {
 		}
 		log.Info("obj ", obj)
 
-		c.Set(AuthObject, obj.(*Claim).Obj)
+		c.Set(Authorization.AuthObject, obj.(*Claim).Obj)
 		c.Next()
 	}
 }
