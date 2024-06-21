@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
+	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
 	"github.com/Thenecromance/OurStories/services/models"
@@ -23,8 +24,10 @@ type TravelController struct {
 }
 
 func (tc *TravelController) SetupRouters() {
+	mw := JWT.Middleware()
 	tc.groups.travel = route.NewREST("/api/travel/:id")
 	{
+		tc.groups.travel.SetMiddleWare(mw)
 		tc.groups.travel.SetHandler(
 			tc.getTravel,    // GET
 			tc.createTravel, // POST
@@ -34,8 +37,13 @@ func (tc *TravelController) SetupRouters() {
 	}
 	tc.groups.travelList = route.NewRouter("/api/travels", "POST")
 	{
+		tc.groups.travelList.SetMiddleWare(mw)
 		tc.groups.travelList.SetHandler(tc.getTravelList)
 	}
+}
+
+func (tc *TravelController) GetRoutes() []Interface.IRoute {
+	return []Interface.IRoute{tc.groups.travel, tc.groups.travelList}
 }
 
 func (tc *TravelController) collectParams(ctx *gin.Context) (travelId string, user models.UserClaim, success bool) {
@@ -44,9 +52,20 @@ func (tc *TravelController) collectParams(ctx *gin.Context) (travelId string, us
 		success = false
 		return
 	}
+
 	success = true
-	user = val.(models.UserClaim)
+	{
+		// any to map
+		m := val.(map[string]any)
+		//user.Id =
+		log.Info("user id: ", m["id"].(float64))
+		user.Id = int(m["id"].(float64))
+		user.UserName = m["username"].(string)
+		/*user.Id = val.(map[string]string)["id"]*/
+		//user = val.(models.UserClaim)
+	}
 	travelId = ctx.Param("id") // get id from url
+	log.Info("user id: ", user.Id, " travel id: ", travelId, " user name: ", user)
 	return
 
 }
@@ -62,22 +81,26 @@ func (tc *TravelController) getTravel(ctx *gin.Context) {
 		return
 	}
 
-	travel, err := tc.service.GetTravel(tId)
+	// get travel from db by id
+	travel, err := tc.service.GetTravelByID(tId)
 	if err != nil {
 		log.Error(err)
 		resp.Error(err.Error())
 		return
 	}
 
+	// check if user is owner of travel
+	// but this is not the best way to check if user is owner of travel
+	// so this is a temp solution
 	isOwner := func() bool {
 		if travel.UserId == user.Id {
 			return true
 		}
-		for _, v := range travel.TogetherWith {
-			if v == user.Id {
-				return true
-			}
-		}
+		/*		for _, v := range travel.TogetherWith {
+				if v == user.Id {
+					return true
+				}
+			}*/
 		return false
 
 	}
@@ -91,12 +114,13 @@ func (tc *TravelController) getTravel(ctx *gin.Context) {
 }
 
 func (tc *TravelController) createTravel(ctx *gin.Context) {
+	log.Debugf("Creating travel")
 	resp := response.New()
 	defer resp.Send(ctx)
 
 	_, user, success := tc.collectParams(ctx)
 	if !success {
-		resp.Unauthorized("Unauthorized access")
+		resp.Unauthorized("something goes wrong with your request")
 		return
 	}
 
@@ -123,17 +147,55 @@ func (tc *TravelController) updateTravel(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	tId, user, success := tc.collectParams(ctx)
+	_, user, success := tc.collectParams(ctx)
 	if !success {
 		resp.Unauthorized("Unauthorized access")
 		return
 	}
+	var obj models.Travel
+	if err := ctx.ShouldBind(&obj); err != nil {
+		log.Error(err)
+		resp.Error("something wrong with your request")
+		return
+	}
 
-	tc.service.UpdateTravel(tId, user.Id, ctx)
+	if obj.UserId != user.Id {
+		resp.Unauthorized("Unauthorized access")
+		return
+	}
+
+	//tc.service.UpdateTravel(tId, user.Id, ctx)
 }
 func (tc *TravelController) deleteTravel(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
+
+	_, user, success := tc.collectParams(ctx)
+	if !success {
+		resp.Unauthorized("Unauthorized access")
+		return
+
+	}
+
+	tId := ctx.Param("id")
+	travel, err := tc.service.GetTravelByID(tId)
+	if err != nil {
+		log.Error(err)
+		resp.Error(err.Error())
+		return
+	}
+
+	if travel.UserId != user.Id {
+		resp.Unauthorized("Unauthorized access")
+		return
+	}
+
+	err = tc.service.DeleteTravel(tId)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	resp.Success("Delete travel")
 }
 
 //------------------------------------------------------------
@@ -143,4 +205,12 @@ func (tc *TravelController) deleteTravel(ctx *gin.Context) {
 func (tc *TravelController) getTravelList(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
+}
+
+func NewTravelController(s services.TravelService) *TravelController {
+	tc := &TravelController{
+		service: s,
+	}
+	tc.SetupRouters()
+	return tc
 }

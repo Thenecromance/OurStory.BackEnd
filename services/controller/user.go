@@ -48,7 +48,6 @@ func (uc *UserController) setupRouters() {
 		{
 			uc.routers.register.SetPath("/api/user/register")
 			uc.routers.register.SetMethod("POST")
-
 			uc.routers.register.SetHandler(uc.register)
 		}
 	}

@@ -16,6 +16,12 @@ func newUserController() *controller.UserController {
 
 }
 
+func newTravelContrller() *controller.TravelController {
+	repo := repository.NewTravelRepository(SQL.Get("travel"))
+	s := services.NewTravelService(repo)
+	return controller.NewTravelController(s)
+}
+
 func main() {
 	svr := server.New()
 
@@ -24,6 +30,9 @@ func main() {
 
 	ec := controller.NewExampleController()
 	svr.RegisterRouter(ec.GetRoutes()...)
+
+	tc := newTravelContrller()
+	svr.RegisterRouter(tc.GetRoutes()...)
 
 	//svr.RegisterMiddleWare("auth", JWT.Middleware())
 

@@ -22,6 +22,7 @@ type travelUpdater interface {
 	UpdateEndTime(id string, endTime int64) error
 	UpdateOwner(id string, owner int) error
 	UpdateToDb(id string) error
+	Update(obj *models.Travel) error
 }
 
 type travelGetter interface {
@@ -52,24 +53,46 @@ type travelMap = map[travelId]*models.Travel
 type updatingTravel models.Travel
 
 func (u *updatingTravel) updateState(state int) {
+	if state == 0 {
+		return
+	}
 	u.State = state
 }
 func (u *updatingTravel) updateLocation(location string) {
+	if location == "" {
+		return
+	}
 	u.Location = location
 }
 func (u *updatingTravel) updateDetails(details string) {
+	if details == "" {
+
+	}
 	u.Details = details
 }
 func (u *updatingTravel) updateTogetherWith(togetherWith []int) {
-	u.TogetherWith = togetherWith
+	if togetherWith == nil {
+		return
+	}
+	//u.TogetherWith = togetherWith
 }
 func (u *updatingTravel) updateStartTime(startTime int64) {
+	if startTime <= 0 {
+		return
+
+	}
 	u.StartTime = startTime
 }
 func (u *updatingTravel) updateEndTime(endTime int64) {
+	if endTime <= 0 {
+		return
+	}
 	u.EndTime = endTime
 }
 func (u *updatingTravel) updateOwner(owner int) {
+	if owner <= 0 {
+		return
+	}
 	u.UserId = owner
 }
 
@@ -212,6 +235,7 @@ func (t *travelServiceImpl) UpdateOwner(id string, owner int) error {
 	return nil
 }
 
+// UpdateToDb update the travel info from cache to db
 func (t *travelServiceImpl) UpdateToDb(id string) error {
 	log.Debugf("UpdateToDb id: %s", id)
 	obj := t.getUpdaterObject(id)
@@ -233,8 +257,31 @@ func (t *travelServiceImpl) UpdateToDb(id string) error {
 
 }
 
-func (t *travelServiceImpl) CreateTravel(info *models.Travel) error {
+func (t *travelServiceImpl) Update(obj *models.Travel) error {
+	o := t.getUpdaterObject(strconv.Itoa(obj.Id))
+	if o == nil {
+		return fmt.Errorf("Update error: %s", "getUpdaterObject return nil")
+	}
+	o.updateDetails(obj.Details)
+	o.updateEndTime(obj.EndTime)
+	o.updateLocation(obj.Location)
+	o.updateOwner(obj.UserId)
+	o.updateStartTime(obj.StartTime)
+	o.updateState(obj.State)
+	//o.updateTogetherWith(obj.TogetherWith)
+	err := t.UpdateToDb(strconv.Itoa(o.Id))
+	if err != nil {
+		log.Errorf("Update error: %v", err)
+		return err
+	}
+	return nil
 
+}
+
+func (t *travelServiceImpl) CreateTravel(info *models.Travel) error {
+	if t.repo == nil {
+		panic("repo is nil")
+	}
 	return t.repo.CreateTravel(info)
 }
 

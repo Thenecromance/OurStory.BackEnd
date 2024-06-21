@@ -18,6 +18,7 @@ type anniversaryServiceImpl struct {
 	repo repository.Anniversary
 }
 
-func NewAnniversaryService(repo repository.Anniversary) AnniversaryService {
+/*func NewAnniversaryService(repo repository.Anniversary) AnniversaryService {
 	return &anniversaryServiceImpl{repo}
 }
+*/

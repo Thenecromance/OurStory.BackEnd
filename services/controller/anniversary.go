@@ -5,7 +5,6 @@ import (
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
 	"github.com/Thenecromance/OurStories/services/services"
-	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -47,14 +46,16 @@ func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, err := c.services.GetAnniversaryById()
-	if err != nil {
-		log.Infof("failed to get anniversary by id with error: %s", err.Error())
-		resp.Error("failed to get anniversary by id with error")
-		return
-	}
+	/*	obj, err := c.services.GetAnniversaryById()
+		if err != nil {
+			log.Infof("failed to get anniversary by id with error: %s", err.Error())
+			resp.Error("failed to get anniversary by id with error")
+			return
+		}
 
-	resp.Success(obj)
+		resp.Success(obj)*/
+
+	panic("implement me")
 }
 
 func (c *AnniversaryController) createAnniversary(ctx *gin.Context) {

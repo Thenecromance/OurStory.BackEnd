@@ -34,7 +34,7 @@ func (s *Service) MarkTokenExpired(token string) error {
 }
 
 func (s *Service) AuthorizeUser(claim interface{}) (string, error) {
-	token_, err := s.authToken(claim, 1, "secret")
+	token_, err := s.authToken(claim, 1, constKey)
 	if err != nil {
 		return "", err
 	}
@@ -54,6 +54,7 @@ func (s *Service) TokenExpired(token string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	log.Info("Shit  ", claims.ExpiresAt.Time.Before(time.Now()))
 	return claims.ExpiresAt.Time.Before(time.Now()), nil
 }
 
@@ -106,9 +107,8 @@ func (s *Service) Middleware() gin.HandlerFunc {
 		token = token[7:]
 
 		expired, err := s.TokenExpired(token)
-		log.Info("token  ", token, expired)
-		if expired == true || err != nil {
-			log.Warn("token is expired")
+		if expired || err != nil {
+			log.Warn("token is expired ", err)
 			resp := response.New()
 			resp.SetCode(response.NotAcceptable).AddData("token is invalid")
 			c.Abort()
