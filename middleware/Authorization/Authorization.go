@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	AuthObject = "UserData"
 	EncryptKey = "M0nkey_Cl1cker"
 )
 

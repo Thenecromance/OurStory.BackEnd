@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
-	"github.com/Thenecromance/OurStories/middleware/Authorization"
+	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
@@ -55,7 +55,7 @@ func (tc *TravelController) GetRoutes() []Interface.IRoute {
 }
 
 func (tc *TravelController) collectParams(ctx *gin.Context) (travelId string, user models.UserClaim, success bool) {
-	val, exists := ctx.Get(Authorization.AuthObject)
+	val, exists := ctx.Get(constants.AuthObject)
 	if !exists {
 		success = false
 		return

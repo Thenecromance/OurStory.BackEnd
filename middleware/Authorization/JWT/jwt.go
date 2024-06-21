@@ -2,6 +2,7 @@ package JWT
 
 import (
 	"fmt"
+	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/utility/cache/lru"
@@ -174,7 +175,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(Authorization.AuthObject, userClaim) // set the user claim to the context
+		c.Set(constants.AuthObject, userClaim) // set the user claim to the context
 
 		c.Next()
 	}

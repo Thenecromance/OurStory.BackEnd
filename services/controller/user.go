@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
-	"github.com/Thenecromance/OurStories/middleware/Authorization"
+	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
@@ -78,7 +78,7 @@ func (uc *UserController) GetRoutes() []Interface.IRoute {
 //-----------------------------------------------------------
 
 func (uc *UserController) hasCredential(ctx *gin.Context) bool {
-	obj, exists := ctx.Get(Authorization.AuthObject)
+	obj, exists := ctx.Get(constants.AuthObject)
 	log.Info("User already Already login ", obj, exists)
 	if exists {
 		log.Info("User already Already login ", obj)
@@ -241,7 +241,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exist := ctx.Get(Authorization.AuthObject)
+	obj, exist := ctx.Get(constants.AuthObject)
 	if !exist {
 		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
