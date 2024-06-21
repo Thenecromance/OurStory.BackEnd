@@ -270,7 +270,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 func (uc *UserController) updateProfile(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
-
+	panic("implement me")
 }
 
 // signTokenToClient is the method to sign the token to the client

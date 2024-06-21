@@ -26,6 +26,7 @@ type UserRepository interface {
 	// if the user or email is exist, return true
 	// other wise return false
 	HasUserAndEmail(username, email string) bool
+	UpdateLastLogin(id int, unix int64) error
 }
 
 type user struct {
@@ -66,6 +67,23 @@ func (u *user) GetUserByUsername(username string) (*models.User, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 	return obj[0].(*models.User), nil
+}
+
+func (u *user) UpdateLastLogin(id int, unix int64) error {
+	trans, err := u.db.Begin()
+	if err != nil {
+		log.Errorf("failed to begin transaction with error: %s", err.Error())
+		return err
+	}
+
+	_, err = trans.Exec("update user set last_login = ? where id = ?", unix, id)
+	if err != nil {
+		log.Errorf("failed to update last login with error: %s", err.Error())
+		trans.Rollback()
+		return err
+	}
+
+	return trans.Commit()
 }
 
 func (u *user) InsertUser(user *models.User) error {

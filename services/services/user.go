@@ -47,7 +47,11 @@ func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) 
 	}
 
 	if hash.Compare(login.Password, usrInDb.Password) {
-		log.Info("user authorized")
+		err = us.repo.UpdateLastLogin(usrInDb.Id, time.Now().Unix())
+		if err != nil {
+			log.Error("error in updating last login", err)
+			return false, err
+		}
 		return true, nil
 	}
 
