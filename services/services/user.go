@@ -6,13 +6,14 @@ import (
 	"github.com/Thenecromance/OurStories/services/repository"
 	"github.com/Thenecromance/OurStories/utility/hash"
 	"github.com/Thenecromance/OurStories/utility/log"
+	"time"
 )
 
 type UserService interface {
 	GetUserIdByName(username string) (int, error)
 	GetUser(id int) (*models.User, error)
 	GetUserByUsername(username string) (*models.User, error)
-	AuthorizeUser(login *models.UserLogin) (*models.User, error)
+	AuthorizeUser(login *models.UserLogin) (bool, error)
 	SignedTokenToUser(info interface{}) string
 	AddUser(user *models.UserRegister) error
 	HasUserAndEmail(username, email string) bool
@@ -33,12 +34,28 @@ func (us *userServiceImpl) GetUser(id int) (*models.User, error) {
 func (us *userServiceImpl) GetUserByUsername(username string) (*models.User, error) {
 	return us.repo.GetUserByUsername(username)
 }
-func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (*models.User, error) {
-	return us.repo.GetUserByUsername(login.UserName)
+func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) {
+
+	usrInDb, err := us.repo.GetUserByUsername(login.UserName)
+	if err != nil {
+		log.Error("error in getting user", err)
+		return false, err
+	}
+	if usrInDb == nil {
+		log.Error("user not found")
+		return false, nil
+	}
+
+	if hash.Compare(login.Password, usrInDb.Password) {
+		log.Info("user authorized")
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (us *userServiceImpl) SignedTokenToUser(info interface{}) string {
-	token, err := JWT.Instance().AuthorizeUser(info)
+	token, err := JWT.Instance().SignTokenToUser(info)
 	if err != nil {
 		log.Error("error in signing token", err)
 		return ""
@@ -47,6 +64,7 @@ func (us *userServiceImpl) SignedTokenToUser(info interface{}) string {
 }
 
 func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
+
 	fullInfo := &models.User{
 		UserAdvancedDTO: models.UserAdvancedDTO{
 			UserBasicDTO: models.UserBasicDTO{
@@ -56,6 +74,10 @@ func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
 		},
 		Password: hash.Hash(user.Password),
 	}
+
+	fullInfo.CreatedTime = time.Now().Unix()
+	fullInfo.LastLogin = fullInfo.CreatedTime
+
 	return us.repo.InsertUser(fullInfo)
 }
 

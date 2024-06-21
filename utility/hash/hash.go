@@ -39,3 +39,7 @@ func HashWithSalt(origin, salt string) string {
 	hash := sha256.Sum256([]byte(salted(origin, salt)))
 	return fmt.Sprintf("%x", hash)
 }
+
+func Compare(origin, hashed string) bool {
+	return Hash(origin) == hashed
+}

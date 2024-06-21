@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/middleware/Authorization"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
@@ -10,10 +11,6 @@ import (
 	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
-)
-
-const (
-	authKey = "AuthObject"
 )
 
 type userRouters struct {
@@ -74,10 +71,10 @@ func (uc *UserController) setupRouters() {
 //-----------------------------------------------------------
 
 func (uc *UserController) hasCredential(ctx *gin.Context) bool {
-	obj, exists := ctx.Get(authKey)
+	obj, exists := ctx.Get(Authorization.AuthObject)
 	log.Info("User already Already login ", obj, exists)
 	if exists {
-		log.Info("User already Already login ", obj.(*models.UserClaim))
+		log.Info("User already Already login ", obj)
 		return true
 	}
 	return false
@@ -87,17 +84,25 @@ func (uc *UserController) login(ctx *gin.Context) {
 
 	resp := response.New()
 	defer resp.Send(ctx)
-
-	// TODO: add token auth here
-	/*	auth, err := ctx.Cookie("Authorization")
-		if err == nil {
-			resp.SetCode(response.OK).AddData("Already login")
-			return
-		}*/
-
-	if uc.hasCredential(ctx) {
+	// due to login does not Attached middle ware, so the user claim will not be attached to the context
+	/*if uc.hasCredential(ctx) {
 		resp.SetCode(response.OK).AddData("Already login")
 		return
+	}*/
+
+	{
+		cookie, err := ctx.Cookie("Authorization")
+		if err == nil {
+			//validate the token
+			if cookie != "" && JWT.Instance().TokenValid(cookie) {
+				resp.SetCode(response.OK).AddData("please do not login again")
+				return
+			}
+			/*log.Error("Error while getting token from cookie ", err)
+			resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
+			return*/
+		}
+
 	}
 
 	info := models.UserLogin{}
@@ -110,13 +115,24 @@ func (uc *UserController) login(ctx *gin.Context) {
 
 	log.Debugf("here should be add a precheck method for the user info incase some one might use the shit names")
 
-	usr, err := uc.service.AuthorizeUser(&info)
+	loginSuccess, err := uc.service.AuthorizeUser(&info)
 	if err != nil {
 		log.Error("authorize user failed :", err)
 		resp.SetCode(response.BadRequest).AddData("Invalid username or password")
 		return
 	}
+	if !loginSuccess {
+		resp.SetCode(response.OK).AddData("Login failed, please check username or password")
+		return
+	}
 
+	usr, err := uc.service.GetUserByUsername(info.UserName)
+	if err != nil {
+		log.Error("something goes wrong with  uc.service.GetUserByUsername(info.UserName) please check ", err)
+		return
+	}
+
+	//set up claim for sign token to client
 	claim_ := models.UserClaim{
 		UserName: usr.UserName,
 		Id:       usr.Id,
@@ -134,10 +150,17 @@ func (uc *UserController) register(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	if uc.hasCredential(ctx) {
-		log.Infof("Already Logged in")
-		resp.SetCode(response.OK).AddData("Already login")
-		return
+	{
+		cookie, err := ctx.Cookie("Authorization")
+		if err != nil {
+			log.Error("Error while getting token from cookie ", err)
+			resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
+			return
+		}
+		if JWT.Instance().TokenValid(cookie) {
+			resp.SetCode(response.OK).AddData("please do not login again")
+			return
+		}
 	}
 
 	// get the user info from the request
@@ -208,12 +231,21 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exist := ctx.Get(authKey)
+	obj, exist := ctx.Get(Authorization.AuthObject)
 	if !exist {
 		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
 	}
-	obj_ := obj.(models.UserClaim)
+	var obj_ models.UserClaim
+	//try to cast to the user claim
+	if _, ok := obj.(models.UserClaim); ok {
+		obj_ = obj.(models.UserClaim)
+
+	} else {
+		mp := obj.(map[string]interface{})
+		obj_.UserName = mp["username"].(string)
+		obj_.Id = int(mp["id"].(float64))
+	}
 
 	usrName := ctx.Param("username")
 	if usrName != obj_.UserName {
@@ -243,7 +275,7 @@ func (uc *UserController) updateProfile(ctx *gin.Context) {
 
 // signTokenToClient is the method to sign the token to the client
 func (uc *UserController) signTokenToClient(ctx *gin.Context, token string) {
-	token = "Bearer " + token
+	//token = "Bearer " + token
 	ctx.SetCookie("Authorization", token, 3600, "/", "", false, true)
 }
 
