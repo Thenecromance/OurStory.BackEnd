@@ -118,6 +118,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			log.Error("Error while getting token from cookie ", err)
 			resp := response.New()
 			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp.Send(c)
 			c.Abort()
 			return
 		}
@@ -138,6 +139,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 		if s.TokenExpired(token) {
 			resp := response.New()
 			resp.SetCode(response.NetworkAuthenticationRequired).AddData("your token has been expired")
+			resp.Send(c)
 			c.Abort()
 			return
 		}
@@ -147,6 +149,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			resp := response.New()
 			log.Warn("Invalid token provided")
 			resp.Error("Invalid token provided")
+			resp.Send(c)
 			c.Abort()
 			return
 		}
@@ -157,6 +160,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			resp := response.New()
 			log.Error("Error while getting user claim from token ", err)
 			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Something goes wrong while getting user claim from token")
+			resp.Send(c)
 			c.Abort()
 			return
 		}
@@ -165,6 +169,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			log.Error("Error while getting user claim from token ", err)
 			resp := response.New()
 			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp.Send(c)
 			c.Abort()
 			return
 		}

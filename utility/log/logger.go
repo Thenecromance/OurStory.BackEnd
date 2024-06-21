@@ -74,7 +74,7 @@ func (l *Logger) resetCallerSkip() {
 }
 
 func (l *Logger) Printf(format string, v ...interface{}) {
-	l._logger.Infof(format, v...)
+	l._logger.Debugf(format, v...)
 }
 
 func New() *Logger {

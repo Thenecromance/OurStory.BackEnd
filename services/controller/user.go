@@ -25,11 +25,15 @@ type UserController struct {
 	routers userRouters
 }
 
-func (uc *UserController) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
+func (uc *UserController) Name() string {
+	return "UserController"
 }
 
-func (uc *UserController) setupRouters() {
+func (uc *UserController) Initialize() {
+	uc.SetRoutes()
+}
+
+func (uc *UserController) SetRoutes() {
 	mw := JWT.Middleware()
 	{
 		uc.routers.login = route.NewDefaultRouter()
@@ -63,7 +67,10 @@ func (uc *UserController) setupRouters() {
 			uc.routers.profile.SetHandler(uc.getProfile, nil, uc.updateProfile)
 		}
 	}
+}
 
+func (uc *UserController) GetRoutes() []Interface.IRoute {
+	return []Interface.IRoute{uc.routers.login, uc.routers.register, uc.routers.logout, uc.routers.profile}
 }
 
 //-----------------------------------------------------------
@@ -151,16 +158,19 @@ func (uc *UserController) register(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	{
-		cookie, err := ctx.Cookie("Authorization")
-		if err != nil {
+		cookie, _ := ctx.Cookie("Authorization")
+		/*if err != nil {
 			log.Error("Error while getting token from cookie ", err)
 			resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
 			return
+		}*/
+		if cookie != "" {
+			if JWT.Instance().TokenValid(cookie) {
+				resp.SetCode(response.OK).AddData("please do not login again")
+				return
+			}
 		}
-		if JWT.Instance().TokenValid(cookie) {
-			resp.SetCode(response.OK).AddData("please do not login again")
-			return
-		}
+
 	}
 
 	// get the user info from the request
@@ -283,11 +293,11 @@ func (uc *UserController) cleanUpClientToken(ctx *gin.Context) {
 	ctx.SetCookie("Authorization", "", -1, "/", "", false, true)
 }
 
-func NewUserController(userService services.UserService) *UserController {
+func NewUserController(userService services.UserService) Interface.IController {
 
 	uc := &UserController{
 		service: userService,
 	}
-	uc.setupRouters()
+	uc.Initialize()
 	return uc
 }

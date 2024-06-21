@@ -23,7 +23,15 @@ type TravelController struct {
 	service services.TravelService
 }
 
-func (tc *TravelController) SetupRouters() {
+func (tc *TravelController) Name() string {
+	return "TravelController"
+}
+
+func (tc *TravelController) Initialize() {
+	tc.SetRoutes()
+}
+
+func (tc *TravelController) SetRoutes() {
 	mw := JWT.Middleware()
 	tc.groups.travel = route.NewREST("/api/travel/:id")
 	{
@@ -207,10 +215,10 @@ func (tc *TravelController) getTravelList(ctx *gin.Context) {
 	defer resp.Send(ctx)
 }
 
-func NewTravelController(s services.TravelService) *TravelController {
+func NewTravelController(s services.TravelService) Interface.IController {
 	tc := &TravelController{
 		service: s,
 	}
-	tc.SetupRouters()
+	tc.Initialize()
 	return tc
 }

@@ -18,6 +18,33 @@ type AnniversaryController struct {
 	services services.AnniversaryService
 }
 
+func (c *AnniversaryController) Name() string {
+	return "AnniversaryController"
+}
+
+func (c *AnniversaryController) SetRoutes() {
+	c.base = route.NewREST("/api/anniversary")
+	{
+		c.base.SetHandler(
+			c.getAnniversary,
+			c.createAnniversary,
+			c.updateAnniversary,
+			c.deleteAnniversary,
+		)
+	}
+
+	c.list = route.NewREST("/api/anniversary/list")
+	{
+		c.list.SetHandler(
+			c.getAnniversaries,
+		)
+	}
+}
+
+func (c *AnniversaryController) GetRoutes() []Interface.IRoute {
+	return []Interface.IRoute{c.base, c.list}
+}
+
 func (c *AnniversaryController) Initialize() {
 	c.base = route.NewREST("/api/anniversary")
 	{
@@ -85,7 +112,7 @@ func (c *AnniversaryController) getAnniversaryById(ctx *gin.Context) {
 	defer resp.Send(ctx)
 }
 
-func NewAnniversaryController(services services.AnniversaryService) *AnniversaryController {
+func NewAnniversaryController(services services.AnniversaryService) Interface.IController {
 	c := new(AnniversaryController)
 	c.services = services
 	c.Initialize()

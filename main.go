@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/server"
 	"github.com/Thenecromance/OurStories/services/controller"
 	"github.com/Thenecromance/OurStories/services/repository"
@@ -9,14 +10,14 @@ import (
 )
 
 // dependency injection
-func newUserController() *controller.UserController {
+func newUserController() Interface.IController {
 	repo := repository.NewUserRepository(SQL.Get("user"))
 	s := services.NewUserService(repo)
 	return controller.NewUserController(s)
 
 }
 
-func newTravelContrller() *controller.TravelController {
+func newTravelController() Interface.IController {
 	repo := repository.NewTravelRepository(SQL.Get("travel"))
 	s := services.NewTravelService(repo)
 	return controller.NewTravelController(s)
@@ -28,10 +29,10 @@ func main() {
 	uc := newUserController()
 	svr.RegisterRouter(uc.GetRoutes()...)
 
-	ec := controller.NewExampleController()
-	svr.RegisterRouter(ec.GetRoutes()...)
+	/*	ec := controller.NewExampleController()
+		svr.RegisterRouter(ec.GetRoutes()...)*/
 
-	tc := newTravelContrller()
+	tc := newTravelController()
 	svr.RegisterRouter(tc.GetRoutes()...)
 
 	//svr.RegisterMiddleWare("auth", JWT.Middleware())

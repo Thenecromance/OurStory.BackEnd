@@ -1,5 +1,8 @@
 package Interface
 
-type Controller interface {
+type IController interface {
+	Initialize()
+	Name() string
+	SetRoutes()
 	GetRoutes() []IRoute
 }
