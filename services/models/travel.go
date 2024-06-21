@@ -1,6 +1,6 @@
 package models
 
-type TravelInfo struct {
+type Travel struct {
 	Id           string `json:"id"          db:"id"`
 	State        int    `json:"state"       db:"state"        form:"state"`
 	UserId       int    `json:"owner"       db:"owner"        form:"owner"     binding:"required"` // the user who create this travel
@@ -10,4 +10,8 @@ type TravelInfo struct {
 	Details      string `json:"details"        db:"details"   form:"details"`                      //if the travel is prepare travel, nothing will be here
 	TogetherWith []int  `json:"together"      form:"together"`                                     //don't need to required, maybe go alone
 	//ImagePath string `json:"img"           form:"img" ` // I hate stored image in database, so I will store the path of image
+}
+
+// UserTravelInfo is the struct that will be used to store the user travel information
+type UserTravelInfo struct {
 }

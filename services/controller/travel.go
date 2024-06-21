@@ -101,7 +101,7 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 	}
 
 	// get data from request
-	var newTravel models.TravelInfo
+	var newTravel models.Travel
 	err := ctx.ShouldBind(&newTravel)
 	if err != nil {
 		log.Error(err)
