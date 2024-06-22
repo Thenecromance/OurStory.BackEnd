@@ -2,6 +2,7 @@ package services
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"github.com/Thenecromance/OurStories/services/repository"
 	"strconv"
@@ -27,10 +28,10 @@ type relationshipServiceImpl struct {
 //	relationType int - the relation type
 //	idx int - the index of the relations, exp: if the user has more than 1 friend, the idx will be 1, 2, 3
 func generateURL(userID, relationType, idx int) string {
-	data := strconv.Itoa(userID) + strconv.Itoa(relationType)
+	data := strconv.Itoa(userID) + "." + strconv.Itoa(relationType) + "." + strconv.Itoa(idx)
 	hash := sha256.Sum256([]byte(data))
 	uniqueID := hex.EncodeToString(hash[:])
-	return uniqueID
+	return base64.StdEncoding.EncodeToString([]byte(uniqueID)) // the link should like https://.../api/relation/bind/NzdhYzMxOWJmZTE5NzllMmQ3OTlkOWU2OTg3ZTY1ZmViNTRmNjE1MTFjMDM1NTJlYmFlOTkwODI2YzIwODU5MA==
 }
 
 func (r *relationshipServiceImpl) UserHasAssociation(userID int) bool {

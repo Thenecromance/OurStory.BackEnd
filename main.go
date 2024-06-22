@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/server"
 	"github.com/Thenecromance/OurStories/services/controller"
 	"github.com/Thenecromance/OurStories/services/repository"
 	"github.com/Thenecromance/OurStories/services/services"
-	"github.com/Thenecromance/OurStories/services/services/Encryptor/Scrypt"
 	"github.com/Thenecromance/OurStories/thirdParty/SQL"
 )
 
@@ -26,10 +24,6 @@ func newTravelController() Interface.IController {
 }
 
 func main() {
-	en := Scrypt.New()
-	a, b := en.Hash("123456")
-	println(a, b)
-	fmt.Println(en.Verify("123456", a, b))
 
 	return
 

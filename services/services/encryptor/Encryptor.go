@@ -1,4 +1,4 @@
-package Encryptor
+package encryptor
 
 // Encryptor is an interface that defines the methods that an encryptor should implement
 // this is useful for user authentication, where the password is hashed and stored in the database

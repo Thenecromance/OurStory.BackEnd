@@ -4,8 +4,8 @@ import (
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/repository"
-	"github.com/Thenecromance/OurStories/services/services/Encryptor"
-	"github.com/Thenecromance/OurStories/services/services/Encryptor/Scrypt"
+	"github.com/Thenecromance/OurStories/services/services/encryptor"
+	"github.com/Thenecromance/OurStories/services/services/encryptor/Scrypt"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"time"
 )
@@ -22,7 +22,7 @@ type UserService interface {
 
 type userServiceImpl struct {
 	repo repository.UserRepository
-	auth Encryptor.Encryptor
+	auth encryptor.Encryptor
 }
 
 func (us *userServiceImpl) GetUserIdByName(username string) (int, error) {
