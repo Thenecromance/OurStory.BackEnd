@@ -7,8 +7,8 @@ import (
 	"github.com/Thenecromance/OurStories/services/controller"
 	"github.com/Thenecromance/OurStories/services/repository"
 	"github.com/Thenecromance/OurStories/services/services"
+	"github.com/Thenecromance/OurStories/services/services/Encryptor/Scrypt"
 	"github.com/Thenecromance/OurStories/thirdParty/SQL"
-	"github.com/Thenecromance/OurStories/utility/Encrypt/Scrypt"
 )
 
 // dependency injection

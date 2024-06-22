@@ -4,7 +4,8 @@ import (
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/repository"
-	"github.com/Thenecromance/OurStories/utility/hash"
+	"github.com/Thenecromance/OurStories/services/services/Encryptor"
+	"github.com/Thenecromance/OurStories/services/services/Encryptor/Scrypt"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"time"
 )
@@ -21,6 +22,7 @@ type UserService interface {
 
 type userServiceImpl struct {
 	repo repository.UserRepository
+	auth Encryptor.Encryptor
 }
 
 func (us *userServiceImpl) GetUserIdByName(username string) (int, error) {
@@ -34,6 +36,7 @@ func (us *userServiceImpl) GetUser(id int) (*models.User, error) {
 func (us *userServiceImpl) GetUserByUsername(username string) (*models.User, error) {
 	return us.repo.GetUserByUsername(username)
 }
+
 func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) {
 
 	usrInDb, err := us.repo.GetUserByUsername(login.UserName)
@@ -46,7 +49,7 @@ func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) 
 		return false, nil
 	}
 
-	if hash.Compare(login.Password, usrInDb.Password) {
+	if us.auth.Verify(login.Password, usrInDb.Password, usrInDb.Salt) {
 		err = us.repo.UpdateLastLogin(usrInDb.Id, time.Now().Unix())
 		if err != nil {
 			log.Error("error in updating last login", err)
@@ -55,6 +58,9 @@ func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) 
 		return true, nil
 	}
 
+	/*if hash.Compare(login.Password, usrInDb.Password) {
+
+	}*/
 	return false, nil
 }
 
@@ -69,6 +75,7 @@ func (us *userServiceImpl) SignedTokenToUser(info interface{}) string {
 
 func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
 
+	hashedPwd, hashedSalt := us.auth.Hash(user.Password)
 	fullInfo := &models.User{
 		UserAdvancedDTO: models.UserAdvancedDTO{
 			UserBasicDTO: models.UserBasicDTO{
@@ -76,7 +83,8 @@ func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
 			},
 			Email: user.Email,
 		},
-		Password: hash.Hash(user.Password),
+		Password: hashedPwd,
+		Salt:     hashedSalt,
 	}
 
 	fullInfo.CreatedTime = time.Now().Unix()
@@ -90,5 +98,5 @@ func (us *userServiceImpl) HasUserAndEmail(username, email string) bool {
 }
 
 func NewUserService(repo repository.UserRepository) UserService {
-	return &userServiceImpl{repo}
+	return &userServiceImpl{repo, Scrypt.New()}
 }

@@ -1,7 +1,7 @@
 package Scrypt
 
 import (
-	"github.com/Thenecromance/OurStories/utility/Encrypt"
+	"github.com/Thenecromance/OurStories/services/services/Encryptor"
 	"reflect"
 	"testing"
 )
@@ -9,7 +9,7 @@ import (
 func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
-		want Encrypt.Encryptor
+		want Encryptor.Encryptor
 	}{
 		{
 			name: "TestNew",

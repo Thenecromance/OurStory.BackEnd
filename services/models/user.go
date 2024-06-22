@@ -29,6 +29,7 @@ type UserAdvancedDTO struct {
 type User struct {
 	UserAdvancedDTO
 	Password string `db:"password"              json:"password"          `
+	Salt     string `db:"salt"                  json:"salt"              `
 }
 
 // when user login, they need to provide username and password

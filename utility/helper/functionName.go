@@ -7,6 +7,7 @@ import (
 )
 
 // CurrentFunctionName returns the name of the function that called it
+// Example: helper.CurrentFunctionName() -> CurrentFunctionName
 func CurrentFunctionName() string {
 	pc := make([]uintptr, 1)
 	runtime.Callers(2, pc)
@@ -15,6 +16,7 @@ func CurrentFunctionName() string {
 }
 
 // GetFunctionName returns the name of the function
+// Example: helper.GetFunctionName(helper.GetFunctionName) -> GetFunctionName
 func GetFunctionName(fn interface{} /*, seps ...rune*/) string {
 	fullName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 	parts := strings.Split(fullName, ".")
@@ -29,6 +31,7 @@ func GetFunctionName(fn interface{} /*, seps ...rune*/) string {
 }
 
 // GetPackageName returns the name of the package
+// Example: helper.GetPackageName(helper.GetPackageName) -> helper
 func GetPackageName(fn interface{}) string {
 
 	fullName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()

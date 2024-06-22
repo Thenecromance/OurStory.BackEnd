@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/Thenecromance/OurStories/utility/Encrypt"
+	"github.com/Thenecromance/OurStories/services/services/Encryptor"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"golang.org/x/crypto/scrypt"
 )
@@ -74,7 +74,7 @@ func (s *scryptor) Verify(password, hash, salt string) bool {
 
 }
 
-func New() Encrypt.Encryptor {
+func New() Encryptor.Encryptor {
 	return &scryptor{
 		cfg: newConfig(),
 	}
