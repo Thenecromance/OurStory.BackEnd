@@ -1,4 +1,4 @@
-package Encrypt
+package RSA
 
 import (
 	"crypto/rand"

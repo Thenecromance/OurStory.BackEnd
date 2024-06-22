@@ -3,6 +3,7 @@ package Config
 import (
 	"errors"
 	"fmt"
+	"github.com/Thenecromance/OurStories/utility/helper"
 	"github.com/Thenecromance/OurStories/utility/log"
 
 	"gopkg.in/ini.v1"
@@ -20,6 +21,11 @@ var (
 
 func init() {
 	var err error
+	err = helper.CreateIfNotExist("./setting")
+	if err != nil {
+		log.Error(err)
+		return
+	}
 	defaultCfg, err = ini.Load(configPath)
 
 	if err != nil {
@@ -82,7 +88,6 @@ func ReflectFrom(section string, v interface{}) (err error) {
 func HasSection(section string) bool {
 	return defaultCfg.HasSection(section)
 }
-
 func GetString(section string, key string) string {
 	return defaultCfg.Section(section).Key(key).String()
 }
