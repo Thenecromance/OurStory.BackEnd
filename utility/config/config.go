@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	configPath = "setting/Config.ini"
+	configPath = "setting/Config.ini" //the path of the config file
 )
 
 var (
-	defaultCfg *ini.File
+	defaultCfg *ini.File // the default config all the config operation will be based on this
 )
 
 // init will load the default config from the file

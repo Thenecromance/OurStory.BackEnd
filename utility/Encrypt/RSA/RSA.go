@@ -21,6 +21,8 @@ var (
 	files      filePath
 )
 
+// TODO: change RSA to implement the Encrypt interface
+
 type filePath struct {
 	PrivateKeyFile string `ini:"privateKeyFile"`
 	PublicKeyFile  string `ini:"publicKeyFile"`
