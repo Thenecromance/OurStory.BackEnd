@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/Thenecromance/OurStories/services/services/encryptor"
+	"github.com/Thenecromance/OurStories/services/services/pwdHashing"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"golang.org/x/crypto/scrypt"
 )
@@ -68,13 +68,13 @@ func (s *scryptor) Verify(password, hash, salt string) bool {
 		log.Error(err)
 		return false
 	}
-
+	
 	newKey := s.generateKeyWithSalt([]byte(password), saltBuffer)
 	return bytes.Equal(newKey, keyBuffer)
 
 }
 
-func New() encryptor.Encryptor {
+func New() pwdHashing.PwdHasher {
 	return &scryptor{
 		cfg: newConfig(),
 	}

@@ -1,7 +1,7 @@
 package Scrypt
 
 import (
-	"github.com/Thenecromance/OurStories/services/services/encryptor"
+	"github.com/Thenecromance/OurStories/services/services/pwdHashing"
 	"reflect"
 	"testing"
 )
@@ -9,7 +9,7 @@ import (
 func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
-		want encryptor.Encryptor
+		want pwdHashing.PwdHasher
 	}{
 		{
 			name: "TestNew",

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	sectionName = "scrypt"
+	sectionName = "Hashing.scrypt"
 )
 
 // Setting is the configuration for the scrypt algorithm
@@ -31,13 +31,8 @@ func defaultConfig() *Setting {
 func newConfig() *Setting {
 	var cfg *Setting
 	cfg = defaultConfig()
-	if !Config.HasSection(sectionName) {
-		Config.MapSection(sectionName, cfg)
-		Config.Flush()
-		return cfg
-	}
 
-	err := Config.LoadToObject("scrypt", cfg)
+	err := Config.LoadToObject(sectionName, cfg)
 	if err != nil {
 		log.Error(err)
 		cfg = defaultConfig()
