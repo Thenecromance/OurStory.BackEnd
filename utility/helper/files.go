@@ -1,8 +1,8 @@
 package helper
 
 import (
-	"encoding/json"
 	"os"
+	"strings"
 )
 
 func FileExists(path string) bool {
@@ -18,7 +18,16 @@ func DirExists(path string) bool {
 	return stat.IsDir()
 }
 
-func CreateIfNotExist(path string) error {
+func CreateFileIfNotExist(path string) error {
+	if pathContainsDir(path) {
+		dir := path[:strings.LastIndex(path, "/")]
+		err := createDirIfNotExist(dir)
+		if err != nil {
+
+			return err
+		}
+	}
+
 	if !FileExists(path) {
 		os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 		file, err := os.Create(path)
@@ -30,27 +39,52 @@ func CreateIfNotExist(path string) error {
 	return nil
 }
 
-func SaveJson(path string, data interface{}) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "    ")
-	err = encoder.Encode(data)
-
-	return err
+func pathContainsDir(path string) bool {
+	return strings.Contains(path, "/")
 }
-func LoadJson(path string, data interface{}) error {
+
+func createDirIfNotExist(path string) error {
+	if !DirExists(path) {
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ReadFile(path string) ([]byte, error) {
+	CreateFileIfNotExist(path)
+
 	file, err := os.Open(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(data)
-	return err
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]byte, stat.Size())
+	_, err = file.Read(data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func WriteFile(path string, buffer []byte) error {
+
+	file, err := os.OpenFile(path, os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer file.Sync()
+	defer file.Close()
+	os.Truncate(path, 0)
+	file.Write(buffer)
+
+	return nil
 }

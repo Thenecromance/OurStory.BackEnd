@@ -13,12 +13,12 @@ func init() {
 			panic(err)
 		}
 	}
-	err := helper.CreateIfNotExist(logFile)
+	err := helper.CreateFileIfNotExist(logFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	err = helper.CreateIfNotExist(errFile)
+	err = helper.CreateFileIfNotExist(errFile)
 	if err != nil {
 		fmt.Println(err)
 		return

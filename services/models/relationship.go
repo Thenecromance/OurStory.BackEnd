@@ -2,11 +2,11 @@ package models
 
 // Relationship is the struct that defines the relationship between users which stores in the database
 type Relationship struct {
-	ID            int   `json:"id,omitempty" db:"id"`
-	UserID        int   `json:"user_id,omitempty" db:"user_id" `              // the user id
-	FriendID      int   `json:"friend_id,omitempty" db:"friend_id"`           // associate with the user id
-	RelationType  int   `json:"relation_type,omitempty" db:"relation_type"`   // two of the user's relationship type
-	AssociateTime int64 `json:"associate_time,omitempty" db:"associate_time"` // the time when the relationship is created
+	ID            int   `json:"id" db:"id"`
+	UserID        int   `json:"user_id" db:"user_id" `              // the user id
+	FriendID      int   `json:"friend_id" db:"friend_id"`           // associate with the user id
+	RelationType  int   `json:"relation_type" db:"relation_type"`   // two of the user's relationship type
+	AssociateTime int64 `json:"associate_time" db:"associate_time"` // the time when the relationship is created
 }
 
 const (
@@ -17,8 +17,8 @@ const (
 )
 
 type RelationShipResponse struct {
-	URL          string `json:"url,omitempty"`
-	RelationType int    `json:"relation_type,omitempty"` // identify the relation type
+	URL          string `json:"url"`
+	RelationType int    `json:"relation_type"` // identify the relation type
 }
 
 // RelationShipHistory is the history of the user's relationship
@@ -26,11 +26,11 @@ type RelationShipResponse struct {
 // like associate, disassociate
 type RelationShipHistory struct {
 	// which user is doing the operation
-	UserID int `json:"user_id,omitempty" db:"user_id"`
+	UserID int `json:"user_id" db:"user_id"`
 	// the operation type
-	OperationType int `json:"operation_type,omitempty" db:"operation_type"`
+	OperationType int `json:"operation_type" db:"operation_type"`
 	// when the operation is done
-	OperationTime int64 `json:"operation_time,omitempty" db:"operation_time"`
+	OperationTime int64 `json:"operation_time" db:"operation_time"`
 	// the target user id
-	TargetID int `json:"target_id,omitempty" db:"target_id"`
+	TargetID int `json:"target_id" db:"target_id"`
 }

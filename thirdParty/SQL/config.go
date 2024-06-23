@@ -7,14 +7,14 @@ import (
 )
 
 type config struct {
-	SqlType   string   `ini:"sql" comment:"which sql to use, default mysql"`
-	Protocol  string   `ini:"protocol"  comment:"tcp or unix socket"`
-	Host      string   `ini:"host" `
-	Port      string   `ini:"port"`
-	User      string   `ini:"user"`
-	Password  string   `ini:"password"`
-	DefaultDb string   `ini:"default_db"  comment:"when there is no db_name, use this,and it need to create first"`
-	DbName    []string `ini:"db_name" comment:"the logic database name which should be the same as the database's name'"`
+	SqlType   string   `ini:"sql"           json:"sql_type"   yaml:"sql_type"     comment:"which sql to use, default mysql"`
+	Protocol  string   `ini:"protocol"      json:"protocol"   yaml:"protocol"     comment:"tcp or unix socket"   `
+	Host      string   `ini:"host"          json:"host"       yaml:"host"`
+	Port      string   `ini:"port"          json:"port"       yaml:"port"`
+	User      string   `ini:"user"          json:"user"       yaml:"user"`
+	Password  string   `ini:"password"      json:"password"   yaml:"password"`
+	DefaultDb string   `ini:"default_db"    json:"default_db" yaml:"default_db"   comment:"when there is no db_name, use this,and it need to create first"`
+	DbName    []string `ini:"db_name"       json:"db_name"    yaml:"db_name"      comment:"the logic database name which should be the same as the database's name'" `
 }
 
 func (c *config) buildConnectString(dbName string) (res string) {
@@ -50,11 +50,12 @@ func defaultConfig() *config {
 		DefaultDb: "mysql",
 		DbName:    []string{},
 	}
-	err := Config.LoadToObject(sectionName, cfg)
+	err := Config.Instance(Config.Yaml).LoadToObject(sectionName, &cfg)
 	if err != nil {
 		log.Error(err.Error())
 		return nil
 	}
 	log.Infof("LoadController config section to %s", sectionName)
+	log.Info(cfg)
 	return cfg
 }

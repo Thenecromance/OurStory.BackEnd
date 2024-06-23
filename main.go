@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/server"
 	"github.com/Thenecromance/OurStories/services/controller"
 	"github.com/Thenecromance/OurStories/services/repository"
 	"github.com/Thenecromance/OurStories/services/services"
-	"github.com/Thenecromance/OurStories/services/services/pwdHashing/Argon2"
 	"github.com/Thenecromance/OurStories/thirdParty/SQL"
 )
 
@@ -26,12 +24,6 @@ func newTravelController() Interface.IController {
 }
 
 func main() {
-	argon := Argon2.New()
-	hashed, salted := argon.Hash("password")
-	fmt.Printf("hashed: %s\nsalted: %s\n", hashed, salted)
-	fmt.Println(argon.Verify("password", hashed, salted)) // should
-
-	return
 
 	svr := server.New()
 
