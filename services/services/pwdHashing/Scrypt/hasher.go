@@ -26,7 +26,7 @@ func (s *scryptor) randomSalt() (salt []byte) {
 
 // generateKeyWithSalt generates a key with a given password and salt
 func (s *scryptor) generateKeyWithSalt(password, salt []byte) (key []byte) {
-	key, err := scrypt.Key(password, salt, s.cfg.N, s.cfg.R, s.cfg.P, s.cfg.KeyLen)
+	key, err := scrypt.Key(password, salt, s.cfg.CostFactor, s.cfg.BlockSizeFactor, s.cfg.ParallelizationFactor, s.cfg.KeyLen)
 	if err != nil {
 		log.Error(err)
 		panic(err)
@@ -45,6 +45,7 @@ func (s *scryptor) Hash(password string) (key, salt string) {
 
 	key = base64.StdEncoding.EncodeToString(keyBuffer)
 	salt = base64.StdEncoding.EncodeToString(saltBuffer)
+	log.Debugf("key: %s salt: %s", key, salt)
 	return
 }
 
@@ -68,7 +69,7 @@ func (s *scryptor) Verify(password, hash, salt string) bool {
 		log.Error(err)
 		return false
 	}
-	
+
 	newKey := s.generateKeyWithSalt([]byte(password), saltBuffer)
 	return bytes.Equal(newKey, keyBuffer)
 
