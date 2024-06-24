@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
-	Config "github.com/Thenecromance/OurStories/utility/config"
+	Config "github.com/Thenecromance/OurStories/Interface"
 	"os"
 )
 
@@ -31,7 +31,8 @@ type filePath struct {
 func init() {
 	files.PrivateKeyFile = privateKeyFile
 	files.PublicKeyFile = publicKeyFile
-	err := Config.LoadToObject("Encrypt", &files)
+	//err := Config.LoadToObject("Encrypt", &files)
+	err := Config.Instance().LoadToObject("Encrypt", &files)
 	if err != nil {
 		return
 	}

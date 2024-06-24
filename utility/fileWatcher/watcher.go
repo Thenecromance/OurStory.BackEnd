@@ -9,6 +9,8 @@ var (
 	inst *Watcher
 )
 
+//TODO: this service should be rewritten to be support more ways
+
 func init() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

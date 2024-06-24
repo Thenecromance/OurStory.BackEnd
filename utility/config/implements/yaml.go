@@ -1,10 +1,10 @@
-package Config
+package implements
 
 import (
 	"errors"
+	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/utility/helper"
-	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,6 +16,15 @@ TODO: add lock mechanism
 
 type yamConfig struct {
 	entries map[string]interface{} `yaml:"config"`
+	name    string
+}
+
+func (y *yamConfig) SetName(name string) {
+	y.name = name
+}
+
+func (y *yamConfig) Type() int {
+	return constants.Yaml
 }
 
 func (y *yamConfig) Save() error {
@@ -29,7 +38,7 @@ func (y *yamConfig) Save() error {
 func (y *yamConfig) initialize() {
 	err := helper.CreateFileIfNotExist(y.GetConfigFileName())
 	if err != nil {
-		log.Error(err)
+		//log.Error(err)
 		return
 	}
 	y.readContentFromFile()
@@ -39,12 +48,12 @@ func (y *yamConfig) readContentFromFile() {
 	bytes, err := helper.ReadFile(y.GetConfigFileName())
 
 	if err != nil {
-		log.Error(err)
+		//log.Error(err)
 		return
 	}
 
 	if err = yaml.Unmarshal(bytes, y.entries); err != nil {
-		log.Error(err)
+		//log.Error(err)
 		return
 	}
 
@@ -52,28 +61,28 @@ func (y *yamConfig) readContentFromFile() {
 }
 
 func (y *yamConfig) GetConfigFileName() string {
-	return constants.SettingFolder + "/" + constants.SettingFileName + constants.YamlExt
+	return constants.SettingFolder + "/" + y.name + constants.YamlExt
 }
 
 func (y *yamConfig) LoadToObject(section string, obj interface{}) error {
-	log.Debug("Loading section:", section)
+	//log.Debug("Loading section:", section)
 
 	entry, exists := y.entries[section]
 	if !exists {
 		if err := y.UpdateToFile(section, obj); err != nil {
-			log.Error("Failed to update file with section:", err)
+			//log.Error("Failed to update file with section:", err)
 			return err
 		}
 		return errors.New("section not found")
 	}
 	entryBytes, err := yaml.Marshal(entry)
 	if err != nil {
-		log.Error("Failed to marshal entry:", err)
+		//log.Error("Failed to marshal entry:", err)
 		return err
 	}
 
-	if err := yaml.Unmarshal(entryBytes, obj); err != nil {
-		log.Error("Failed to unmarshal entry to object:", err)
+	if err = yaml.Unmarshal(entryBytes, obj); err != nil {
+		//log.Error("Failed to unmarshal entry to object:", err)
 		return err
 	}
 
@@ -85,9 +94,19 @@ func (y *yamConfig) UpdateToFile(section string, obj interface{}) error {
 	return y.Save()
 }
 
-func newYamlConfig() IConfiguration {
+func NewYamlConfig() Interface.IConfiguration {
 	y := &yamConfig{
 		entries: make(map[string]interface{}),
+		name:    constants.SettingFileName,
+	}
+	y.initialize()
+	return y
+}
+
+func NewYamlConfigWithName(name string) Interface.IConfiguration {
+	y := &yamConfig{
+		entries: make(map[string]interface{}),
+		name:    name,
 	}
 	y.initialize()
 	return y

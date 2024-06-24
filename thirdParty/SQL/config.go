@@ -3,6 +3,7 @@ package SQL
 import (
 	"fmt"
 	Config "github.com/Thenecromance/OurStories/utility/config"
+
 	"github.com/Thenecromance/OurStories/utility/log"
 )
 

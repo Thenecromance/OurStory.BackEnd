@@ -1,11 +1,8 @@
 package log
 
 import (
-	"fmt"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"io"
-	"os"
 )
 
 var (
@@ -26,10 +23,13 @@ type Logger struct {
 	writers *writerContainer
 }
 
-func (l *Logger) initCore() {
+/*func (l *Logger) initCore() {
+
+	cfg, _ := load()
+
 	core := zapcore.NewCore(
 		//zapcore.NewJSONEncoder(setupEncoderConfig()),
-		zapcore.NewConsoleEncoder(setupEncoderConfig()),
+		zapcore.NewConsoleEncoder(cfg.EncoderConfig),
 		zapcore.AddSync(l.writers),
 		zapcore.DebugLevel)
 
@@ -49,6 +49,18 @@ func (l *Logger) initCore() {
 
 		l.writers.addWriter(file)
 	}
+}
+*/
+
+func (l *Logger) initCore() {
+	cfg, err := load()
+	build, err := cfg.Build()
+	if err != nil {
+		return
+	}
+
+	l._logger = build.Sugar()
+
 }
 
 // AppendWriter when log need to place to more place, just add the target to here
