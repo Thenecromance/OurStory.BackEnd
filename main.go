@@ -23,6 +23,12 @@ func newTravelController() Interface.IController {
 	return controller.NewTravelController(s)
 }
 
+func newRelationShipController() Interface.IController {
+	repo := repository.NewRelationShipRepository(SQL.Get("user"))
+	s := services.NewRelationShipService(repo)
+	return controller.NewRelationshipController(s)
+}
+
 func main() {
 
 	svr := server.New()

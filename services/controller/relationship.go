@@ -4,7 +4,9 @@ import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
+	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/services"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,8 +31,7 @@ type relationshipController struct {
 }
 
 func (r *relationshipController) Initialize() {
-	//TODO implement me
-	panic("implement me")
+	r.SetRoutes()
 }
 
 func (r *relationshipController) Name() string {
@@ -40,13 +41,15 @@ func (r *relationshipController) Name() string {
 func (r *relationshipController) SetRoutes() {
 	r.createLink = route.NewRouter("/api/relation", "POST")
 	{
-		r.createLink.SetHandler(r.getAssociateLink)
+		r.createLink.SetHandler(r.createBindLink)
 	}
 	r.activeLink = route.NewRouter("/api/relation/:id", "GET")
 	{
+		r.activeLink.SetHandler(r.linkUser)
 	}
 	r.deleteLink = route.NewRouter("/api/relation/:id", "DELETE")
 	{
+		r.deleteLink.SetHandler(r.unbindUser)
 	}
 	r.getRelation = route.NewRouter("/api/relation/:user", "GET")
 	{
@@ -64,18 +67,53 @@ func (r *relationshipController) GetRoutes() []Interface.IRoute {
 // handlers
 // ---------------------------------------------------------
 
-// @Title getAssociateLink the user's associate link
+// @Title createBindLink the user's associate link
 // @description get the user's associate link
-func (r *relationshipController) getAssociateLink(ctx *gin.Context) {
+func (r *relationshipController) createBindLink(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	/*	if r.service.UserHasAssociation() {
+	type request struct {
+		UserID       int `json:"user_id,omitempty" form:"user_id"`
+		RelationType int `json:"relation_type,omitempty" form:"relation_type"`
+	}
 
-		}*/
+	var req request
+	if err := ctx.ShouldBind(&req); err != nil {
+		log.Error(err)
+		resp.Error("invalid request")
+		return
+	}
+
+	// create the relationship
+	link := r.service.CreateRelationshipConnection(req.UserID, req.RelationType)
+	if link == "" {
+		resp.Error("failed to create the relationship, you have reached the limit")
+		return
+	}
+
+	var urlResp models.RelationShipResponse
+	urlResp.URL = link
+	urlResp.RelationType = req.RelationType
+	resp.Success(urlResp)
 }
 
-func (r *relationshipController) associateWithOther(ctx *gin.Context) {
+// @Title linkUser
+// @description start to process the user's associate link jobs
+func (r *relationshipController) linkUser(ctx *gin.Context) {
+	resp := response.New()
+	defer resp.Send(ctx)
+
+	// get the user's associate link
+	link := ctx.Param("id")
+	if link == "" {
+		resp.Error("invalid link")
+		return
+	}
+
+}
+
+func (r *relationshipController) unbindUser(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 }

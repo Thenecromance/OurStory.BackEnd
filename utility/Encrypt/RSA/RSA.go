@@ -200,6 +200,7 @@ func Encrypt(plaintext string) (string, error) {
 }
 
 func Decrypt(ciphertext string) (string, error) {
+
 	//decode base64
 	cipherbytes, err := base64.StdEncoding.DecodeString(ciphertext)
 	if err != nil {
