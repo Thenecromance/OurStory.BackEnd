@@ -25,7 +25,7 @@ func (cfg *config) defaultConfig() {
 
 func (cfg *config) load() {
 	cfg.defaultConfig()
-	err := /*Config.LoadToObject("server", cfg)*/ Config.Instance(Config.Yaml).LoadToObject("server", cfg)
+	err := /*Config.LoadToObject("server", cfg)*/ Config.Instance().LoadToObject("server", cfg)
 	if err != nil {
 		log.Error(err.Error())
 		return

@@ -50,7 +50,7 @@ func defaultConfig() *config {
 		DefaultDb: "mysql",
 		DbName:    []string{},
 	}
-	err := Config.Instance(Config.Yaml).LoadToObject(sectionName, &cfg)
+	err := Config.Instance().LoadToObject(sectionName, &cfg)
 	if err != nil {
 		log.Error(err.Error())
 		return nil

@@ -32,7 +32,7 @@ func newConfig() *Setting {
 	var cfg *Setting
 	cfg = defaultConfig()
 
-	err := Config.Instance(Config.Yaml).LoadToObject(sectionName, cfg)
+	err := Config.Instance().LoadToObject(sectionName, cfg)
 	if err != nil {
 		log.Warnf("%s, start to use default instead", err)
 		cfg = defaultConfig()

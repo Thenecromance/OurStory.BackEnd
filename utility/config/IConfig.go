@@ -36,6 +36,9 @@ const (
 )
 
 var (
+	defaultInst IConfiguration
+
+	//different Instances to support different config types
 	iniInst  IConfiguration
 	jsonInst IConfiguration
 	yamlInst IConfiguration
@@ -54,23 +57,30 @@ func New(configType int) IConfiguration {
 	}
 }
 
-func Instance(configType int) IConfiguration {
+func Instance() IConfiguration {
+	if defaultInst == nil {
+		SetDefault(Yaml)
+	}
+	return defaultInst
+}
+
+func SetDefault(configType int) {
 	switch configType {
 	case Ini:
 		if iniInst == nil {
 			iniInst = newIniConfig()
 		}
-		return iniInst
+		defaultInst = iniInst
 	case Json:
 		if jsonInst == nil {
 			jsonInst = newJsonConfig()
 		}
-		return jsonInst
+		defaultInst = jsonInst
 	case Yaml:
 		if yamlInst == nil {
 			yamlInst = newYamlConfig()
 		}
-		return yamlInst
+		defaultInst = yamlInst
 	default:
 		panic("Invalid config type")
 	}
