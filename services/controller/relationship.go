@@ -4,7 +4,6 @@ import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
-	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
@@ -47,7 +46,7 @@ func (r *relationshipController) SetRoutes() {
 	{
 		r.activeLink.SetHandler(r.linkUser)
 	}
-	r.deleteLink = route.NewRouter("/api/relation/:id", "DELETE")
+	r.deleteLink = route.NewRouter("/api/relation/", "DELETE")
 	{
 		r.deleteLink.SetHandler(r.unbindUser)
 	}
@@ -60,7 +59,7 @@ func (r *relationshipController) SetRoutes() {
 }
 
 func (r *relationshipController) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{r.createLink, r.activeLink, r.deleteLink, r.getRelation, r.associateHistory}
+	return []Interface.IRoute{r.createLink, r.activeLink, r.deleteLink /*, r.getRelation, r.associateHistory*/}
 }
 
 // ---------------------------------------------------------
@@ -92,7 +91,12 @@ func (r *relationshipController) createBindLink(ctx *gin.Context) {
 		return
 	}
 
-	var urlResp models.RelationShipResponse
+	type RelationShipResponse struct {
+		URL          string `json:"url"`
+		RelationType int    `json:"relation_type"` // identify the relation type
+	}
+
+	var urlResp RelationShipResponse
 	urlResp.URL = link
 	urlResp.RelationType = req.RelationType
 	resp.Success(urlResp)
@@ -130,10 +134,32 @@ func (r *relationshipController) linkUser(ctx *gin.Context) {
 func (r *relationshipController) unbindUser(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
+
+	type request struct {
+		UserID   int `json:"user_id,omitempty" form:"user_id"`
+		TargetID int `json:"target_id,omitempty" form:"target_id"`
+	}
+
+	var req request
+	if err := ctx.ShouldBind(&req); err != nil {
+		log.Error(err)
+		resp.Error("invalid request")
+		return
+	}
+
+	if !r.service.DisassociateUser(req.UserID, req.TargetID) {
+		resp.Error("failed to disassociate the user")
+		return
+	}
+
+	resp.Success("success")
+
 }
 
 func NewRelationshipController(service services.RelationShipService) Interface.IController {
-	return &relationshipController{
+	controller := &relationshipController{
 		service: service,
 	}
+	controller.Initialize()
+	return controller
 }

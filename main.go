@@ -30,13 +30,6 @@ func newRelationShipController() Interface.IController {
 	return controller.NewRelationshipController(s)
 }
 
-func test() services.RelationShipService {
-	repo := repository.NewRelationShipRepository(SQL.Get("user"))
-	s := services.NewRelationShipService(repo)
-
-	return s
-}
-
 func main() {
 
 	svr := server.New()
@@ -44,13 +37,11 @@ func main() {
 	uc := newUserController()
 	svr.RegisterRouter(uc.GetRoutes()...)
 
-	/*	ec := controller.NewExampleController()
-		svr.RegisterRouter(ec.GetRoutes()...)*/
-
 	tc := newTravelController()
 	svr.RegisterRouter(tc.GetRoutes()...)
 
-	//svr.RegisterMiddleWare("auth", JWT.Middleware())
+	rc := newRelationShipController()
+	svr.RegisterRouter(rc.GetRoutes()...)
 
 	svr.Run()
 }

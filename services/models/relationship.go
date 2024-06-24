@@ -23,11 +23,6 @@ const (
 	Modify              // means the user is modifying the relationship with other users
 )
 
-type RelationShipResponse struct {
-	URL          string `json:"url"`
-	RelationType int    `json:"relation_type"` // identify the relation type
-}
-
 // RelationShipHistory is the history of the user's relationship
 // which it will be used to track the user's relationship's operation
 // like associate, disassociate

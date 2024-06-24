@@ -204,5 +204,5 @@ func NewRelationShipRepository(db *gorp.DbMap) RelationshipRepository {
 		db: db,
 	}
 	repo.initTable()
-	return
+	return repo
 }
