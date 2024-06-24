@@ -1,13 +1,10 @@
 package services
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/hex"
 	"github.com/Thenecromance/OurStories/services/models"
 	"github.com/Thenecromance/OurStories/services/repository"
+	"github.com/Thenecromance/OurStories/services/services/RelationValidator"
 	"github.com/Thenecromance/OurStories/utility/log"
-	"strconv"
 )
 
 type RelationShipService interface {
@@ -21,28 +18,25 @@ type RelationShipService interface {
 	DisassociateUser(userID int, associateID int) bool
 
 	// BindingTwoUser will bind two users with the relationship
-	BindingTwoUser(senderID, receiverID, relationType int)
+	BindingTwoUser(link string, receiverID int)
 }
 
 type relationshipServiceImpl struct {
-	repo repository.RelationshipRepository
+	repo      repository.RelationshipRepository
+	validator RelationValidator.IRelationValidator
 }
 
-func (r *relationshipServiceImpl) BindingTwoUser(senderID, receiverID, relationType int) {
-	r.repo.BindTwoUser(senderID, receiverID, relationType)
-}
-
-// generateURL
-// generate a unique url based on the user's id and the relation type
-//
-//	userID int - the user's id
-//	relationType int - the relation type
-//	idx int - the index of the relations, exp: if the user has more than 1 friend, the idx will be 1, 2, 3
-func generateURL(userID, relationType, idx int) string {
-	data := strconv.Itoa(userID) + "." + strconv.Itoa(relationType) + "." + strconv.Itoa(idx)
-	hash := sha256.Sum256([]byte(data))
-	uniqueID := hex.EncodeToString(hash[:])
-	return base64.StdEncoding.EncodeToString([]byte(uniqueID)) // the link should like https://.../api/relation/bind/NzdhYzMxOWJmZTE5NzllMmQ3OTlkOWU2OTg3ZTY1ZmViNTRmNjE1MTFjMDM1NTJlYmFlOTkwODI2YzIwODU5MA==
+func (r *relationshipServiceImpl) BindingTwoUser(link string, receiverID int) {
+	senderID, relationType, err := r.validator.GetTokenInfo(link)
+	if err != nil {
+		log.Error("BindingTwoUser failed! error: ", err)
+		return
+	}
+	err = r.repo.BindTwoUser(senderID, receiverID, relationType)
+	if err != nil {
+		log.Error("BindingTwoUser failed! error: ", err)
+		return
+	}
 }
 
 // UserHasAssociation mean to check users has been associate relationship with others
@@ -67,7 +61,13 @@ func (r *relationshipServiceImpl) CreateRelationshipConnection(userID int, type_
 	if r.UserHasAssociation(userID, type_) {
 		// todo:in this place, service will do twice sql check,this is not necessary need to be improved
 		count := r.UserAssociationCount(userID, type_)
-		return generateURL(userID, type_, count)
+		token, err := r.validator.GenerateToken(userID, type_, count)
+
+		if err != nil {
+			log.Error(err)
+			return ""
+		}
+		return token
 	}
 	return ""
 }
@@ -83,6 +83,7 @@ func (r *relationshipServiceImpl) DisassociateUser(userID int, associateID int) 
 
 func NewRelationShipService(userRepository repository.RelationshipRepository) RelationShipService {
 	return &relationshipServiceImpl{
-		repo: userRepository,
+		repo:      userRepository,
+		validator: RelationValidator.New(),
 	}
 }

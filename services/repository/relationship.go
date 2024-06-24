@@ -200,7 +200,9 @@ func (r *relationshipRepositoryImpl) initTable() error {
 }
 
 func NewRelationShipRepository(db *gorp.DbMap) RelationshipRepository {
-	return &relationshipRepositoryImpl{
+	repo := &relationshipRepositoryImpl{
 		db: db,
 	}
+	repo.initTable()
+	return
 }

@@ -111,6 +111,20 @@ func (r *relationshipController) linkUser(ctx *gin.Context) {
 		return
 	}
 
+	//todo: process the link
+
+	type request struct {
+		UserID int `json:"user_id,omitempty" form:"user_id"` // this id is the receiver's id
+	}
+	var req request
+	if err := ctx.ShouldBind(&req); err != nil {
+		log.Error(err)
+		resp.Error("invalid request")
+		return
+	}
+
+	r.service.BindingTwoUser(link, req.UserID)
+
 }
 
 func (r *relationshipController) unbindUser(ctx *gin.Context) {
