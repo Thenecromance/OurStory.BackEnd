@@ -1,7 +1,7 @@
 package Scrypt
 
 import (
-	"github.com/Thenecromance/OurStories/services/services/pwdHashing"
+	"github.com/Thenecromance/OurStories/application/services/pwdHashing"
 	"reflect"
 	"testing"
 )

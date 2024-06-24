@@ -2,8 +2,8 @@ package services
 
 import (
 	"fmt"
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/repository"
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/repository"
 	"github.com/Thenecromance/OurStories/utility/helper"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"strconv"

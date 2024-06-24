@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"github.com/Thenecromance/OurStories/services/models"
+	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 	"math"

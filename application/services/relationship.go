@@ -1,9 +1,9 @@
 package services
 
 import (
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/repository"
-	"github.com/Thenecromance/OurStories/services/services/RelationValidator"
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/repository"
+	"github.com/Thenecromance/OurStories/application/services/RelationValidator"
 	"github.com/Thenecromance/OurStories/utility/log"
 )
 

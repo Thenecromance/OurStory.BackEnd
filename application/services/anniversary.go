@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/repository"
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/repository"
 )
 
 type AnniversaryService interface {

@@ -7,8 +7,8 @@ import (
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
 
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/services"
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )

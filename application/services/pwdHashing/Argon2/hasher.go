@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/Thenecromance/OurStories/services/services/pwdHashing"
+	"github.com/Thenecromance/OurStories/application/services/pwdHashing"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"golang.org/x/crypto/argon2"
 )

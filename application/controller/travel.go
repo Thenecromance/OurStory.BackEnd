@@ -2,12 +2,12 @@ package controller
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )

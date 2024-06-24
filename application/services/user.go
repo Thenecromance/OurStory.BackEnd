@@ -1,11 +1,11 @@
 package services
 
 import (
+	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/application/repository"
+	"github.com/Thenecromance/OurStories/application/services/pwdHashing"
+	"github.com/Thenecromance/OurStories/application/services/pwdHashing/Scrypt"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
-	"github.com/Thenecromance/OurStories/services/models"
-	"github.com/Thenecromance/OurStories/services/repository"
-	"github.com/Thenecromance/OurStories/services/services/pwdHashing"
-	"github.com/Thenecromance/OurStories/services/services/pwdHashing/Scrypt"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"time"
 )
