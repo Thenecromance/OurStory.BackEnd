@@ -45,9 +45,9 @@ func defaultRegisteredClaim() jwt.RegisteredClaims {
 
 func (s *Service) SignTokenToUser(claim_ any) (string, error) {
 	c := claim{
-		Obj: claim_,
+		Obj:              claim_,
+		RegisteredClaims: defaultRegisteredClaim(),
 	}
-	c.RegisteredClaims = defaultRegisteredClaim()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	tokenStr, err := token.SignedString([]byte(Authorization.EncryptKey))
 
@@ -55,7 +55,7 @@ func (s *Service) SignTokenToUser(claim_ any) (string, error) {
 		log.Error("Error while storing token ", err)
 		return "", err
 	}
-
+	log.Info("Cookie: ", tokenStr)
 	return tokenStr, nil
 }
 
@@ -64,6 +64,7 @@ func (s *Service) GetClaimFromToken(token_ string) (any, error) {
 	_, err := jwt.ParseWithClaims(token_, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(Authorization.EncryptKey), nil
 	})
+
 	if err != nil {
 		log.Error("Error while parsing token ", err)
 		return nil, err
@@ -201,24 +202,11 @@ func Middleware() gin.HandlerFunc {
 }
 
 func TokenValid(ctx *gin.Context) (bool, error) {
-	//{
-	//	cookie, _ := ctx.Cookie("Authorization")
-	//	/*if err != nil {
-	//		log.Error("Error while getting token from cookie ", err)
-	//		resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
-	//		return
-	//	}*/
-	//	if cookie != "" {
-	//		if Instance().TokenValid(cookie) {
-	//			return
-	//		}
-	//	}
-	//
-	//}
 
 	cookie, err := ctx.Cookie("Authorization")
+	log.Info("Cookie:", cookie)
 	if err != nil || cookie == "" {
-		log.Error("Error while getting token from cookie ", err)
+		log.Warn("Error while getting token from cookie ", err)
 		return false, errors.New("please login first")
 	}
 

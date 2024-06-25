@@ -3,19 +3,20 @@ package controller
 import (
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/application/services"
+	"github.com/Thenecromance/OurStories/constants"
+	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/response"
 	"github.com/Thenecromance/OurStories/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 // the relationship controller should have the following routes
 // 1. createLink - POST /api/relation
 // 2. activeLink - GET /api/relation/:id - get the user's associate link just like: https://m0nkeycl1cker.com/api/relation/d8290f28049f4f538d4df2a10a922a3783c1ee3df0e15e9632058f0d06a0639c
 // 3. deleteLink - DELETE /api/relation/:id - delete the user's associate link
-// 4. getRelation - GET /api/relation/:user - get the user associate with the other's list
-// 5. associateHistory - GET /api/relation/:user/history - get the user's associate history
+// 4. getRelation - GET /api/relation/list/:user - get the user associate with the other's list
+// 5. associateHistory - GET /api/relation/history/:user - get the user's associate history
 
 type relationGroups struct {
 	createLink       Interface.IRoute
@@ -39,24 +40,30 @@ func (r *relationshipController) Name() string {
 }
 
 func (r *relationshipController) SetRoutes() {
+	mw := JWT.Middleware()
 	r.createLink = route.NewRouter("/api/relation", "POST")
 	{
+		r.createLink.SetMiddleWare(mw)
 		r.createLink.SetHandler(r.createBindLink)
 	}
 	r.activeLink = route.NewRouter("/api/relation/:id", "GET")
 	{
+		r.activeLink.SetMiddleWare(mw)
 		r.activeLink.SetHandler(r.linkUser)
 	}
 	r.deleteLink = route.NewRouter("/api/relation/", "DELETE")
 	{
+		r.deleteLink.SetMiddleWare(mw)
 		r.deleteLink.SetHandler(r.unbindUser)
 	}
 	r.getRelation = route.NewRouter("/api/relation/list/:user", "GET")
 	{
+		r.getRelation.SetMiddleWare(mw)
 		r.getRelation.SetHandler(r.getFriendList)
 	}
 	r.associateHistory = route.NewRouter("/api/relation/history/:user", "GET")
 	{
+		r.associateHistory.SetMiddleWare(mw)
 		r.associateHistory.SetHandler(r.getHistory)
 	}
 }
@@ -176,24 +183,15 @@ func (r *relationshipController) getFriendList(ctx *gin.Context) {
 		return
 	}
 
-	/*result, err := JWT.ValidAndGetResult(ctx)
-	if err != nil || result == nil {
+	val, exists := ctx.Get(constants.AuthObject)
+	if !exists {
 		resp.Error("invalid request")
 		return
 	}
 
-	//models.UserClaim
-	id := result.(map[string]interface{})["id"].(float64)
-	UserName := result.(map[string]interface{})["username"].(string)
-	if user != UserName {
-		resp.Error("invalid request")
-		return
-	}*/
+	id := val.(map[string]interface{})["id"].(float64)
+	//UserName := val.(map[string]interface{})["username"].(string)
 
-	id, err := strconv.Atoi(user)
-	if err != nil {
-		return
-	}
 	lists := r.service.GetFriendList(int(id))
 
 	resp.Success(lists)
@@ -209,7 +207,7 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 		return
 	}
 
-	/*result, err := JWT.ValidAndGetResult(ctx)
+	result, err := JWT.ValidAndGetResult(ctx)
 	if err != nil || result == nil {
 		resp.Error("invalid request")
 		return
@@ -221,12 +219,9 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 	if user != UserName {
 		resp.Error("invalid request")
 		return
-	}*/
-	id, err := strconv.Atoi(user)
-	if err != nil {
-		return
 	}
-	lists := r.service.GetHistoryList(id)
+
+	lists := r.service.GetHistoryList(int(id))
 
 	resp.Success(lists)
 }

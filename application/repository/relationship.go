@@ -202,7 +202,7 @@ func (r *relationshipRepositoryImpl) GetRelationList(userID int) []models.Relati
 }
 
 func (r *relationshipRepositoryImpl) GetHistoryList(userID int) []models.RelationShipHistory {
-	history, err := r.db.Select(models.RelationShipHistory{}, "SELECT * FROM relationship_history WHERE user_id = ? OR receiver_id = ?", userID, userID)
+	history, err := r.db.Select(models.RelationShipHistory{}, "SELECT * FROM relationship_history WHERE user_id = ? OR target_id = ?", userID, userID)
 	if err != nil {
 		log.Warn("GetHistoryList failed! error: ", err, " userID: ", userID)
 		return nil
