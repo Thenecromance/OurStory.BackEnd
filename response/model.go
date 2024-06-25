@@ -15,6 +15,10 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
+type ErrorResponse struct {
+	Message string `json:"err_message"`
+}
+
 func (r *Response) Reset() {
 	r.Meta.Count = 0
 	r.Data = nil
@@ -36,7 +40,8 @@ func (r *Response) SetCode(code int) *Response {
 
 func (r *Response) Error(errMsg string) {
 	r.SetCode(BadRequest)
-	r.AddData(errMsg)
+
+	r.AddData(ErrorResponse{Message: errMsg})
 }
 
 func (r *Response) Success(data interface{}) {
@@ -45,9 +50,9 @@ func (r *Response) Success(data interface{}) {
 
 func (r *Response) NotFound() {
 	r.SetCode(NotFound)
+
 }
 
 func (r *Response) Unauthorized(msg string) {
-
-	r.SetCode(Unauthorized).AddData(msg)
+	r.SetCode(Unauthorized).AddData(ErrorResponse{Message: msg})
 }

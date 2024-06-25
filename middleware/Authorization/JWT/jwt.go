@@ -89,16 +89,14 @@ func (s *Service) MarkTokenExpired(token_ string) error {
 	return nil
 }
 
+// HasToken will check if the token is exist in cache or not
 func (s *Service) HasToken(token_ string) bool {
 	_, ok := s.cache.Get(token_) // just check if the token is exist or not
 	return ok
 }
 
 func (s *Service) TokenValid(token_ string) bool {
-	// just precheck if the token is exist or not , if not exist means the token is invalid , just don't need to check anymore
-	if !s.HasToken(token_) {
-		return false
-	}
+
 	_, err := s.GetClaimFromToken(token_) // just check if the token is valid or not
 	return err == nil
 }
@@ -147,11 +145,21 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			return
 		}
 
+		// just precheck if the token is exist or not , if not exist means the token is invalid , just don't need to check anymore
+		if !s.HasToken(token) {
+			restore, err := s.GetClaimFromToken(token)
+			if err != nil {
+				return
+			}
+			s.cache.Add(token, restore.(*claim).Obj, restore.(*claim).ExpiresAt.Time)
+		}
+
 		// check if the token is valid
 		if !s.TokenValid(token) {
 			resp := response.New()
 			log.Warn("Invalid token provided")
-			resp.Error("Invalid token provided")
+			/*resp.Error("Invalid token provided")*/
+			resp.Unauthorized("Invalid token provided")
 			resp.Send(c)
 			c.Abort()
 			return

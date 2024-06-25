@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/repository"
@@ -23,14 +24,15 @@ type travelUpdater interface {
 	UpdateEndTime(id string, endTime int64) error
 	UpdateOwner(id string, owner int) error
 	UpdateToDb(id string) error
-	Update(obj *models.Travel) error
+	Update(obj *models.TravelDTO) error
 }
 
 type travelGetter interface {
 	GetTravelByID(id string, userId int) (*models.TravelDTO, error)
-	GetTravelByOwner(owner int) ([]models.Travel, error)
-	GetTravelByLocation(location string) ([]models.Travel, error)
-	GetTravelByState(state int) ([]models.Travel, error)
+	GetTravelByOwner(owner int) ([]models.TravelDTO, error)
+	GetTravelByLocation(location string) ([]models.TravelDTO, error)
+	GetTravelByState(state int) ([]models.TravelDTO, error)
+	GetTravelList(userId int) ([]models.TravelDTO, error)
 }
 
 // TravelService is interface for travel service
@@ -38,8 +40,8 @@ type TravelService interface {
 	travelGetter
 	travelUpdater
 
-	CreateTravel(*models.Travel) error
-	DeleteTravel(id string) error
+	CreateTravel(dto *models.TravelDTO) error
+	DeleteTravel(id string, userId int) error
 }
 
 type travelId = string
@@ -51,30 +53,37 @@ type travelMap = map[travelId]*models.TravelDTO
 // updater object
 // ---------------------------------
 // using a type to store the travel info , decrease the code duplication
-type updatingTravel models.TravelDTO
+type updatingTravel struct {
+	*models.TravelDTO
+	needUpdate bool
+}
 
 func (u *updatingTravel) updateState(state int) {
 	if state == 0 {
 		return
 	}
+	u.needUpdate = true
 	u.State = state
 }
 func (u *updatingTravel) updateLocation(location string) {
 	if location == "" {
 		return
 	}
+	u.needUpdate = true
 	u.Location = location
 }
 func (u *updatingTravel) updateDetails(details string) {
 	if details == "" {
-
+		return
 	}
+	u.needUpdate = true
 	u.Details = details
 }
 func (u *updatingTravel) updateTogetherWith(togetherWith []int) {
 	if togetherWith == nil {
 		return
 	}
+	u.needUpdate = true
 	//u.TogetherWith = togetherWith
 }
 func (u *updatingTravel) updateStartTime(startTime int64) {
@@ -82,23 +91,29 @@ func (u *updatingTravel) updateStartTime(startTime int64) {
 		return
 
 	}
+	u.needUpdate = true
 	u.StartTime = startTime
 }
 func (u *updatingTravel) updateEndTime(endTime int64) {
 	if endTime <= 0 {
 		return
 	}
+	u.needUpdate = true
 	u.EndTime = endTime
 }
 func (u *updatingTravel) updateOwner(owner int) {
 	if owner <= 0 {
 		return
 	}
+	u.needUpdate = true
 	u.UserId = owner
 }
 
 func newUpdater(travel *models.TravelDTO) *updatingTravel {
-	return (*updatingTravel)(travel)
+	return &updatingTravel{
+		TravelDTO:  travel,
+		needUpdate: false,
+	}
 
 }
 
@@ -116,6 +131,7 @@ func travelToDTO(travel *models.Travel) *models.TravelDTO {
 	dto := &models.TravelDTO{
 		Id:           travel.Id,
 		State:        travel.State,
+		UserId:       travel.UserId,
 		Location:     travel.Location,
 		Details:      travel.Details,
 		StartTime:    travel.StartTime,
@@ -135,6 +151,7 @@ func travelToDTO(travel *models.Travel) *models.TravelDTO {
 func dtoToTravel(travel *models.TravelDTO) *models.Travel {
 	obj := &models.Travel{
 		Id:           travel.Id,
+		UserId:       travel.UserId,
 		State:        travel.State,
 		Location:     travel.Location,
 		Details:      travel.Details,
@@ -214,16 +231,62 @@ func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.Travel
 	return nil, fmt.Errorf("user not in travel")
 }
 
-func (t *travelServiceImpl) GetTravelByOwner(owner int) ([]models.Travel, error) {
-	return t.repo.GetTravelByOwner(owner)
+func (t *travelServiceImpl) GetTravelByOwner(owner int) ([]models.TravelDTO, error) {
+	travels, err := t.repo.GetTravelByOwner(owner)
+	if err != nil {
+		log.Errorf("GetTravelByOwner error: %v", err)
+		return nil, errors.New("no travel data in db")
+	}
+	var returnObjs []models.TravelDTO
+	for _, v := range travels {
+		returnObjs = append(returnObjs, *travelToDTO(&v))
+	}
+	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelByLocation(location string) ([]models.Travel, error) {
-	return t.repo.GetTravelByLocation(location)
+func (t *travelServiceImpl) GetTravelByLocation(location string) ([]models.TravelDTO, error) {
+	travels, err := t.repo.GetTravelByLocation(location)
+	if err != nil {
+		log.Errorf("GetTravelByLocation error: %v", err)
+		return nil, errors.New("no travel data in db")
+	}
+
+	var returnObjs []models.TravelDTO
+	for _, v := range travels {
+		returnObjs = append(returnObjs, *travelToDTO(&v))
+	}
+
+	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelByState(state int) ([]models.Travel, error) {
-	return t.repo.GetTravelByState(state)
+func (t *travelServiceImpl) GetTravelByState(state int) ([]models.TravelDTO, error) {
+	travels, err := t.repo.GetTravelByState(state)
+	if err != nil {
+		log.Errorf("GetTravelByState error: %v", err)
+		return nil, errors.New("no travel data in db")
+	}
+
+	var returnObjs []models.TravelDTO
+	for _, v := range travels {
+		returnObjs = append(returnObjs, *travelToDTO(&v))
+	}
+
+	return returnObjs, nil
+}
+
+func (t *travelServiceImpl) GetTravelList(userId int) ([]models.TravelDTO, error) {
+	travels, err := t.repo.GetTravelListByID(userId)
+	if err != nil {
+		log.Errorf("GetTravelList error: %v", err)
+		return nil, errors.New("no travel data in db")
+	}
+
+	var returnObjs []models.TravelDTO
+	for _, v := range travels {
+		returnObjs = append(returnObjs, *travelToDTO(&v))
+	}
+
+	return returnObjs, nil
 }
 
 func (t *travelServiceImpl) UpdateState(id string, state int) error {
@@ -310,7 +373,7 @@ func (t *travelServiceImpl) UpdateOwner(id string, owner int) error {
 func (t *travelServiceImpl) UpdateToDb(id string) error {
 	log.Debugf("UpdateToDb id: %s", id)
 
-	obj := (*models.TravelDTO)(t.getUpdaterObject(id))
+	obj := t.getUpdaterObject(id).TravelDTO
 	if obj == nil {
 		return fmt.Errorf("UpdateToDb error: %s", "getUpdaterObject return nil")
 	}
@@ -329,10 +392,10 @@ func (t *travelServiceImpl) UpdateToDb(id string) error {
 
 }
 
-func (t *travelServiceImpl) Update(obj *models.Travel) error {
+func (t *travelServiceImpl) Update(obj *models.TravelDTO) error {
 	o := t.getUpdaterObject(strconv.Itoa(obj.Id))
 	if o == nil {
-		return fmt.Errorf("Update error: %s", "getUpdaterObject return nil")
+		return fmt.Errorf("update error: %s", "getUpdaterObject return nil")
 	}
 	o.updateDetails(obj.Details)
 	o.updateEndTime(obj.EndTime)
@@ -340,7 +403,13 @@ func (t *travelServiceImpl) Update(obj *models.Travel) error {
 	o.updateOwner(obj.UserId)
 	o.updateStartTime(obj.StartTime)
 	o.updateState(obj.State)
-	//o.updateTogetherWith(obj.TogetherWith)
+	o.updateTogetherWith(obj.TogetherWith)
+
+	// if there is no change, no need to update
+	if !o.needUpdate {
+		return nil
+	}
+
 	err := t.UpdateToDb(strconv.Itoa(o.Id))
 	if err != nil {
 		log.Errorf("Update error: %v", err)
@@ -350,30 +419,42 @@ func (t *travelServiceImpl) Update(obj *models.Travel) error {
 
 }
 
-func (t *travelServiceImpl) CreateTravel(info *models.Travel) error {
+func (t *travelServiceImpl) CreateTravel(dto *models.TravelDTO) error {
 	if t.repo == nil {
 		panic("repo is nil")
 	}
-	return t.repo.CreateTravel(info)
+
+	travel := dtoToTravel(dto)
+	return t.repo.CreateTravel(travel)
 }
 
-func (t *travelServiceImpl) DeleteTravel(id string) error {
-	/*	if err := t.repo.DeleteTravel(id); err != nil {
+func (t *travelServiceImpl) DeleteTravel(id string, userId int) error {
 
-		}*/
+	dto, err := t.GetTravelByID(id, userId)
+	if err != nil {
+		log.Errorf("DeleteTravel error: %v", err)
+		return fmt.Errorf("could not find travel id %s", id)
+	}
+	if dto == nil {
+		return fmt.Errorf("could not find travel id %s", id)
+	}
+
 	iid, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 
 	}
+
 	err = t.repo.DeleteTravel(iid)
 	if err != nil {
 		return err
 	}
+
 	//remove the cache if exists
 	if _, ok := t.cache[id]; ok {
 		delete(t.cache, id)
 	}
+
 	if _, ok := t.updatingCache[id]; ok {
 		log.Error("DeleteTravel error: %s", "updatingCache should not be contains the id after delete it from db")
 		delete(t.updatingCache, id)

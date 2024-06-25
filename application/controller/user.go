@@ -152,11 +152,14 @@ func (uc *UserController) register(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	ok, err := JWT.TokenValid(ctx)
-	if err != nil || !ok {
-		log.Error("token valid failed :", err)
-		resp.SetCode(response.BadRequest).AddData("Invalid request")
-		return
+	_, exists := ctx.Get("Authorization")
+	if exists {
+		ok, err := JWT.TokenValid(ctx)
+		if err != nil || ok {
+			log.Error("token valid failed :", err)
+			resp.SetCode(response.BadRequest).AddData("Invalid request")
+			return
+		}
 	}
 
 	// get the user info from the request

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -15,6 +16,7 @@ type TravelRepository interface {
 	GetTravelByOwner(owner int) ([]models.Travel, error)
 	GetTravelByLocation(location string) ([]models.Travel, error)
 	GetTravelByState(state int) ([]models.Travel, error)
+	GetTravelListByID(id int) ([]models.Travel, error)
 }
 
 type travelRepository struct {
@@ -46,10 +48,15 @@ func (t *travelRepository) DeleteTravel(travelId int) error {
 		return err
 	}
 	//delete the travel data from db by id , if not exists
-	errId, err := trans.Delete(models.Travel{}, travelId)
+	//errId, err := trans.Delete(models.Travel{}, travelId)
+	/*obj, err := t.GetTravelByID(travelId)
+	if err != nil {
+		return err
+	}*/
+	errId, err := trans.Query("delete from travel where id = ?", travelId)
 	if err != nil {
 		log.Errorf("DeleteTravel error: %v\nerror Id:%d", err, errId)
-		return err
+		return errors.New("delete travel failed")
 	}
 
 	return trans.Commit()
@@ -87,10 +94,14 @@ func (t *travelRepository) GetTravelByID(travelId int) (*models.Travel, error) {
 func (t *travelRepository) GetTravelByOwner(owner int) ([]models.Travel, error) {
 	//get travel from db by id
 	var travel []models.Travel
-	err := t.db.SelectOne(travel, "select * from travel where owner = ?", owner)
+	objects, err := t.db.Select(models.Travel{}, "select * from travel where owner = ?", owner)
 	if err != nil {
 		log.Errorf("GetTravelByID error: %v", err)
 		return nil, err
+	}
+
+	for _, obj := range objects {
+		travel = append(travel, *obj.(*models.Travel))
 	}
 
 	return travel, nil
@@ -118,6 +129,22 @@ func (t *travelRepository) GetTravelByState(state int) ([]models.Travel, error) 
 		return nil, err
 	}
 	return travel, nil
+}
+
+func (t *travelRepository) GetTravelListByID(userId int) ([]models.Travel, error) {
+	var lists []models.Travel
+
+	objects, err := t.db.Select(models.Travel{}, "select * from travel where ( owner = ?) or (find_in_set(?,TogetherWith) > 0)", userId, userId)
+	if err != nil {
+		log.Errorf("GetTravelListByID error: %v", err)
+		return nil, err
+	}
+
+	for _, obj := range objects {
+		lists = append(lists, *obj.(*models.Travel))
+	}
+
+	return lists, nil
 }
 
 func (t *travelRepository) initTable() error {
