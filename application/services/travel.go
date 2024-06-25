@@ -7,6 +7,7 @@ import (
 	"github.com/Thenecromance/OurStories/utility/helper"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"strconv"
+	"strings"
 )
 
 //---------------------------------
@@ -26,7 +27,7 @@ type travelUpdater interface {
 }
 
 type travelGetter interface {
-	GetTravelByID(id string) (*models.Travel, error)
+	GetTravelByID(id string, userId int) (*models.TravelDTO, error)
 	GetTravelByOwner(owner int) ([]models.Travel, error)
 	GetTravelByLocation(location string) ([]models.Travel, error)
 	GetTravelByState(state int) ([]models.Travel, error)
@@ -44,13 +45,13 @@ type TravelService interface {
 type travelId = string
 
 // todo: use ICache to store the travel info,due to ICache only implements LRU, so  temp to use map instead.
-type travelMap = map[travelId]*models.Travel
+type travelMap = map[travelId]*models.TravelDTO
 
 // ---------------------------------
 // updater object
 // ---------------------------------
 // using a type to store the travel info , decrease the code duplication
-type updatingTravel models.Travel
+type updatingTravel models.TravelDTO
 
 func (u *updatingTravel) updateState(state int) {
 	if state == 0 {
@@ -96,8 +97,9 @@ func (u *updatingTravel) updateOwner(owner int) {
 	u.UserId = owner
 }
 
-func newUpdater(travel *models.Travel) *updatingTravel {
+func newUpdater(travel *models.TravelDTO) *updatingTravel {
 	return (*updatingTravel)(travel)
+
 }
 
 //---------------------------------
@@ -110,10 +112,50 @@ type travelServiceImpl struct {
 	updatingCache map[travelId]*updatingTravel
 }
 
+func travelToDTO(travel *models.Travel) *models.TravelDTO {
+	dto := &models.TravelDTO{
+		Id:           travel.Id,
+		State:        travel.State,
+		Location:     travel.Location,
+		Details:      travel.Details,
+		StartTime:    travel.StartTime,
+		EndTime:      travel.EndTime,
+		TogetherWith: make([]int, 0),
+	}
+	for _, v := range strings.Split(travel.TogetherWith, ",") {
+		id, err := strconv.Atoi(v)
+		if err != nil {
+			log.Warnf("failed convert string to int with error: %v", err)
+			continue
+		}
+		dto.TogetherWith = append(dto.TogetherWith, id)
+	}
+	return dto
+}
+func dtoToTravel(travel *models.TravelDTO) *models.Travel {
+	obj := &models.Travel{
+		Id:           travel.Id,
+		State:        travel.State,
+		Location:     travel.Location,
+		Details:      travel.Details,
+		StartTime:    travel.StartTime,
+		EndTime:      travel.EndTime,
+		TogetherWith: "",
+	}
+	for _, v := range travel.TogetherWith {
+		obj.TogetherWith += strconv.Itoa(v) + ","
+	}
+	// remove the last comma
+	if len(obj.TogetherWith) > 0 {
+		obj.TogetherWith = obj.TogetherWith[:len(obj.TogetherWith)-1]
+	}
+	return obj
+}
+
 func (t *travelServiceImpl) getUpdaterObject(id string) *updatingTravel {
 	travel, exists := t.updatingCache[id]
 	if !exists {
-		travelInDb, err := t.GetTravelByID(id)
+		travelInDb, err := t.GetTravelByID(id, 0)
 		if err != nil {
 			log.Errorf("%s  error: %v", helper.GetFunctionName(t.UpdateState), err)
 			return nil
@@ -126,21 +168,50 @@ func (t *travelServiceImpl) getUpdaterObject(id string) *updatingTravel {
 	return travel
 }
 
-func (t *travelServiceImpl) GetTravelByID(id string) (*models.Travel, error) {
-	if travel, ok := t.cache[id]; ok {
-		return travel, nil
+// userInTravel check if the user in the travel
+func (t *travelServiceImpl) userInTravel(travel *models.TravelDTO, userId int) bool {
+	if userId == travel.UserId {
+		return true
+	}
+	for _, v := range travel.TogetherWith {
+		if v == userId {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *travelServiceImpl) getTravelData(travelId string) *models.TravelDTO {
+	if travel, ok := t.cache[travelId]; ok {
+		return travel
 	}
 
-	// get travel from db
-	Iid, err := strconv.Atoi(id)
-	travel, err := t.repo.GetTravelByID(Iid)
+	id, err := strconv.Atoi(travelId)
+	travel, err := t.repo.GetTravelByID(id)
+
 	if err != nil {
-		log.Error("GetTravelByID error: %v", err)
-		return nil, err
+		log.Warnf("getTravelData error: %v", err)
+		return nil
+	}
+	t.cache[travelId] = travelToDTO(travel)
+
+	return travelToDTO(travel)
+}
+
+func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.TravelDTO, error) {
+	log.Debug("start to get travel by id:", id)
+	dto := t.getTravelData(id)
+	if dto == nil {
+		return nil, fmt.Errorf("could not find travel id %s", id)
 	}
 
-	t.cache[id] = travel
-	return travel, nil
+	log.Debug("check user in travel...")
+	if t.userInTravel(dto, userId) {
+		return dto, nil
+	}
+
+	log.Debug("user not in travel")
+	return nil, fmt.Errorf("user not in travel")
 }
 
 func (t *travelServiceImpl) GetTravelByOwner(owner int) ([]models.Travel, error) {
@@ -238,20 +309,21 @@ func (t *travelServiceImpl) UpdateOwner(id string, owner int) error {
 // UpdateToDb update the travel info from cache to db
 func (t *travelServiceImpl) UpdateToDb(id string) error {
 	log.Debugf("UpdateToDb id: %s", id)
-	obj := t.getUpdaterObject(id)
+
+	obj := (*models.TravelDTO)(t.getUpdaterObject(id))
 	if obj == nil {
 		return fmt.Errorf("UpdateToDb error: %s", "getUpdaterObject return nil")
 	}
 	// trying to update to db (transaction)
-	err := t.repo.UpdateTravel((*models.Travel)(obj))
+	err := t.repo.UpdateTravel(dtoToTravel(obj))
 	if err != nil {
 		// if failed , need to handle the cache
 		panic("something wrong with db, need to handle the cache here")
 		return err
 	}
+
 	// if update success, remove the cache, sync back to cache
-	travel := (*models.Travel)(obj)
-	t.cache[id] = travel
+	t.cache[id] = obj
 	delete(t.updatingCache, id) // erase the updating cache
 	return nil
 

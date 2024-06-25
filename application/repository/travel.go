@@ -77,7 +77,7 @@ func (t *travelRepository) GetTravelByID(travelId int) (*models.Travel, error) {
 	travel := new(models.Travel)
 	err := t.db.SelectOne(travel, "select * from travel where id = ?", travelId)
 	if err != nil {
-		log.Errorf("GetTravelByID error: %v", err)
+		log.Warnf("GetTravelByID error: %v", err)
 		return nil, err
 	}
 
