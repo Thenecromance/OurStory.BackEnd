@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/application/controller"
+	"github.com/Thenecromance/OurStories/application/repository"
+	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/server"
-	"github.com/Thenecromance/OurStories/services/controller"
-	"github.com/Thenecromance/OurStories/services/repository"
-	"github.com/Thenecromance/OurStories/services/services"
 	"github.com/Thenecromance/OurStories/thirdParty/SQL"
 )
 

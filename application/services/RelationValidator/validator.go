@@ -25,7 +25,7 @@ type relationCache struct {
 should I put the data into the database? or just keep it in memory?
 */
 type validator struct {
-	cache *lru.Cache
+	cache *lru.Cache // key:hashed token, value:relationCache
 }
 
 func generateHash(cache *relationCache) string {
@@ -48,6 +48,7 @@ func (v *validator) GenerateToken(userID int, relationType int, idx int) (string
 	}
 	hash := generateHash(cache)
 	v.cache.Add(hash, cache, time.Now().Add(ExpireTime)) // just added it to the cache and give it an expiration time
+
 	return hash, nil
 }
 
@@ -60,6 +61,8 @@ func (v *validator) GetTokenInfo(token string) (userID int, relationType int, er
 	if !ok {
 		return 0, 0, fmt.Errorf("token not found")
 	}
+
+	v.cache.Remove(token) // remove the token from the cache
 	return rc.UserId, rc.RelationType, nil
 }
 

@@ -52,7 +52,6 @@ func (r *routerManager) ApplyRouter() error {
 		} else {
 			r.gin.Handle(router.GetMethod(), router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 		}
-
 	}
 	Log.Infof("All routers registered")
 	return nil

@@ -7,6 +7,7 @@ import (
 	"github.com/Thenecromance/OurStories/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 // the relationship controller should have the following routes
@@ -50,16 +51,18 @@ func (r *relationshipController) SetRoutes() {
 	{
 		r.deleteLink.SetHandler(r.unbindUser)
 	}
-	r.getRelation = route.NewRouter("/api/relation/:user", "GET")
+	r.getRelation = route.NewRouter("/api/relation/list/:user", "GET")
 	{
+		r.getRelation.SetHandler(r.getFriendList)
 	}
-	r.associateHistory = route.NewRouter("/api/relation/:user/history", "GET")
+	r.associateHistory = route.NewRouter("/api/relation/history/:user", "GET")
 	{
+		r.associateHistory.SetHandler(r.getHistory)
 	}
 }
 
 func (r *relationshipController) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{r.createLink, r.activeLink, r.deleteLink /*, r.getRelation, r.associateHistory*/}
+	return []Interface.IRoute{r.createLink, r.activeLink, r.deleteLink, r.getRelation, r.associateHistory}
 }
 
 // ---------------------------------------------------------
@@ -97,7 +100,7 @@ func (r *relationshipController) createBindLink(ctx *gin.Context) {
 	}
 
 	var urlResp RelationShipResponse
-	urlResp.URL = link
+	urlResp.URL = "/api/relation/" + link
 	urlResp.RelationType = req.RelationType
 	resp.Success(urlResp)
 }
@@ -127,7 +130,13 @@ func (r *relationshipController) linkUser(ctx *gin.Context) {
 		return
 	}
 
-	r.service.BindingTwoUser(link, req.UserID)
+	err := r.service.BindingTwoUser(link, req.UserID)
+	if err != nil {
+		resp.Error("failed to bind the user")
+		return
+	}
+
+	resp.Success("success")
 
 }
 
@@ -154,6 +163,72 @@ func (r *relationshipController) unbindUser(ctx *gin.Context) {
 
 	resp.Success("success")
 
+}
+
+func (r *relationshipController) getFriendList(ctx *gin.Context) {
+	resp := response.New()
+	defer resp.Send(ctx)
+
+	user := ctx.Param("user")
+	log.Info("user: ", user)
+	if user == "" {
+		resp.Error("invalid user")
+		return
+	}
+
+	/*result, err := JWT.ValidAndGetResult(ctx)
+	if err != nil || result == nil {
+		resp.Error("invalid request")
+		return
+	}
+
+	//models.UserClaim
+	id := result.(map[string]interface{})["id"].(float64)
+	UserName := result.(map[string]interface{})["username"].(string)
+	if user != UserName {
+		resp.Error("invalid request")
+		return
+	}*/
+
+	id, err := strconv.Atoi(user)
+	if err != nil {
+		return
+	}
+	lists := r.service.GetFriendList(int(id))
+
+	resp.Success(lists)
+}
+
+func (r *relationshipController) getHistory(ctx *gin.Context) {
+	resp := response.New()
+	defer resp.Send(ctx)
+
+	user := ctx.Param("user")
+	if user == "" {
+		resp.Error("invalid user")
+		return
+	}
+
+	/*result, err := JWT.ValidAndGetResult(ctx)
+	if err != nil || result == nil {
+		resp.Error("invalid request")
+		return
+	}
+
+	//models.UserClaim
+	id := result.(map[string]interface{})["id"].(float64)
+	UserName := result.(map[string]interface{})["username"].(string)
+	if user != UserName {
+		resp.Error("invalid request")
+		return
+	}*/
+	id, err := strconv.Atoi(user)
+	if err != nil {
+		return
+	}
+	lists := r.service.GetHistoryList(id)
+
+	resp.Success(lists)
 }
 
 func NewRelationshipController(service services.RelationShipService) Interface.IController {

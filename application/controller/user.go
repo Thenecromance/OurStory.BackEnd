@@ -97,23 +97,15 @@ func (uc *UserController) login(ctx *gin.Context) {
 		return
 	}*/
 
-	{
-		cookie, err := ctx.Cookie("Authorization")
-		if err == nil {
-			//validate the token
-			if cookie != "" && JWT.Instance().TokenValid(cookie) {
-				resp.SetCode(response.OK).AddData("please do not login again")
-				return
-			}
-			/*log.Error("Error while getting token from cookie ", err)
-			resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
-			return*/
-		}
-
+	ok, err := JWT.TokenValid(ctx)
+	if err != nil || !ok {
+		log.Error("token valid failed :", err)
+		resp.SetCode(response.BadRequest).AddData("Invalid request")
+		return
 	}
 
 	info := models.UserLogin{}
-	err := ctx.ShouldBind(&info)
+	err = ctx.ShouldBind(&info)
 	if err != nil {
 		log.Error("params binding failed :", err)
 		resp.SetCode(response.BadRequest).AddData("Invalid request")
@@ -157,20 +149,11 @@ func (uc *UserController) register(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	{
-		cookie, _ := ctx.Cookie("Authorization")
-		/*if err != nil {
-			log.Error("Error while getting token from cookie ", err)
-			resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
-			return
-		}*/
-		if cookie != "" {
-			if JWT.Instance().TokenValid(cookie) {
-				resp.SetCode(response.OK).AddData("please do not login again")
-				return
-			}
-		}
-
+	ok, err := JWT.TokenValid(ctx)
+	if err != nil || !ok {
+		log.Error("token valid failed :", err)
+		resp.SetCode(response.BadRequest).AddData("Invalid request")
+		return
 	}
 
 	// get the user info from the request

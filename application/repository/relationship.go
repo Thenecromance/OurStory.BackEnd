@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -14,14 +15,14 @@ type RelationshipRepository interface {
 	//HasBindToUser for checking if the user has bind to other user if they already has Bind info , return true
 	//otherwise return false
 	HasBindToUser(userID int, userID2 int) bool
-	//GetRelationShipCount will return the count of the user's relationship
+	//GetRelationCount will return the count of the user's relationship
 	//
 	//	userID int - the user's id
 	//
 	//	type_ int - the relation type
 	//
 	//	return int - the count of the user's relationship
-	GetRelationShipCount(userID int, type_ int) int
+	GetRelationCount(userID int, type_ int) int
 
 	//BindTwoUser will bind two users with the relationship
 	//
@@ -42,6 +43,10 @@ type RelationshipRepository interface {
 	//
 	// return error - if the operation failed, return the error
 	UnBindTwoUser(senderID, receiverID int) error
+
+	GetRelationList(userID int) []models.Relationship
+
+	GetHistoryList(userID int) []models.RelationShipHistory
 }
 
 type relationshipRepositoryImpl struct {
@@ -63,10 +68,10 @@ func (r *relationshipRepositoryImpl) HasBindToUser(userID int, userID2 int) bool
 	return false
 }
 
-func (r *relationshipRepositoryImpl) GetRelationShipCount(userID int, type_ int) int {
+func (r *relationshipRepositoryImpl) GetRelationCount(userID int, type_ int) int {
 	selectInt, err := r.db.SelectInt("SELECT COUNT(*) FROM relationship WHERE user_id = ? AND relation_type = ?", userID, type_)
 	if err != nil {
-		log.Error("GetRelationShipCount failed! error: ", err, " userID: ", userID, " type: ", type_)
+		log.Error("GetRelationCount failed! error: ", err, " userID: ", userID, " type: ", type_)
 		return math.MinInt
 	}
 	return int(selectInt)
@@ -74,6 +79,12 @@ func (r *relationshipRepositoryImpl) GetRelationShipCount(userID int, type_ int)
 
 func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID, relationType int) error {
 	now := time.Now().Unix()
+
+	obj, err := r.db.Select(models.Relationship{}, "SELECT * FROM relationship WHERE (user_id = ? AND friend_id = ? ) OR (user_id = ? AND friend_id = ?)", senderID, receiverID, receiverID, senderID)
+	if err != nil || (obj != nil && len(obj) > 0) {
+		return errors.New("the relationship already exists")
+	}
+
 	transaction, err := r.db.Begin()
 	if err != nil {
 		log.Error("Transaction create failed! error: ", err, " senderID: ", senderID, " receiverID: ", receiverID, " relationType: ", relationType)
@@ -175,6 +186,33 @@ func (r *relationshipRepositoryImpl) UnBindTwoUser(senderID, receiverID int) err
 	}
 	return nil
 
+}
+
+func (r *relationshipRepositoryImpl) GetRelationList(userID int) []models.Relationship {
+	result, err := r.db.Select(models.Relationship{}, "SELECT * FROM relationship WHERE user_id = ? OR friend_id = ?", userID, userID)
+	if err != nil {
+		log.Warn("GetRelationList failed! error: ", err, " userID: ", userID)
+		return nil
+	}
+	var relationships []models.Relationship
+	for _, item := range result {
+		relationships = append(relationships, *item.(*models.Relationship))
+	}
+	return relationships
+}
+
+func (r *relationshipRepositoryImpl) GetHistoryList(userID int) []models.RelationShipHistory {
+	history, err := r.db.Select(models.RelationShipHistory{}, "SELECT * FROM relationship_history WHERE user_id = ? OR receiver_id = ?", userID, userID)
+	if err != nil {
+		log.Warn("GetHistoryList failed! error: ", err, " userID: ", userID)
+		return nil
+	}
+	//format []interface{} to []models.RelationShipHistory
+	var histories []models.RelationShipHistory
+	for _, item := range history {
+		histories = append(histories, *item.(*models.RelationShipHistory))
+	}
+	return histories
 }
 
 func (r *relationshipRepositoryImpl) initTable() error {

@@ -1,6 +1,7 @@
 package JWT
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
@@ -197,4 +198,41 @@ func Instance() Authorization.IAuth {
 
 func Middleware() gin.HandlerFunc {
 	return Instance().MiddleWare()
+}
+
+func TokenValid(ctx *gin.Context) (bool, error) {
+	//{
+	//	cookie, _ := ctx.Cookie("Authorization")
+	//	/*if err != nil {
+	//		log.Error("Error while getting token from cookie ", err)
+	//		resp.SetCode(response.BadRequest).AddData("Something wrong with the cookie")
+	//		return
+	//	}*/
+	//	if cookie != "" {
+	//		if Instance().TokenValid(cookie) {
+	//			return
+	//		}
+	//	}
+	//
+	//}
+
+	cookie, err := ctx.Cookie("Authorization")
+	if err != nil || cookie == "" {
+		log.Error("Error while getting token from cookie ", err)
+		return false, errors.New("please login first")
+	}
+
+	return Instance().TokenValid(cookie), nil
+}
+
+func ValidAndGetResult(ctx *gin.Context) (any, error) {
+	ok, err := TokenValid(ctx)
+	if err != nil || !ok {
+		return nil, errors.New("please login first")
+	}
+	claims, err := Instance().GetUserClaimFromToken(ctx.GetString("Authorization"))
+	if err != nil {
+		return nil, errors.New("please login first")
+	}
+	return claims, nil
 }

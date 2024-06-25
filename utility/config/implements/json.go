@@ -81,8 +81,6 @@ func (j *jsonConfig) GetConfigFileName() string {
 }
 
 func (j *jsonConfig) Save() error {
-	//TODO: json has something wrong
-
 	bytes, err := json.MarshalIndent(j.entries, "", "  ")
 	if err != nil {
 		return err

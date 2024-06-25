@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/repository"
 	"github.com/Thenecromance/OurStories/application/services/RelationValidator"
@@ -18,25 +19,50 @@ type RelationShipService interface {
 	DisassociateUser(userID int, associateID int) bool
 
 	// BindingTwoUser will bind two users with the relationship
-	BindingTwoUser(link string, receiverID int)
+	BindingTwoUser(link string, receiverID int) (err error)
+
+	GetFriendList(userID int) []models.Relationship
+
+	GetHistoryList(userID int) []models.RelationShipHistory
 }
 
 type relationshipServiceImpl struct {
 	repo      repository.RelationshipRepository
+	userRepo  repository.UserRepository
 	validator RelationValidator.IRelationValidator
 }
 
-func (r *relationshipServiceImpl) BindingTwoUser(link string, receiverID int) {
+func (r *relationshipServiceImpl) GetFriendList(userID int) []models.Relationship {
+	lists := r.repo.GetRelationList(userID)
+
+	return lists
+}
+
+func (r *relationshipServiceImpl) BindingTwoUser(link string, receiverID int) error {
+
 	senderID, relationType, err := r.validator.GetTokenInfo(link)
 	if err != nil {
-		log.Error("BindingTwoUser failed! error: ", err)
-		return
+		log.Warn("BindingTwoUser failed! error: ", err)
+		return err
 	}
+
+	if r.userRepo.HasId(receiverID) == false {
+		log.Warn("BindingTwoUser failed! error: ", "receiverID not exists")
+		return errors.New("receiverID not exists")
+	}
+
+	//in case to avoid the senderID equals receiverID
+	if senderID == receiverID {
+		log.Warn("BindingTwoUser failed! error: ", "senderID equals receiverID")
+		return errors.New("senderID equals receiverID")
+	}
+
 	err = r.repo.BindTwoUser(senderID, receiverID, relationType)
 	if err != nil {
-		log.Error("BindingTwoUser failed! error: ", err)
-		return
+		log.Warn("BindingTwoUser failed! error: ", err)
+		return err
 	}
+	return err
 }
 
 // UserHasAssociation mean to check users has been associate relationship with others
@@ -44,6 +70,7 @@ func (r *relationshipServiceImpl) BindingTwoUser(link string, receiverID int) {
 // but if user wants to bind Couple relationship , this must be limited to 1
 func (r *relationshipServiceImpl) UserHasAssociation(userID int, type_ int) bool {
 	count := r.UserAssociationCount(userID, type_)
+
 	if type_ == models.Couple {
 		return count < 1 //limit the user's couple count
 	}
@@ -52,7 +79,7 @@ func (r *relationshipServiceImpl) UserHasAssociation(userID int, type_ int) bool
 }
 
 func (r *relationshipServiceImpl) UserAssociationCount(userID int, type_ int) int {
-	return r.repo.GetRelationShipCount(userID, type_)
+	return r.repo.GetRelationCount(userID, type_)
 }
 
 // CreateRelationshipConnection a method for create bind link for users, if this user can add more friend, method will return a linkpath
@@ -79,6 +106,10 @@ func (r *relationshipServiceImpl) DisassociateUser(userID int, associateID int) 
 		return false
 	}
 	return true
+}
+
+func (r *relationshipServiceImpl) GetHistoryList(userID int) []models.RelationShipHistory {
+	return r.repo.GetHistoryList(userID)
 }
 
 func NewRelationShipService(userRepository repository.RelationshipRepository) RelationShipService {

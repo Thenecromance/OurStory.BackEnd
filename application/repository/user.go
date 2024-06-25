@@ -22,6 +22,8 @@ type UserRepository interface {
 	// other wise return false
 	HasUser(username string)
 
+	HasId(id int) bool
+
 	// HasUserAndEmail Check if the user and email is exist
 	// if the user or email is exist, return true
 	// other wise return false
@@ -110,9 +112,17 @@ func (u *user) HasUser(username string) {
 		return
 
 	}
-
 }
-
+func (u *user) HasId(id int) bool {
+	obj, err := u.db.SelectInt("select count(*) from user where id = ?", id)
+	if err != nil {
+		return false
+	}
+	if obj > 0 {
+		return true
+	}
+	return false
+}
 func (u *user) HasUserAndEmail(username, email string) bool {
 	obj, err := u.db.SelectInt("select count(*) from user where username = ? or email = ?", username, email)
 	if err != nil {
