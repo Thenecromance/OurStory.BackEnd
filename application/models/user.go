@@ -1,5 +1,11 @@
 package models
 
+const (
+	RoleUser = iota
+	RoleAdmin
+	RoleMaster
+)
+
 // UserClaim only for signature JWT Token or other token that need to be signed
 type UserClaim struct {
 	Id       int    `json:"id"`
@@ -12,6 +18,7 @@ type UserBasicDTO struct {
 	UserName string `json:"username"         db:"username"` // username is the name that use to login
 	Avatar   string `json:"avatar"           db:"avatar"`   // the path of avatar
 	NickName string `json:"nickname"         db:"nickname"` // nickname is the name that show to others
+	Role     int    `json:"role"             db:"role"`
 }
 
 // UserAdvancedDTO is the advanced information of user

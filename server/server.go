@@ -24,6 +24,21 @@ func (s *Server) setTLS(tls Interface.ITLs) {
 	s.core.Tls = tls
 }
 
+func (s *Server) setupResource() {
+	s.gin.LoadHTMLFiles("frontend/index.html")
+
+	s.gin.Static("/css", "frontend/css")
+	s.gin.Static("/js", "frontend/js")
+
+	/*	s.gin.NoRoute(func(c *gin.Context) {
+
+		})
+
+		s.gin.NoMethod(func(c *gin.Context) {
+
+		})*/
+}
+
 func (s *Server) initialize() {
 	log.Infof("Initializing the server")
 	s.core.initializeCore(s.gin)
