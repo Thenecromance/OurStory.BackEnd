@@ -27,7 +27,7 @@ type UserAdvancedDTO struct {
 	Email       string `db:"email"                 json:"email"             `
 	MBTI        string `db:"mbti"                  json:"mbti"              `
 	Birthday    int64  `db:"birthday"              json:"birthday"          `
-	Gender      int    `db:"gender"                json:"gender"            `
+	Gender      string `db:"gender"                json:"gender"            `
 	CreatedTime int64  `db:"created_time"          json:"created_time"      `
 	LastLogin   int64  `db:"last_login"            json:"last_login"        `
 }
