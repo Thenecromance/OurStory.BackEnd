@@ -45,10 +45,19 @@ func (r *routerManager) ApplyRouter() error {
 	for _, router := range r.routeMap {
 		//Logger.Infof("Registering route %s", route.GetPath())
 		if router.IsRESTFUL() {
-			r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
-			r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)
-			r.gin.Handle(http.MethodPut, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[2])...)
-			r.gin.Handle(http.MethodDelete, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[3])...)
+			if router.GetHandler()[0] != nil {
+				r.gin.Handle(http.MethodGet, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
+			}
+			if router.GetHandler()[1] != nil {
+				r.gin.Handle(http.MethodPost, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[1])...)
+			}
+			if router.GetHandler()[2] != nil {
+				r.gin.Handle(http.MethodPut, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[2])...)
+			}
+			if router.GetHandler()[3] != nil {
+				r.gin.Handle(http.MethodDelete, router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[3])...)
+			}
+
 		} else {
 			r.gin.Handle(router.GetMethod(), router.GetPath(), append(router.GetMiddleWare(), router.GetHandler()[0])...)
 		}

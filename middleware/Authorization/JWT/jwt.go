@@ -24,7 +24,7 @@ const (
 // claim is a struct that will be used to store the user information
 type claim struct {
 	Obj                  interface{} `json:"info"` // the user information
-	jwt.RegisteredClaims             // embedded unmodified `jwt.RegisteredClaims`
+	jwt.RegisteredClaims                           // embedded unmodified `jwt.RegisteredClaims`
 }
 
 type Service struct {

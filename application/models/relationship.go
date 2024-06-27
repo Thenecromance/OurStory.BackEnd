@@ -3,10 +3,10 @@ package models
 // Relationship is the struct that defines the relationship between users which stores in the database
 type Relationship struct {
 	ID            int   `json:"id" db:"id"`
-	UserID        int   `json:"user_id" db:"user_id" `              // the user id
-	FriendID      int   `json:"friend_id" db:"friend_id"`           // associate with the user id
-	RelationType  int   `json:"relation_type" db:"relation_type"`   // two of the user's relationship type
-	AssociateTime int64 `json:"associate_time" db:"associate_time"` // the time when the relationship is created
+	UserID        int   `json:"user_id" db:"user_id" `            // the user id
+	FriendID      int   `json:"friend_id" db:"friend_id"`         // associate with the user id
+	RelationType  int   `json:"relation_type" db:"relation_type"` // two of the user's relationship type
+	AssociateTime int64 `json:"stamp" db:"associate_time"`        // the time when the relationship is created
 }
 
 const (

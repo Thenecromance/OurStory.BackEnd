@@ -30,6 +30,13 @@ func newRelationShipController() Interface.IController {
 	return controller.NewRelationshipController(s)
 }
 
+func newAnniversaryController() Interface.IController {
+	repo := repository.NewAnniversaryRepository(SQL.Get("user"))
+	s := services.NewAnniversaryService(repo)
+
+	return controller.NewAnniversaryController(s)
+}
+
 func main() {
 
 	svr := server.New()
@@ -42,6 +49,9 @@ func main() {
 
 	rc := newRelationShipController()
 	svr.RegisterRouter(rc.GetRoutes()...)
+
+	ac := newAnniversaryController()
+	svr.RegisterRouter(ac.GetRoutes()...)
 
 	svr.Run()
 }
