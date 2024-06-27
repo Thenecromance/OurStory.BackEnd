@@ -9,6 +9,7 @@ import (
 	"github.com/Thenecromance/OurStories/utility/log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //---------------------------------
@@ -146,9 +147,11 @@ func travelToDTO(travel *models.Travel) *models.TravelDTO {
 		}
 		dto.TogetherWith = append(dto.TogetherWith, id)
 	}
+	parseTravelState(dto) // update the state of the travel
 	return dto
 }
 func dtoToTravel(travel *models.TravelDTO) *models.Travel {
+	parseTravelState(travel)
 	obj := &models.Travel{
 		Id:           travel.Id,
 		UserId:       travel.UserId,
@@ -166,7 +169,19 @@ func dtoToTravel(travel *models.TravelDTO) *models.Travel {
 	if len(obj.TogetherWith) > 0 {
 		obj.TogetherWith = obj.TogetherWith[:len(obj.TogetherWith)-1]
 	}
+
 	return obj
+}
+
+func parseTravelState(travel *models.TravelDTO) {
+	now := time.Now().Unix()
+	if travel.StartTime > now {
+		travel.State = models.TravelStatePending
+	} else if travel.EndTime < now {
+		travel.State = models.TravelStateFinished
+	} else {
+		travel.State = models.TravelStateOngoing
+	}
 }
 
 func (t *travelServiceImpl) getUpdaterObject(id string) *updatingTravel {
@@ -224,6 +239,7 @@ func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.Travel
 
 	log.Debug("check user in travel...")
 	if t.userInTravel(dto, userId) {
+
 		return dto, nil
 	}
 

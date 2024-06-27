@@ -1,5 +1,11 @@
 package models
 
+const (
+	TravelStatePending = iota
+	TravelStateOngoing
+	TravelStateFinished
+)
+
 type Travel struct {
 	Id           int    `json:"id"          db:"id"`
 	State        int    `json:"state"       db:"state"        form:"state"`
