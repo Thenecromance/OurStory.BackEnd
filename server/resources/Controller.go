@@ -1,16 +1,16 @@
-package resourceControl
+package resources
 
 import (
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
-type ResourceControl struct {
+type Controller struct {
 	cfg *config
 }
 
-func (rc *ResourceControl) Apply(engine *gin.Engine) {
-
+func (rc *Controller) ApplyTo(engine *gin.Engine) {
+	log.Info("Start to apply resources to gin engine")
 	if rc.cfg.HtmlFiles != nil && len(rc.cfg.HtmlFiles) > 0 {
 		//engine.LoadHTMLFiles(rc.cfg.HtmlFiles...)
 		if len(rc.cfg.HtmlFiles) == 1 {
@@ -20,17 +20,15 @@ func (rc *ResourceControl) Apply(engine *gin.Engine) {
 		}
 	}
 
-	/*	engine.GET("/", func(c *gin.Context) {
-		c.File("dist/index.html")
-	})*/
-
 	if rc.cfg.NoMethod != "" {
+		log.Infof("Setting NoMethod to %s", rc.cfg.NoMethod)
 		engine.NoMethod(func(c *gin.Context) {
 			c.File(rc.cfg.NoMethod)
 		})
 	}
 
 	if rc.cfg.NoRoute != "" {
+		log.Infof("Setting NoRoute to %s", rc.cfg.NoRoute)
 		engine.NoRoute(func(c *gin.Context) {
 			c.File(rc.cfg.NoRoute)
 		})
@@ -52,10 +50,11 @@ func (rc *ResourceControl) Apply(engine *gin.Engine) {
 		}
 	}
 
+	log.Info("Resources applied to gin engine")
 }
 
-func New() *ResourceControl {
-	ctrl := &ResourceControl{
+func New() *Controller {
+	ctrl := &Controller{
 		cfg: newConfig(),
 	}
 	return ctrl

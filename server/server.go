@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
-	"github.com/Thenecromance/OurStories/server/resourceControl"
+	"github.com/Thenecromance/OurStories/server/resources"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +10,7 @@ import (
 type Server struct {
 	gin       *gin.Engine
 	core      *core
-	resources *resourceControl.ResourceControl
+	resources *resources.Controller
 }
 
 func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
@@ -31,7 +31,7 @@ func (s *Server) initialize() {
 
 	s.core.initializeCore(s.gin)
 
-	s.resources.Apply(s.gin)
+	s.resources.ApplyTo(s.gin)
 
 	log.Infof("Server initialized")
 }
@@ -55,7 +55,7 @@ func New() *Server {
 	svr := &Server{
 		gin:       gin.Default(),
 		core:      newCore(),
-		resources: resourceControl.New(),
+		resources: resources.New(),
 	}
 	svr.initialize()
 

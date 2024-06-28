@@ -1,4 +1,4 @@
-package resourceControl
+package resources
 
 import Config "github.com/Thenecromance/OurStories/utility/config"
 
@@ -12,7 +12,7 @@ type config struct {
 }
 
 func (c *config) load() {
-	Config.Instance().LoadToObject("resourceControl", c)
+	Config.Instance().LoadToObject("resources", c)
 }
 
 func newConfig() *config {
