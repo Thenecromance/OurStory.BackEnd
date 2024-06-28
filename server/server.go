@@ -2,13 +2,15 @@ package server
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/server/resourceControl"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	gin  *gin.Engine
-	core *core
+	gin       *gin.Engine
+	core      *core
+	resources *resourceControl.ResourceControl
 }
 
 func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
@@ -24,28 +26,12 @@ func (s *Server) setTLS(tls Interface.ITLs) {
 	s.core.Tls = tls
 }
 
-func (s *Server) setupResource() {
-	s.gin.LoadHTMLGlob("dist/*.html")
-
-	//s.gin.Handle("GET", "/", func(c *gin.Context) {
-	//	/*	c.File("./dist/index.html")*/
-	//})
-
-	s.gin.Static("assets", "dist/assets")
-	s.gin.Static("/favicon.svg", "dist/favicon.svg")
-
-	s.gin.NoRoute(func(c *gin.Context) {
-		c.File("./dist/index.html")
-	})
-	s.gin.NoMethod(func(c *gin.Context) {
-		c.File("./dist/index.html")
-	})
-}
-
 func (s *Server) initialize() {
 	log.Infof("Initializing the server")
-	s.setupResource()
+
 	s.core.initializeCore(s.gin)
+
+	s.resources.Apply(s.gin)
 
 	log.Infof("Server initialized")
 }
@@ -67,8 +53,9 @@ func (s *Server) Close() error {
 
 func New() *Server {
 	svr := &Server{
-		gin:  gin.Default(),
-		core: newCore(),
+		gin:       gin.Default(),
+		core:      newCore(),
+		resources: resourceControl.New(),
 	}
 	svr.initialize()
 
