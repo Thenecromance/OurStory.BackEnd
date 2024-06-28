@@ -32,7 +32,7 @@ export class Request {
         return result.data
     }
 
-     post<R>(): Promise<R | null> {
+    async post<R>(): Promise<R | null> {
         const resp = await axios.post<response>(this.api, this.data)
         const result = resp.data
 

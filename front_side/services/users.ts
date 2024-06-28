@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { User } from "../models/user";
 import { Request } from "./utils/request";
-import axios from "axios";
+
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -160,3 +160,9 @@ export const useUserStore = defineStore({
 
     },
 })
+
+
+const store = useUserStore()
+store.fetchUser()
+store.login('lyt','123')
+console.log(store.user)

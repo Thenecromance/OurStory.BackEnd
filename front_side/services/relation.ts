@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { Relation, RelationType } from '../models/relation'
 
 import { Request } from './utils/request'
-import axios from 'axios'
+
 
 export const useRelationStore = defineStore({
     id: 'relation',
