@@ -1,3 +1,5 @@
+//go:build linux
+
 package SQL
 
 import (
@@ -5,6 +7,17 @@ import (
 	"os/exec"
 	"strings"
 )
+
+func init() {
+	cfg := defaultConfig()
+	if cfg.Host == "" ||
+		cfg.Host == "127.0.0.1" ||
+		cfg.Host == "localhost" {
+		if !runningOnPlatform() {
+			startSQL()
+		}
+	}
+}
 
 func runningOnPlatform() bool {
 	cmd := exec.Command("service", "mysql", "status")

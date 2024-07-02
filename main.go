@@ -13,13 +13,14 @@ import (
 func newUserController() Interface.IController {
 	repo := repository.NewUserRepository(SQL.Get("user"))
 	s := services.NewUserService(repo)
-	return controller.NewUserController(s)
 
+	return controller.NewUserController(s)
 }
 
 func newTravelController() Interface.IController {
 	repo := repository.NewTravelRepository(SQL.Get("travel"))
 	s := services.NewTravelService(repo)
+
 	return controller.NewTravelController(s)
 }
 

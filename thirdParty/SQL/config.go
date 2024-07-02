@@ -8,14 +8,14 @@ import (
 )
 
 type config struct {
-	SqlType   string   `ini:"sql"           json:"sql_type"   yaml:"sql_type"     comment:"which sql to use, default mysql"`
-	Protocol  string   `ini:"protocol"      json:"protocol"   yaml:"protocol"     comment:"tcp or unix socket"   `
+	SqlType   string   `ini:"sql"           json:"sql_type"   yaml:"sql_type"    `
+	Protocol  string   `ini:"protocol"      json:"protocol"   yaml:"protocol"    `
 	Host      string   `ini:"host"          json:"host"       yaml:"host"`
 	Port      string   `ini:"port"          json:"port"       yaml:"port"`
 	User      string   `ini:"user"          json:"user"       yaml:"user"`
 	Password  string   `ini:"password"      json:"password"   yaml:"password"`
-	DefaultDb string   `ini:"default_db"    json:"default_db" yaml:"default_db"   comment:"when there is no db_name, use this,and it need to create first"`
-	DbName    []string `ini:"db_name"       json:"db_name"    yaml:"db_name"      comment:"the logic database name which should be the same as the database's name'" `
+	DefaultDb string   `ini:"default_db"    json:"default_db" yaml:"default_db"  `
+	DbName    []string `ini:"db_name"       json:"db_name"    yaml:"db_name"     `
 }
 
 func (c *config) buildConnectString(dbName string) (res string) {
