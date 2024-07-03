@@ -60,10 +60,11 @@ func (r *redisMQ) Subscribe(topic_ string, callback_ Callback) {
 
 	if _, exists := r.subscribers[topic_]; !exists {
 		r.subscribers[topic_] = CallbackList{}
+
+		go r.handleTopic(topic_)
 	}
 	r.subscribers[topic_] = append(r.subscribers[topic_], callback_)
 
-	go r.handleTopic(topic_)
 }
 
 func (r *redisMQ) Consume(topic_ string) (any, error) {
