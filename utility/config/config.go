@@ -10,7 +10,6 @@ var (
 	defaultInst Interface.IConfiguration
 
 	//different Instances to support different config types
-	iniInst  Interface.IConfiguration
 	jsonInst Interface.IConfiguration
 	yamlInst Interface.IConfiguration
 
@@ -19,8 +18,8 @@ var (
 
 func New(configType int) Interface.IConfiguration {
 	switch configType {
-	case constants.Ini:
-		return implements.NewIniConfig()
+	/*case constants.Ini:
+	return implements.NewIniConfig()*/
 	case constants.Json:
 		return implements.NewJsonConfig()
 	case constants.Yaml:
@@ -31,8 +30,8 @@ func New(configType int) Interface.IConfiguration {
 }
 func NewWithName(name string, configType int) Interface.IConfiguration {
 	switch configType {
-	case constants.Ini:
-		return implements.NewIniConfigWithName(name)
+	/*case constants.Ini:
+	return implements.NewIniConfigWithName(name)*/
 	case constants.Json:
 		return implements.NewJsonConfigWithName(name)
 	case constants.Yaml:
@@ -52,11 +51,11 @@ func Instance() Interface.IConfiguration {
 
 func SetDefault(configType int) {
 	switch configType {
-	case constants.Ini:
-		if iniInst == nil {
-			iniInst = implements.NewIniConfig()
-		}
-		defaultInst = iniInst
+	/*case constants.Ini:
+	if iniInst == nil {
+		iniInst = implements.NewIniConfig()
+	}
+	defaultInst = iniInst*/
 	case constants.Json:
 		if jsonInst == nil {
 			jsonInst = implements.NewJsonConfig()

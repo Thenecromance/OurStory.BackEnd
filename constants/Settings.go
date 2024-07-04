@@ -1,8 +1,7 @@
 package constants
 
 const (
-	Ini = iota
-	Json
+	Json = iota
 	Yaml
 )
 
@@ -12,5 +11,4 @@ const (
 
 	YamlExt = ".yaml"
 	JsonExt = ".json"
-	IniExt  = ".ini"
 )
