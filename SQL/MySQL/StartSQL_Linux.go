@@ -1,6 +1,6 @@
 //go:build linux
 
-package SQL
+package MySQL
 
 import (
 	"github.com/Thenecromance/OurStories/utility/log"

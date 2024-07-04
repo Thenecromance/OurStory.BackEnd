@@ -2,6 +2,7 @@ package mq
 
 import (
 	"context"
+	SQL "github.com/Thenecromance/OurStories/SQL/redis"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/go-redis/redis/v8"
 	"sync"
@@ -17,13 +18,14 @@ type redisMQ struct {
 }
 
 func NewRedisMQ() IMQ {
-	cli := redis.NewClient(&redis.Options{
+
+	/*	cli := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		PoolFIFO: true,
-	})
+	})*/
 
 	return &redisMQ{
-		client:      cli,
+		client:      SQL.NewRedis(),
 		subscribers: make(map[string]CallbackList),
 	}
 }
