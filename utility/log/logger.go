@@ -23,35 +23,6 @@ type Logger struct {
 	writers *writerContainer
 }
 
-/*func (l *Logger) initCore() {
-
-	cfg, _ := load()
-
-	core := zapcore.NewCore(
-		//zapcore.NewJSONEncoder(setupEncoderConfig()),
-		zapcore.NewConsoleEncoder(cfg.EncoderConfig),
-		zapcore.AddSync(l.writers),
-		zapcore.DebugLevel)
-
-	l._logger = zap.New(core, zap.AddCaller()).Sugar()
-
-	// let log output to the console
-	l.writers.addWriter(os.Stderr)
-
-	// let log output to the file
-	{
-		file, err := os.OpenFile(logFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE|os.O_APPEND, os.ModeAppend)
-
-		if err != nil {
-			fmt.Println("open log file failed")
-			return
-		}
-
-		l.writers.addWriter(file)
-	}
-}
-*/
-
 func (l *Logger) initCore() {
 	cfg, err := load()
 	build, err := cfg.Build()

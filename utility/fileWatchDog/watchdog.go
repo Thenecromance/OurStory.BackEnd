@@ -1,4 +1,4 @@
-package fileWatcher
+package fileWatchDog
 
 import (
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -30,13 +30,6 @@ func init() {
 func Close() {
 	inst.ptr.Close()
 	inst.callbackList = nil
-}
-
-type FileCallback struct {
-	OnChanged func()
-	OnDeleted func()
-	OnCreated func()
-	OnRenamed func()
 }
 
 type Watcher struct {
