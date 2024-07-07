@@ -28,7 +28,7 @@ func (c *AnniversaryController) Name() string {
 	return "AnniversaryController"
 }
 
-func (c *AnniversaryController) SetRoutes() {
+func (c *AnniversaryController) SetupRoutes() {
 
 	mw := JWT.Middleware()
 	c.base = route.NewREST("/api/anniversary")
@@ -57,7 +57,7 @@ func (c *AnniversaryController) GetRoutes() []Interface.IRoute {
 }
 
 func (c *AnniversaryController) Initialize() {
-	c.SetRoutes()
+	c.SetupRoutes()
 
 }
 

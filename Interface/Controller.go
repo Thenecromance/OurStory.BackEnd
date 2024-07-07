@@ -3,6 +3,6 @@ package Interface
 type IController interface {
 	Initialize()
 	Name() string
-	SetRoutes()
+	SetupRoutes()
 	GetRoutes() []IRoute
 }

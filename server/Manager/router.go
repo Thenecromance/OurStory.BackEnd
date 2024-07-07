@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/Interface"
 	Log "github.com/Thenecromance/OurStories/utility/log"
+	"github.com/Thenecromance/OurStories/utility/mq"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,12 +15,12 @@ import (
 		loaded bool
 	}
 */
-type routerManager struct {
+type routeMgr struct {
 	gin      *gin.Engine
 	routeMap map[string]Interface.IRoute
 }
 
-func (r *routerManager) RegisterRouter(routerProxy ...Interface.IRoute) error {
+func (r *routeMgr) RegisterRouter(routerProxy ...Interface.IRoute) error {
 
 	//r.routeMap[routerProxy.GetPath()] = routerProxy
 	for _, router := range routerProxy {
@@ -32,7 +33,7 @@ func (r *routerManager) RegisterRouter(routerProxy ...Interface.IRoute) error {
 	return nil
 }
 
-func (r *routerManager) GetRouter(name string) (Interface.IRoute, error) {
+func (r *routeMgr) GetRouter(name string) (Interface.IRoute, error) {
 	router, ok := r.routeMap[name]
 	if !ok {
 		return nil, fmt.Errorf("route %s not found", name)
@@ -40,7 +41,7 @@ func (r *routerManager) GetRouter(name string) (Interface.IRoute, error) {
 	return router, nil
 }
 
-func (r *routerManager) ApplyRouter() error {
+func (r *routeMgr) ApplyRouter() error {
 	Log.Info(r.routeMap)
 	for _, router := range r.routeMap {
 		//Logger.Infof("Registering route %s", route.GetPath())
@@ -66,14 +67,18 @@ func (r *routerManager) ApplyRouter() error {
 	return nil
 }
 
-func (r *routerManager) Close() error {
+func (r *routeMgr) Close() error {
 	//TODO implement me
 	panic("implement me")
 	return nil
 }
 
+func (r *routeMgr) Run() {
+	mq.Publish(mq.DevRoute, r.routeMap)
+}
+
 func NewRouterManager(g *gin.Engine) Interface.IRouterController {
-	return &routerManager{
+	return &routeMgr{
 		gin:      g,
 		routeMap: make(map[string]Interface.IRoute),
 	}

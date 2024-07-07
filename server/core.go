@@ -11,9 +11,8 @@ import (
 )
 
 type core struct {
-	routerController     Interface.IRouterController
-	middleWareController Interface.IMiddleWareController // all middlewares will be registered here which will be used by all routers
-
+	routerController Interface.IRouterController
+	
 	Tls Interface.ITLs
 	cfg *config
 	svr *http.Server

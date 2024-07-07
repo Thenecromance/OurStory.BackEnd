@@ -27,6 +27,7 @@ type IConfiguration interface {
 
 	// GetConfigFileName returns the name of the configuration file
 	GetConfigFileName() string
+
 	SetName(name string)
 
 	Type() int

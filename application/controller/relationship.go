@@ -32,14 +32,14 @@ type relationshipController struct {
 }
 
 func (r *relationshipController) Initialize() {
-	r.SetRoutes()
+	r.SetupRoutes()
 }
 
 func (r *relationshipController) Name() string {
 	return "relationship"
 }
 
-func (r *relationshipController) SetRoutes() {
+func (r *relationshipController) SetupRoutes() {
 	mw := JWT.Middleware()
 	r.createLink = route.NewRouter("/api/relation", "POST")
 	{

@@ -113,6 +113,7 @@ func (u *user) HasUser(username string) {
 
 	}
 }
+
 func (u *user) HasId(id int) bool {
 	obj, err := u.db.SelectInt("select count(*) from user where id = ?", id)
 	if err != nil {
@@ -123,6 +124,7 @@ func (u *user) HasId(id int) bool {
 	}
 	return false
 }
+
 func (u *user) HasUserAndEmail(username, email string) bool {
 	obj, err := u.db.SelectInt("select count(*) from user where username = ? or email = ?", username, email)
 	if err != nil {

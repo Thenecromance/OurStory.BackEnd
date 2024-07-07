@@ -17,10 +17,10 @@ func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
 	return s.core.routerController.RegisterRouter(routers...)
 }
 
-func (s *Server) RegisterMiddleWare(name string, handler gin.HandlerFunc) {
+/*func (s *Server) RegisterMiddleWare(name string, handler gin.HandlerFunc) {
 	return
 	s.core.middleWareController.RegisterMiddleWare(name, handler)
-}
+}*/
 
 func (s *Server) setTLS(tls Interface.ITLs) {
 	s.core.Tls = tls

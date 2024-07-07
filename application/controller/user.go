@@ -30,10 +30,10 @@ func (uc *UserController) Name() string {
 }
 
 func (uc *UserController) Initialize() {
-	uc.SetRoutes()
+	uc.SetupRoutes()
 }
 
-func (uc *UserController) SetRoutes() {
+func (uc *UserController) SetupRoutes() {
 	mw := JWT.Middleware()
 	{
 		uc.routers.login = route.NewDefaultRouter()

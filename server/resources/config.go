@@ -12,7 +12,7 @@ type config struct {
 }
 
 func (c *config) load() {
-	Config.Instance().LoadToObject("resources", c)
+	Config.LoadToObject("resources", c)
 }
 
 func newConfig() *config {

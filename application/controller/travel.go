@@ -31,7 +31,7 @@ func (tc *TravelController) Initialize() {
 	tc.SetRoutes()
 }
 
-func (tc *TravelController) SetRoutes() {
+func (tc *TravelController) SetupRoutes() {
 	mw := JWT.Middleware()
 	tc.groups.travel = route.NewREST("/api/travel/")
 	{

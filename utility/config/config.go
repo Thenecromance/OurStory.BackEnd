@@ -81,3 +81,7 @@ func InstanceByName(name string, type_ int) Interface.IConfiguration {
 	}
 	return customConfig[name]
 }
+
+func LoadToObject(section string, obj interface{}) error {
+	return Instance().LoadToObject(section, obj)
+}
