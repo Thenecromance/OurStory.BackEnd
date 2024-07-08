@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/server/Manager"
 	Log "github.com/Thenecromance/OurStories/utility/log"
@@ -12,7 +13,7 @@ import (
 
 type core struct {
 	routerController Interface.IRouterController
-	
+
 	Tls Interface.ITLs
 	cfg *config
 	svr *http.Server
@@ -30,11 +31,22 @@ func (c *core) Run() {
 			return
 		}
 	} else {
-		Log.Infof("Server is running on %s without ITLs. use http to request", c.cfg.Addr)
+		//Log.Infof("Server is running on %s without ITLs. use http to request", c.cfg.Addr)
+
+		if c.cfg.Addr == ":8080" {
+			Log.Info("server is running , visit by : http://localhost:8080")
+		}
+
 		err := c.svr.ListenAndServe()
-		if err != nil {
+		/*if err != nil {
 			Log.Errorf("Error while running the server: %s", err.Error())
 			return
+		}*/
+		if errors.Is(err, http.ErrServerClosed) {
+			Log.Infof("Server closed")
+		} else {
+			Log.Errorf("Error while running the server: %s", err.Error())
+
 		}
 	}
 }
@@ -58,6 +70,11 @@ func (c *core) setupServer(handler http.Handler) {
 		ConnContext:                  nil,*/
 	}
 	Log.Info("Server setup done")
+
+}
+
+func (c *core) close() {
+	c.svr.Close()
 }
 
 func (c *core) initializeCore(g *gin.Engine) {

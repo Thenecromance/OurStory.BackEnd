@@ -23,7 +23,7 @@ func init() {
 		callbackList: make(map[string]FileCallback),
 	}
 
-	go inst.watchThread()
+	go inst.eventHandler()
 
 }
 
@@ -37,7 +37,7 @@ type Watcher struct {
 	callbackList map[string]FileCallback
 }
 
-func (w *Watcher) watchThread() {
+func (w *Watcher) eventHandler() {
 	for {
 		select {
 		case event := <-w.ptr.Events:

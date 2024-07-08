@@ -11,6 +11,8 @@ type Server struct {
 	gin       *gin.Engine
 	core      *core
 	resources *resources.Controller
+
+	command string
 }
 
 func (s *Server) RegisterRouter(routers ...Interface.IRoute) error {
@@ -42,12 +44,21 @@ func (s *Server) Run() {
 	if s.core == nil {
 		s.core = newCore()
 	}
+
+	s.gin.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
 	log.Info("Server is running")
+
 	s.core.Run()
 
 }
 
 func (s *Server) Close() error {
+	s.core.close()
 	return nil
 }
 

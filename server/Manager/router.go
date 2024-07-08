@@ -24,6 +24,9 @@ func (r *routeMgr) RegisterRouter(routerProxy ...Interface.IRoute) error {
 
 	//r.routeMap[routerProxy.GetPath()] = routerProxy
 	for _, router := range routerProxy {
+		if router == nil {
+			continue
+		}
 		_, ok := r.routeMap[router.GetPath()]
 		if ok {
 			return fmt.Errorf("route %s already registered", router.GetPath())

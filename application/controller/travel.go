@@ -28,7 +28,7 @@ func (tc *TravelController) Name() string {
 }
 
 func (tc *TravelController) Initialize() {
-	tc.SetRoutes()
+	//tc.SetRoutes()
 }
 
 func (tc *TravelController) SetupRoutes() {
