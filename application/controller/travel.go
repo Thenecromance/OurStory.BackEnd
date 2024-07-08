@@ -28,7 +28,6 @@ func (tc *TravelController) Name() string {
 }
 
 func (tc *TravelController) Initialize() {
-	//tc.SetRoutes()
 }
 
 func (tc *TravelController) SetupRoutes() {
@@ -205,6 +204,5 @@ func NewTravelController(s services.TravelService) Interface.IController {
 	tc := &TravelController{
 		service: s,
 	}
-	tc.Initialize()
 	return tc
 }

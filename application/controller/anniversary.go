@@ -57,8 +57,6 @@ func (c *AnniversaryController) GetRoutes() []Interface.IRoute {
 }
 
 func (c *AnniversaryController) Initialize() {
-	c.SetupRoutes()
-
 }
 
 //---------------------------------------------------------
@@ -268,6 +266,5 @@ func (c *AnniversaryController) getAnniversaryById(ctx *gin.Context) {
 func NewAnniversaryController(services services.AnniversaryService) Interface.IController {
 	c := new(AnniversaryController)
 	c.services = services
-	c.Initialize()
 	return c
 }

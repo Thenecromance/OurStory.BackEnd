@@ -1,8 +1,8 @@
-package resources
+package setting
 
 import Config "github.com/Thenecromance/OurStories/utility/config"
 
-type config struct {
+type Gin struct {
 	HtmlFiles []string          `ini:"html_files" json:"html_files" yaml:"html_files"`
 	NoRoute   string            `ini:"no_route" json:"no_route" yaml:"no_route"`
 	NoMethod  string            `ini:"no_method" json:"no_method" yaml:"no_method"`
@@ -11,12 +11,12 @@ type config struct {
 	Redirects map[string]string `ini:"redirects" json:"redirects" yaml:"redirects"`
 }
 
-func (c *config) load() {
-	Config.LoadToObject("resources", c)
+func (c *Gin) load() {
+	Config.LoadToObject("gin", c)
 }
 
-func newConfig() *config {
-	cfg := &config{
+func NewGinSetting() *Gin {
+	cfg := &Gin{
 		HtmlFiles: []string{},
 		NoRoute:   "",
 		NoMethod:  "",

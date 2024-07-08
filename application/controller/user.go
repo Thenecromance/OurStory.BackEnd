@@ -30,7 +30,6 @@ func (uc *UserController) Name() string {
 }
 
 func (uc *UserController) Initialize() {
-	uc.SetupRoutes()
 }
 
 func (uc *UserController) SetupRoutes() {
@@ -287,6 +286,5 @@ func NewUserController(userService services.UserService) Interface.IController {
 	uc := &UserController{
 		service: userService,
 	}
-	uc.Initialize()
 	return uc
 }

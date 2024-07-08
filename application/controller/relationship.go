@@ -32,7 +32,6 @@ type relationshipController struct {
 }
 
 func (r *relationshipController) Initialize() {
-	r.SetupRoutes()
 }
 
 func (r *relationshipController) Name() string {
@@ -230,6 +229,5 @@ func NewRelationshipController(service services.RelationShipService) Interface.I
 	controller := &relationshipController{
 		service: service,
 	}
-	controller.Initialize()
 	return controller
 }
