@@ -34,7 +34,7 @@ func (s *SQLManager) getSafeHandler(db string) *gorp.DbMap {
 		return conn
 	}
 
-	log.Infof("could not find connection to [%s] prepare to create a new database", db)
+	log.Infof("could not find connection to [%s] prepare to connect to database", db)
 	if err := s.createDatabase(db); err != nil {
 		log.Errorf("could not create database [%s], Error:%s", db, err)
 		return nil
@@ -95,7 +95,7 @@ func (s *SQLManager) createDatabase(db string) error {
 	if s.defaultHandler == nil {
 		return errors.New("default handler is nil")
 	}
-	log.Debugf("start to create database [%s] ...", db)
+	log.Debugf("[%s] start to create database ...", db)
 	script := "CREATE DATABASE  IF NOT EXISTS %s  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 	exec, err := s.defaultHandler.Exec(fmt.Sprintf(script, db))
@@ -124,7 +124,7 @@ func (s *SQLManager) initGorpDb(dbName string) *gorp.DbMap {
 		Encoding: "utf8mb4",
 	}}
 
-	dbmap.TraceOn("[gorp]", log.Instance)
+	dbmap.TraceOn("[SQL Query]", log.Instance)
 	return dbmap
 }
 

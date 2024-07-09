@@ -137,6 +137,7 @@ func (c *core) initialize(handler http.Handler) {
 	}
 }
 
+// getCertPath get the certificate file path if file path not exist , return empty
 func (c *core) getCertPath() string {
 	if c.setting.CertPath != "" && File.Exists(c.setting.CertPath) {
 		return c.setting.CertPath

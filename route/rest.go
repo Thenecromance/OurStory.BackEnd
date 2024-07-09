@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,28 +18,28 @@ type rest struct {
 
 func (r *rest) getHandler(c *gin.Context) {
 	if r.handlers[0] != nil || !r.active {
-		r.handlers[0](c)
+		DefaultHandler()(c)
 	} else {
 		r.handlers[0](c)
 	}
 }
 func (r *rest) postHandler(c *gin.Context) {
 	if r.handlers[1] != nil || !r.active {
-		r.handlers[1](c)
+		DefaultHandler()(c)
 	} else {
 		r.handlers[1](c)
 	}
 }
 func (r *rest) putHandler(c *gin.Context) {
 	if r.handlers[2] != nil || !r.active {
-		r.handlers[2](c)
+		DefaultHandler()(c)
 	} else {
 		r.handlers[2](c)
 	}
 }
 func (r *rest) deleteHandler(c *gin.Context) {
 	if r.handlers[3] != nil || !r.active {
-		r.handlers[3](c)
+		DefaultHandler()(c)
 	} else {
 		r.handlers[3](c)
 	}
@@ -62,6 +63,7 @@ func (r *rest) SetPath(path string) {
 
 func (r *rest) SetMethod(method string) {
 	// empty method for rest
+	log.Warn("REST route does not need method")
 }
 
 func (r *rest) SetMiddleWare(middleware gin.HandlerFunc) {

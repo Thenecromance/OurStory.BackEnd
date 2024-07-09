@@ -6,6 +6,7 @@ import (
 	"github.com/Thenecromance/OurStories/server/setting"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 //
@@ -19,7 +20,7 @@ import (
 //type Server struct {
 //	gin       *gin.Engine
 //	core      *core
-//	resources *resources.Controller
+//	resources *resources.ControllerMgr
 //
 //	command string
 //}
@@ -90,7 +91,7 @@ type Server struct {
 	gs *setting.Gin // gin setting
 
 	//=======================================
-	controllerMgr *Manager.Controller
+	controllerMgr *Manager.ControllerMgr
 	//=======================================
 }
 
@@ -101,10 +102,12 @@ func (s *Server) initialize() {
 	s.setUpGinResource()
 
 	s.controllerMgr.Initialize()
+
+	s.initializeGinRoutes()
 }
 
 func (s *Server) setUpGinResource() {
-	log.Info("Start to apply resources to gin engine")
+	log.Info("Start to set up resources to gin engine")
 	if s.gs.HtmlFiles != nil && len(s.gs.HtmlFiles) > 0 {
 		//engine.LoadHTMLFiles(rc.cfg.HtmlFiles...)
 		if len(s.gs.HtmlFiles) == 1 {
@@ -144,11 +147,40 @@ func (s *Server) setUpGinResource() {
 		}
 	}
 
-	log.Info("Resources applied to gin engine")
+	log.Info("set up resources to gin engine done")
 }
 
 func (s *Server) RegisterController(controller ...Interface.IController) {
 	s.controllerMgr.RegisterController(controller...)
+}
+
+func (s *Server) loadRouteToGin(ctrl Interface.IController) {
+	for _, r := range ctrl.GetRoutes() {
+		if r.IsRESTFUL() {
+			handlers := r.GetHandler()
+			if handlers[0] != nil {
+				s.gin.Handle(http.MethodGet, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+			}
+			if handlers[1] != nil {
+				s.gin.Handle(http.MethodPost, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+			}
+			if handlers[2] != nil {
+				s.gin.Handle(http.MethodPut, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+			}
+			if handlers[3] != nil {
+				s.gin.Handle(http.MethodDelete, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+			}
+		} else {
+			s.gin.Handle(r.GetMethod(), r.GetPath(), append(r.GetMiddleWare(), r.GetHandler()...)...)
+		}
+	}
+}
+
+func (s *Server) initializeGinRoutes() {
+	for _, ctrl := range s.controllerMgr.GetAllControllers() {
+		log.Infof("Setting up routes for controller [%s]", ctrl.Name())
+		s.loadRouteToGin(ctrl)
+	}
 }
 
 // Run will Start the server

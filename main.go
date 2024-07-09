@@ -43,16 +43,16 @@ func main() {
 	svr := server.New()
 
 	uc := newUserController()
-	svr.RegisterRouter(uc.GetRoutes()...)
 
 	tc := newTravelController()
-	svr.RegisterRouter(tc.GetRoutes()...)
 
 	rc := newRelationShipController()
-	svr.RegisterRouter(rc.GetRoutes()...)
 
 	ac := newAnniversaryController()
-	svr.RegisterRouter(ac.GetRoutes()...)
 
-	svr.Run()
+	svr.RegisterController(uc, tc, rc, ac)
+
+	if err := svr.Run(); err != nil {
+		panic(err)
+	}
 }

@@ -5,10 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	handler = _defaultHandler
-)
-
 func _defaultHandler(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
@@ -19,23 +15,18 @@ func _defaultHandler(ctx *gin.Context) {
 	}
 }
 
-// _DefaultHandler is the default handler of the route
-func _DefaultHandler(ctx *gin.Context) {
-	handler(ctx)
-}
-
 func DefaultRESTHandlers() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		_DefaultHandler,
-		_DefaultHandler,
-		_DefaultHandler,
-		_DefaultHandler,
+		_defaultHandler,
+		_defaultHandler,
+		_defaultHandler,
+		_defaultHandler,
 	}
 }
 
 // DefaultHandler will be used to set the default handler of the route
 func DefaultHandler() gin.HandlerFunc {
-	return _DefaultHandler
+	return _defaultHandler
 }
 
 //--------------------------------------------
