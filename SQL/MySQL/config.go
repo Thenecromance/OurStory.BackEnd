@@ -8,14 +8,13 @@ import (
 )
 
 type config struct {
-	SqlType   string   `ini:"sql"           json:"sql_type"   yaml:"sql_type"    `
-	Protocol  string   `ini:"protocol"      json:"protocol"   yaml:"protocol"    `
-	Host      string   `ini:"host"          json:"host"       yaml:"host"`
-	Port      string   `ini:"port"          json:"port"       yaml:"port"`
-	User      string   `ini:"user"          json:"user"       yaml:"user"`
-	Password  string   `ini:"password"      json:"password"   yaml:"password"`
-	DefaultDb string   `ini:"default_db"    json:"default_db" yaml:"default_db"  `
-	DbName    []string `ini:"db_name"       json:"db_name"    yaml:"db_name"     `
+	SqlType   string `ini:"sql"           json:"sql_type"   yaml:"sql_type"    `
+	Protocol  string `ini:"protocol"      json:"protocol"   yaml:"protocol"    `
+	Host      string `ini:"host"          json:"host"       yaml:"host"`
+	Port      string `ini:"port"          json:"port"       yaml:"port"`
+	User      string `ini:"user"          json:"user"       yaml:"user"`
+	Password  string `ini:"password"      json:"password"   yaml:"password"`
+	DefaultDb string `ini:"default_db"    json:"default_db" yaml:"default_db"  `
 }
 
 func (c *config) buildConnectString(dbName string) (res string) {
@@ -49,7 +48,6 @@ func defaultConfig() *config {
 		Port:      "3306",
 		User:      "root",
 		DefaultDb: "mysql",
-		DbName:    []string{},
 	}
 	err := Config.Instance().LoadToObject(sectionName, &cfg)
 	if err != nil {

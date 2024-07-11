@@ -21,7 +21,7 @@ func init() {
 
 type SQLManager struct {
 	*config
-
+	DbName         []string
 	defaultHandler *sql.DB
 	handlerPool    map[string]*gorp.DbMap
 }
