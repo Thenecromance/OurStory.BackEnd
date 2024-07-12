@@ -38,6 +38,14 @@ func newAnniversaryController() Interface.IController {
 	return controller.NewAnniversaryController(s)
 }
 
+func newShopController() Interface.IController {
+	sRepo := repository.NewShopRepository(MySQL.Get("shop"))
+	cRepo := repository.NewCartRepository(MySQL.Get("shop"))
+	s := services.NewShopService(sRepo, cRepo)
+
+	return controller.NewShopController(s)
+}
+
 func main() {
 
 	svr := server.New()
@@ -50,7 +58,9 @@ func main() {
 
 	ac := newAnniversaryController()
 
-	svr.RegisterController(uc, tc, rc, ac)
+	shop := newShopController()
+
+	svr.RegisterController(uc, tc, rc, ac, shop)
 
 	if err := svr.Run(); err != nil {
 		panic(err)

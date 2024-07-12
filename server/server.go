@@ -159,16 +159,16 @@ func (s *Server) loadRouteToGin(ctrl Interface.IController) {
 		if r.IsRESTFUL() {
 			handlers := r.GetHandler()
 			if handlers[0] != nil {
-				s.gin.Handle(http.MethodGet, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+				s.gin.Handle(http.MethodGet, r.GetPath(), append(r.GetMiddleWare(), handlers[0])...)
 			}
 			if handlers[1] != nil {
-				s.gin.Handle(http.MethodPost, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+				s.gin.Handle(http.MethodPost, r.GetPath(), append(r.GetMiddleWare(), handlers[1])...)
 			}
 			if handlers[2] != nil {
-				s.gin.Handle(http.MethodPut, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+				s.gin.Handle(http.MethodPut, r.GetPath(), append(r.GetMiddleWare(), handlers[2])...)
 			}
 			if handlers[3] != nil {
-				s.gin.Handle(http.MethodDelete, r.GetPath(), append(r.GetMiddleWare(), handlers...)...)
+				s.gin.Handle(http.MethodDelete, r.GetPath(), append(r.GetMiddleWare(), handlers[3])...)
 			}
 		} else {
 			s.gin.Handle(r.GetMethod(), r.GetPath(), append(r.GetMiddleWare(), r.GetHandler()...)...)

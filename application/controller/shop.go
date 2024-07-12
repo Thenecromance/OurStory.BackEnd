@@ -15,7 +15,7 @@ type shopRoutes struct {
 }
 
 type shopControllerImpl struct {
-	service services.ShopService
+	//service services.ShopService
 
 	//cart shop.ShopService
 	shop services.ShopService
@@ -24,8 +24,7 @@ type shopControllerImpl struct {
 }
 
 func (s *shopControllerImpl) Initialize() {
-	//TODO implement me
-	panic("implement me")
+
 }
 
 func (s *shopControllerImpl) Name() string {
@@ -34,7 +33,8 @@ func (s *shopControllerImpl) Name() string {
 
 func (s *shopControllerImpl) SetupRoutes() {
 	//get shop items
-	s.routes.shop = route.NewREST("/api/shop/")
+	log.Info("Setting up routes for shop controller....")
+	s.routes.shop = route.NewREST("/api/shop")
 	{
 		s.routes.shop.SetHandler(s.getShopItems, s.addItemToShop, s.updateShopItem, s.deleteShopItem)
 	}
@@ -42,19 +42,20 @@ func (s *shopControllerImpl) SetupRoutes() {
 	{
 		s.routes.cart.SetHandler(s.userGetCartData, s.userAddItemToCart, s.userRemoveItemFromCart, s.userCleanCart)
 	}
+	log.Info("Shop controller routes set up")
 
 }
 
 func (s *shopControllerImpl) GetRoutes() []Interface.IRoute {
-	//TODO implement me
-	panic("implement me")
+	return []Interface.IRoute{s.routes.shop, s.routes.cart}
 }
 
 // getShopItems can publish all available items in the shop
 func (s *shopControllerImpl) getShopItems(ctx *gin.Context) {
+	log.Error("getShopItems")
 	resp := response.New()
 	defer resp.Send(ctx)
-
+	return
 }
 
 // addItemToShop for adding new item to the shop when a user want to sell something
@@ -202,6 +203,8 @@ func (s *shopControllerImpl) userCleanCart(ctx *gin.Context) {
 	resp.Success("done")
 }
 
-func NewShopController() Interface.IController {
-	return &shopControllerImpl{}
+func NewShopController(shop_ services.ShopService) Interface.IController {
+	return &shopControllerImpl{
+		shop: shop_,
+	}
 }

@@ -17,28 +17,28 @@ type rest struct {
 }
 
 func (r *rest) getHandler(c *gin.Context) {
-	if r.handlers[0] != nil || !r.active {
+	if r.handlers[0] == nil || !r.active {
 		DefaultHandler()(c)
 	} else {
 		r.handlers[0](c)
 	}
 }
 func (r *rest) postHandler(c *gin.Context) {
-	if r.handlers[1] != nil || !r.active {
+	if r.handlers[1] == nil || !r.active {
 		DefaultHandler()(c)
 	} else {
 		r.handlers[1](c)
 	}
 }
 func (r *rest) putHandler(c *gin.Context) {
-	if r.handlers[2] != nil || !r.active {
+	if r.handlers[2] == nil || !r.active {
 		DefaultHandler()(c)
 	} else {
 		r.handlers[2](c)
 	}
 }
 func (r *rest) deleteHandler(c *gin.Context) {
-	if r.handlers[3] != nil || !r.active {
+	if r.handlers[3] == nil || !r.active {
 		DefaultHandler()(c)
 	} else {
 		r.handlers[3](c)
