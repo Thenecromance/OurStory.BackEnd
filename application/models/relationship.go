@@ -43,9 +43,9 @@ type RelationShipHistory struct {
 	// the operation
 	Operation int `json:"operation" db:"operation"`
 	// the target user id
-	ReceiverID int `json:"target_id" db:"target_id"`
+	ReceiverID int64 `json:"target_id" db:"target_id"`
 
-	OperationUser int `json:"operation_user" db:"operation_user"`
+	OperationUser int64 `json:"operation_user" db:"operation_user"`
 }
 
 func (r *Relationship) PreInsert(s gorp.SqlExecutor) error {

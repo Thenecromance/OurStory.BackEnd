@@ -11,13 +11,13 @@ import (
 type TravelRepository interface {
 	Interface.Repository
 	CreateTravel(info *models.Travel) error
-	DeleteTravel(travelId int) error
+	DeleteTravel(travelId int64) error
 	UpdateTravel(info *models.Travel) error
-	GetTravelByID(travelId int) (*models.Travel, error)
-	GetTravelByOwner(owner int) ([]models.Travel, error)
+	GetTravelByID(travelId int64) (*models.Travel, error)
+	GetTravelByOwner(owner int64) ([]models.Travel, error)
 	GetTravelByLocation(location string) ([]models.Travel, error)
 	GetTravelByState(state int) ([]models.Travel, error)
-	GetTravelListByID(id int) ([]models.Travel, error)
+	GetTravelListByID(id int64) ([]models.Travel, error)
 }
 
 type travelRepository struct {
@@ -49,7 +49,7 @@ func (t *travelRepository) CreateTravel(info *models.Travel) error {
 	return trans.Commit()
 }
 
-func (t *travelRepository) DeleteTravel(travelId int) error {
+func (t *travelRepository) DeleteTravel(travelId int64) error {
 	trans, err := t.db.Begin()
 	if err != nil {
 		log.Error(err)
@@ -87,7 +87,7 @@ func (t *travelRepository) UpdateTravel(info *models.Travel) error {
 
 }
 
-func (t *travelRepository) GetTravelByID(travelId int) (*models.Travel, error) {
+func (t *travelRepository) GetTravelByID(travelId int64) (*models.Travel, error) {
 	//get travel from db by id
 	travel := new(models.Travel)
 	err := t.db.SelectOne(travel, "select * from travel where id = ?", travelId)
@@ -99,7 +99,7 @@ func (t *travelRepository) GetTravelByID(travelId int) (*models.Travel, error) {
 	return travel, nil
 }
 
-func (t *travelRepository) GetTravelByOwner(owner int) ([]models.Travel, error) {
+func (t *travelRepository) GetTravelByOwner(owner int64) ([]models.Travel, error) {
 	//get travel from db by id
 	var travel []models.Travel
 	objects, err := t.db.Select(models.Travel{}, "select * from travel where owner = ?", owner)
@@ -139,10 +139,10 @@ func (t *travelRepository) GetTravelByState(state int) ([]models.Travel, error) 
 	return travel, nil
 }
 
-func (t *travelRepository) GetTravelListByID(userId int) ([]models.Travel, error) {
+func (t *travelRepository) GetTravelListByID(id int64) ([]models.Travel, error) {
 	var lists []models.Travel
 
-	objects, err := t.db.Select(models.Travel{}, "select * from travel where ( owner = ?) or (find_in_set(?,TogetherWith) > 0)", userId, userId)
+	objects, err := t.db.Select(models.Travel{}, "select * from travel where ( owner = ?) or (find_in_set(?,TogetherWith) > 0)", id, id)
 	if err != nil {
 		log.Errorf("GetTravelListByID error: %v", err)
 		return nil, err

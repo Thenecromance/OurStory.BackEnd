@@ -14,7 +14,7 @@ type RelationshipRepository interface {
 	Interface.Repository
 	//HasBindToUser for checking if the user has bind to other user if they already has Bind info , return true
 	//otherwise return false
-	HasBindToUser(userID int, userID2 int) bool
+	HasBindToUser(userID int64, userID2 int64) bool
 	//GetRelationCount will return the count of the user's relationship
 	//
 	//	userID int - the user's id
@@ -22,7 +22,7 @@ type RelationshipRepository interface {
 	//	type_ int - the relation type
 	//
 	//	return int - the count of the user's relationship
-	GetRelationCount(userID int, type_ int) int
+	GetRelationCount(userID int64, type_ int) int
 
 	//BindTwoUser will bind two users with the relationship
 	//
@@ -33,7 +33,7 @@ type RelationshipRepository interface {
 	//	relationType int - the relation type
 	//
 	//	return error - if the operation failed, return the error
-	BindTwoUser(senderID, receiverID, relationType int) error
+	BindTwoUser(senderID, receiverID int64, relationType int) error
 
 	//UnBindTwoUser will unbind two users with the relationship
 	//
@@ -42,18 +42,18 @@ type RelationshipRepository interface {
 	//	receiverID int - the receiver's id
 	//
 	// return error - if the operation failed, return the error
-	UnBindTwoUser(senderID, receiverID int) error
+	UnBindTwoUser(senderID, receiverID int64) error
 
-	GetRelationList(userID int) []models.Relationship
+	GetRelationList(userID int64) []models.Relationship
 
-	GetHistoryList(userID int) []models.RelationShipHistory
+	GetHistoryList(userID int64) []models.RelationShipHistory
 }
 
 type relationshipRepositoryImpl struct {
 	db *gorp.DbMap
 }
 
-func (r *relationshipRepositoryImpl) HasBindToUser(userID int, userID2 int) bool {
+func (r *relationshipRepositoryImpl) HasBindToUser(userID int64, userID2 int64) bool {
 	count, err := r.db.SelectInt("SELECT COUNT(*) FROM relationship WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)", userID, userID2, userID2, userID)
 
 	if err != nil {
@@ -68,7 +68,7 @@ func (r *relationshipRepositoryImpl) HasBindToUser(userID int, userID2 int) bool
 	return false
 }
 
-func (r *relationshipRepositoryImpl) GetRelationCount(userID int, type_ int) int {
+func (r *relationshipRepositoryImpl) GetRelationCount(userID int64, type_ int) int {
 	selectInt, err := r.db.SelectInt("SELECT COUNT(*) FROM relationship WHERE user_id = ? AND relation_type = ?", userID, type_)
 	if err != nil {
 		log.Error("GetRelationCount failed! error: ", err, " userID: ", userID, " type: ", type_)
@@ -77,7 +77,7 @@ func (r *relationshipRepositoryImpl) GetRelationCount(userID int, type_ int) int
 	return int(selectInt)
 }
 
-func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID, relationType int) error {
+func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID int64, relationType int) error {
 	now := time.Now().Unix()
 
 	obj, err := r.db.Select(models.Relationship{}, "SELECT * FROM relationship WHERE (user_id = ? AND friend_id = ? ) OR (user_id = ? AND friend_id = ?)", senderID, receiverID, receiverID, senderID)
@@ -92,7 +92,7 @@ func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID, relationT
 	}
 
 	//record Operation time
-	{
+	/*	{
 		err := r.recordOperationTime(transaction,
 			senderID,
 			receiverID,
@@ -103,7 +103,8 @@ func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID, relationT
 			err = transaction.Rollback()
 			return err
 		}
-	}
+	}*/
+
 	//record relationship info
 	{
 		relationship := models.Relationship{
@@ -130,7 +131,7 @@ func (r *relationshipRepositoryImpl) BindTwoUser(senderID, receiverID, relationT
 	return nil
 }
 
-func (r *relationshipRepositoryImpl) recordOperationTime(transaction *gorp.Transaction, senderID, receiverID, relationType int, operationType int, timestamp int64) error {
+func (r *relationshipRepositoryImpl) recordOperationTime(transaction *gorp.Transaction, senderID, receiverID int64, relationType int, operationType int, timestamp int64) error {
 	history := models.RelationShipHistory{
 		UserID:        senderID,
 		ReceiverID:    receiverID,
@@ -150,7 +151,7 @@ func (r *relationshipRepositoryImpl) recordOperationTime(transaction *gorp.Trans
 	return err
 }
 
-func (r *relationshipRepositoryImpl) UnBindTwoUser(senderID, receiverID int) error {
+func (r *relationshipRepositoryImpl) UnBindTwoUser(senderID, receiverID int64) error {
 	transaction, err := r.db.Begin()
 	if err != nil {
 		log.Error("Transaction create failed! error: ", err, " senderID: ", senderID, " receiverID: ", receiverID)
@@ -158,17 +159,17 @@ func (r *relationshipRepositoryImpl) UnBindTwoUser(senderID, receiverID int) err
 	}
 
 	//record Operation time
-	{
-		r.recordOperationTime(transaction, senderID, receiverID, models.Unknown, models.Disassociate, time.Now().Unix())
-		if err != nil {
-			err = transaction.Rollback()
+	/*	{
+			r.recordOperationTime(transaction, senderID, receiverID, models.Unknown, models.Disassociate, time.Now().Unix())
 			if err != nil {
+				err = transaction.Rollback()
+				if err != nil {
+					return err
+				}
 				return err
 			}
-			return err
 		}
-	}
-
+	*/
 	_, err = transaction.Exec("DELETE FROM relationship WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)", senderID, receiverID, receiverID, senderID)
 	if err != nil {
 		err = transaction.Rollback()
@@ -188,7 +189,7 @@ func (r *relationshipRepositoryImpl) UnBindTwoUser(senderID, receiverID int) err
 
 }
 
-func (r *relationshipRepositoryImpl) GetRelationList(userID int) []models.Relationship {
+func (r *relationshipRepositoryImpl) GetRelationList(userID int64) []models.Relationship {
 	result, err := r.db.Select(models.Relationship{}, "SELECT * FROM relationship WHERE user_id = ? OR friend_id = ?", userID, userID)
 	if err != nil {
 		log.Warn("GetRelationList failed! error: ", err, " userID: ", userID)
@@ -201,7 +202,7 @@ func (r *relationshipRepositoryImpl) GetRelationList(userID int) []models.Relati
 	return relationships
 }
 
-func (r *relationshipRepositoryImpl) GetHistoryList(userID int) []models.RelationShipHistory {
+func (r *relationshipRepositoryImpl) GetHistoryList(userID int64) []models.RelationShipHistory {
 	history, err := r.db.Select(models.RelationShipHistory{}, "SELECT * FROM relationship_history WHERE user_id = ? OR target_id = ?", userID, userID)
 	if err != nil {
 		log.Warn("GetHistoryList failed! error: ", err, " userID: ", userID)

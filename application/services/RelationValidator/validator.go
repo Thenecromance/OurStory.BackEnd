@@ -15,7 +15,7 @@ const (
 )
 
 type relationCache struct {
-	UserId       int
+	UserId       int64
 	RelationType int
 	Idx          int
 	Stamp        int64 //WARNING: this field use time.Now().UnixNano() not time.Now().Unix()
@@ -38,7 +38,7 @@ func generateHash(cache *relationCache) string {
 	}
 	return fmt.Sprintf("%x", sha1.Sum(buf.Bytes()))
 }
-func (v *validator) GenerateToken(userID int, relationType int, idx int) (string, error) {
+func (v *validator) GenerateToken(userID int64, relationType int, idx int) (string, error) {
 
 	cache := &relationCache{
 		UserId:       userID,
@@ -52,7 +52,7 @@ func (v *validator) GenerateToken(userID int, relationType int, idx int) (string
 	return hash, nil
 }
 
-func (v *validator) GetTokenInfo(token string) (userID int, relationType int, err error) {
+func (v *validator) GetTokenInfo(token string) (userID int64, relationType int, err error) {
 	cache, ok := v.cache.Get(token)
 	if !ok {
 		return 0, 0, fmt.Errorf("token not found")

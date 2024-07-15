@@ -188,7 +188,7 @@ func (tc *TravelController) getTravelList(ctx *gin.Context) {
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	lists, err := tc.service.GetTravelList(uid)

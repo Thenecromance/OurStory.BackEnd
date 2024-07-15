@@ -82,8 +82,8 @@ func (r *relationshipController) createBindLink(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	type request struct {
-		UserID       int `json:"user_id,omitempty" form:"user_id"`
-		RelationType int `json:"relation_type,omitempty" form:"relation_type"`
+		UserID       int64 `json:"user_id,omitempty" form:"user_id"`
+		RelationType int   `json:"relation_type,omitempty" form:"relation_type"`
 	}
 
 	var req request
@@ -127,7 +127,7 @@ func (r *relationshipController) linkUser(ctx *gin.Context) {
 	//todo: process the link
 
 	type request struct {
-		UserID int `json:"user_id,omitempty" form:"user_id"` // this id is the receiver's id
+		UserID int64 `json:"user_id,omitempty" form:"user_id"` // this id is the receiver's id
 	}
 	var req request
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -151,8 +151,8 @@ func (r *relationshipController) unbindUser(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	type request struct {
-		UserID   int `json:"user_id,omitempty" form:"user_id"`
-		TargetID int `json:"target_id,omitempty" form:"target_id"`
+		UserID   int64 `json:"user_id,omitempty" form:"user_id"`
+		TargetID int64 `json:"target_id,omitempty" form:"target_id"`
 	}
 
 	var req request
@@ -188,10 +188,10 @@ func (r *relationshipController) getFriendList(ctx *gin.Context) {
 		return
 	}
 
-	id := val.(map[string]interface{})["id"].(float64)
+	id := val.(map[string]interface{})["id"].(int64)
 	//UserName := val.(map[string]interface{})["username"].(string)
 
-	lists := r.service.GetFriendList(int(id))
+	lists := r.service.GetFriendList(id)
 
 	resp.Success(lists)
 }
@@ -213,14 +213,14 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 	}
 
 	//models.UserClaim
-	id := result.(map[string]interface{})["id"].(float64)
+	id := result.(map[string]interface{})["id"].(int64)
 	UserName := result.(map[string]interface{})["username"].(string)
 	if user != UserName {
 		resp.Error("invalid request")
 		return
 	}
 
-	lists := r.service.GetHistoryList(int(id))
+	lists := r.service.GetHistoryList(id)
 
 	resp.Success(lists)
 }

@@ -136,7 +136,7 @@ func (c *AnniversaryController) createAnniversary(ctx *gin.Context) {
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	log.Debugf("uid: %d", uid)
 
 	anni := models.Anniversary{}

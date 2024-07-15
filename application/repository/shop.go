@@ -18,11 +18,11 @@ type ShopRepository interface {
 	// method will return all available items
 	GetAllItems() []models.Item
 
-	AddItem(item models.Item) (int, error)
+	AddItem(item models.Item) (int64, error)
 
 	UpdateItem(item models.Item) error
 
-	DeleteItem(id int) error
+	DeleteItem(id int64) error
 
 	Interface.Repository
 }
@@ -79,7 +79,7 @@ func (s *shopRepository) GetAllItems() []models.Item {
 	return items
 }
 
-func (s *shopRepository) AddItem(item models.Item) (int, error) {
+func (s *shopRepository) AddItem(item models.Item) (int64, error) {
 	err := s.db.Insert(&item)
 	if err != nil {
 		return 0, err
@@ -98,7 +98,7 @@ func (s *shopRepository) UpdateItem(item models.Item) error {
 	return nil
 }
 
-func (s *shopRepository) DeleteItem(id int) error {
+func (s *shopRepository) DeleteItem(id int64) error {
 	i, err := s.db.Delete(models.Item{ItemId: id})
 	log.Debugf("delete item %d", i)
 	return err

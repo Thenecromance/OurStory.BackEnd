@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	Interface.Repository
-	GetUser(id int) (*models.User, error)
+	GetUser(id int64) (*models.User, error)
 	GetUsers() ([]models.User, error)
 	GetUserByUsername(username string) (*models.User, error)
 
@@ -24,7 +24,7 @@ type UserRepository interface {
 	// other wise return false
 	HasUser(username string)
 
-	HasId(id int) bool
+	HasId(id int64) bool
 
 	// HasUserAndEmail Check if the user and email is exist
 	// if the user or email is exist, return true
@@ -52,7 +52,7 @@ func (u *user) GetUserIdByName(username string) (int64, error) {
 	return selectInt, nil
 }
 
-func (u *user) GetUser(id int) (*models.User, error) {
+func (u *user) GetUser(id int64) (*models.User, error) {
 	//models.User
 	obj, err := u.db.Select(models.User{}, "select * from user where id = ?", id)
 	if err != nil {
@@ -121,7 +121,7 @@ func (u *user) HasUser(username string) {
 	}
 }
 
-func (u *user) HasId(id int) bool {
+func (u *user) HasId(id int64) bool {
 	obj, err := u.db.SelectInt("select count(*) from user where id = ?", id)
 	if err != nil {
 		return false

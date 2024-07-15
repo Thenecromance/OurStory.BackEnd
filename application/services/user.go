@@ -12,7 +12,7 @@ import (
 
 type UserService interface {
 	GetUserIdByName(username string) (int64, error)
-	GetUser(id int) (*models.User, error)
+	GetUser(id int64) (*models.User, error)
 	GetUserByUsername(username string) (*models.User, error)
 	AuthorizeUser(login *models.UserLogin) (bool, error)
 	SignedTokenToUser(info interface{}) string
@@ -29,7 +29,7 @@ func (us *userServiceImpl) GetUserIdByName(username string) (int64, error) {
 	return us.repo.GetUserIdByName(username)
 }
 
-func (us *userServiceImpl) GetUser(id int) (*models.User, error) {
+func (us *userServiceImpl) GetUser(id int64) (*models.User, error) {
 	return us.repo.GetUser(id)
 }
 

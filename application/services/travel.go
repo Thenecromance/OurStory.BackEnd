@@ -30,10 +30,10 @@ type travelUpdater interface {
 
 type travelGetter interface {
 	GetTravelByID(id string, userId int) (*models.TravelDTO, error)
-	GetTravelByOwner(owner int) ([]models.TravelDTO, error)
+	GetTravelByOwner(owner int64) ([]models.TravelDTO, error)
 	GetTravelByLocation(location string) ([]models.TravelDTO, error)
 	GetTravelByState(state int) ([]models.TravelDTO, error)
-	GetTravelList(userId int) ([]models.TravelDTO, error)
+	GetTravelList(userId int64) ([]models.TravelDTO, error)
 }
 
 // TravelService is interface for travel service
@@ -218,7 +218,13 @@ func (t *travelServiceImpl) getTravelData(travelId string) *models.TravelDTO {
 		return travel
 	}
 
-	id, err := strconv.Atoi(travelId)
+	//format the string to int64
+	id, err := strconv.ParseInt(travelId, 10, 64)
+	if err != nil {
+		log.Warnf("getTravelData error: %v", err)
+		return nil
+	}
+
 	travel, err := t.repo.GetTravelByID(id)
 
 	if err != nil {
@@ -247,7 +253,7 @@ func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.Travel
 	return nil, fmt.Errorf("user not in travel")
 }
 
-func (t *travelServiceImpl) GetTravelByOwner(owner int) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelByOwner(owner int64) ([]models.TravelDTO, error) {
 	travels, err := t.repo.GetTravelByOwner(owner)
 	if err != nil {
 		log.Errorf("GetTravelByOwner error: %v", err)
@@ -290,7 +296,7 @@ func (t *travelServiceImpl) GetTravelByState(state int) ([]models.TravelDTO, err
 	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelList(userId int) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelList(userId int64) ([]models.TravelDTO, error) {
 	travels, err := t.repo.GetTravelListByID(userId)
 	if err != nil {
 		log.Errorf("GetTravelList error: %v", err)
@@ -455,7 +461,7 @@ func (t *travelServiceImpl) DeleteTravel(id string, userId int) error {
 		return fmt.Errorf("could not find travel id %s", id)
 	}
 
-	iid, err := strconv.Atoi(id)
+	iid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		return err
 

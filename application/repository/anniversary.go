@@ -9,19 +9,19 @@ import (
 
 type Anniversary interface {
 	Interface.Repository
-	CreateAnniversary(anniversary *models.AnniversaryInDb) error
-	RemoveAnniversary(anniversary *models.AnniversaryInDb) error
+	CreateAnniversary(anniversary *models.Anniversary) error
+	RemoveAnniversary(anniversary *models.Anniversary) error
 	RemoveAnniversaryById(userId, id int) error
-	UpdateAnniversary(anniversary *models.AnniversaryInDb) error
-	GetAnniversaryById(userId, id int) (*models.AnniversaryInDb, error)
-	GetAnniversaryList(user string) ([]models.AnniversaryInDb, error)
+	UpdateAnniversary(anniversary *models.Anniversary) error
+	GetAnniversaryById(userId, id int) (*models.Anniversary, error)
+	GetAnniversaryList(user string) ([]models.Anniversary, error)
 }
 
 type anniversaryRepository struct {
 	db *gorp.DbMap
 }
 
-func (a *anniversaryRepository) CreateAnniversary(anniversary *models.AnniversaryInDb) error {
+func (a *anniversaryRepository) CreateAnniversary(anniversary *models.Anniversary) error {
 	trans, err := a.db.Begin()
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (a *anniversaryRepository) CreateAnniversary(anniversary *models.Anniversar
 	return trans.Commit()
 }
 
-func (a *anniversaryRepository) RemoveAnniversary(anniversary *models.AnniversaryInDb) error {
+func (a *anniversaryRepository) RemoveAnniversary(anniversary *models.Anniversary) error {
 	trans, err := a.db.Begin()
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (a *anniversaryRepository) RemoveAnniversaryById(userId, id int) error {
 	return trans.Commit()
 }
 
-func (a *anniversaryRepository) UpdateAnniversary(anniversary *models.AnniversaryInDb) error {
+func (a *anniversaryRepository) UpdateAnniversary(anniversary *models.Anniversary) error {
 	trans, err := a.db.Begin()
 	if err != nil {
 		return err
@@ -81,9 +81,9 @@ func (a *anniversaryRepository) UpdateAnniversary(anniversary *models.Anniversar
 	return trans.Commit()
 }
 
-func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.AnniversaryInDb, error) {
+func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anniversary, error) {
 
-	result := &models.AnniversaryInDb{}
+	result := &models.Anniversary{}
 	err := a.db.SelectOne(result, "select * from anniversary where id = ? and user_id = ?", id, userId)
 	if err != nil {
 		return nil, err
@@ -94,15 +94,15 @@ func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anni
 	panic("implement me")
 }
 
-func (a *anniversaryRepository) GetAnniversaryList(user string) ([]models.AnniversaryInDb, error) {
-	result, err := a.db.Select(&models.AnniversaryInDb{}, "select * from anniversary where user_id = ?", user)
+func (a *anniversaryRepository) GetAnniversaryList(user string) ([]models.Anniversary, error) {
+	result, err := a.db.Select(&models.Anniversary{}, "select * from anniversary where user_id = ?", user)
 	if err != nil {
 		return nil, err
 	}
 
-	var anniversaries []models.AnniversaryInDb
+	var anniversaries []models.Anniversary
 	for _, v := range result {
-		anniversaries = append(anniversaries, v.(models.AnniversaryInDb))
+		anniversaries = append(anniversaries, v.(models.Anniversary))
 	}
 	//TODO implement me
 	panic("implement me")
@@ -116,7 +116,7 @@ func (a *anniversaryRepository) initTable() {
 	}
 
 	log.Info("start to binding anniversary with table travel")
-	tbl := a.db.AddTableWithName(models.AnniversaryInDb{}, "anniversary")
+	tbl := a.db.AddTableWithName(models.Anniversary{}, "anniversary")
 	tbl.SetKeys(false, "UserId") // using snowflake to generate the id
 	tbl.ColMap("UserId").SetNotNull(true)
 	tbl.ColMap("UserId").SetNotNull(true)
@@ -132,7 +132,7 @@ func (a *anniversaryRepository) initTable() {
 }*/
 
 func (a *anniversaryRepository) BindTable() error {
-	a.db.AddTableWithName(models.AnniversaryInDb{}, "Anniversaries")
+	a.db.AddTableWithName(models.Anniversary{}, "Anniversaries")
 	return nil
 }
 
