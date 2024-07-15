@@ -6,6 +6,9 @@ const (
 	TravelStateFinished
 )
 
+// =======================================================
+// Data In Db
+// =======================================================
 type Travel struct {
 	Id           int    `json:"id"          db:"id"`
 	State        int    `json:"state"       db:"state"        form:"state"`
@@ -17,6 +20,18 @@ type Travel struct {
 	TogetherWith string `json:"together"    db:"together"     form:"together"`                     // this is the user list who will go with the owner
 	ImagePath    string `json:"img"         db:"image"        form:"img" `                         // I hate stored image in database, so I will store the path of image
 }
+
+type TravelLog struct {
+	LogId      int64  `db:"log_id"`
+	TravelId   int    `db:"travel_id"`
+	ModifiedBy int    `db:"modified_by"`
+	ModifiedAt int64  `db:"modified_at"`
+	Message    string `db:"message"`
+}
+
+// =======================================================
+// Data Transfer Object
+// =======================================================
 
 type TravelDTO struct {
 	Id           int    `json:"id"          `
@@ -32,7 +47,4 @@ type TravelDTO struct {
 
 // UserTravelInfo is the struct that will be used to store the user travel information
 type UserTravelInfo struct {
-}
-
-type TravelLog struct {
 }

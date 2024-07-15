@@ -34,7 +34,7 @@ type UserAdvancedDTO struct {
 // User is full user information
 type User struct {
 	UserAdvancedDTO
-	Password string `db:"password"              json:"password"          `
+	Password string `db:"pass_word"              json:"pass_word"          `
 	Salt     string `db:"salt"                  json:"salt"              `
 }
 

@@ -17,19 +17,19 @@ CREATE TABLE if not exists Relations (
     friend_id BIGINT NOT NULL,
     relation_type INT NOT NULL,
     status ENUM('pending', 'accepted', 'rejected') NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (friend_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE if not exists RelationLogs(
+CREATE TABLE IF NOT EXISTS RelationLogs(
     log_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,  
     target_id BIGINT NOT NULL ,  
     operation_user BIGINT NOT NULL ,
     operation_type INT NOT NULL, 
-    operation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    operation_time BIGINT NOT NULL, 
     operation INT NOT NULL , 
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (target_id) REFERENCES Users(user_id),
