@@ -132,7 +132,7 @@ func (a *anniversaryRepository) initTable() {
 }*/
 
 func (a *anniversaryRepository) BindTable() error {
-	a.db.AddTableWithName(models.Anniversary{}, "Anniversaries")
+	a.db.AddTableWithName(models.AnniversaryInDb{}, "Anniversaries")
 	return nil
 }
 

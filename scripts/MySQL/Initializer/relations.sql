@@ -33,5 +33,5 @@ CREATE TABLE IF NOT EXISTS RelationLogs(
     operation INT NOT NULL , 
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (target_id) REFERENCES Users(user_id),
-    FOREIGN KEY(operation_user) REFERENCES Users(user_id)
+    FOREIGN KEY (operation_user) REFERENCES Users(user_id)
 );

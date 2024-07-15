@@ -1,5 +1,11 @@
 package models
 
+import (
+	"github.com/Thenecromance/OurStories/utility/id"
+	"gopkg.in/gorp.v2"
+	"time"
+)
+
 const (
 	RoleUser = iota
 	RoleAdmin
@@ -48,4 +54,12 @@ type UserRegister struct {
 	UserName string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
 	Email    string `json:"email"    form:"email"   `
+}
+
+func (u *User) PreInsert(s gorp.SqlExecutor) error {
+	u.UserId = id.Generate()
+	u.CreatedAt = time.Now().UnixMilli()
+	u.LastLogin = time.Now().UnixMilli()
+
+	return nil
 }

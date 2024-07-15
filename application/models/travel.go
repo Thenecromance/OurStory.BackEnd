@@ -9,6 +9,7 @@ const (
 // =======================================================
 // Data In Db
 // =======================================================
+
 type Travel struct {
 	Id           int    `json:"id"          db:"id"`
 	State        int    `json:"state"       db:"state"        form:"state"`

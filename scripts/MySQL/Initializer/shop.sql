@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Items(
 
 
 CREATE TABLE IF NOT EXISTS Carts( 
-    cart_id INT PRIMARY KEY AUTO_INCREMENT,
+    cart_id INT PRIMARY KEY ,
     user_id BIGINT NOT NULL,
     created_at BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS CartedItems(
 );
 
 CREATE TABLE IF NOT EXISTS Transactions ( 
-    transaction_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    transaction_id BIGINT PRIMARY KEY ,
     user_id BIGINT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     transaction_type ENUM('credit', 'debit') NOT NULL,

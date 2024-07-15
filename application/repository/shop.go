@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
 
@@ -98,7 +99,8 @@ func (s *shopRepository) UpdateItem(item models.Item) error {
 }
 
 func (s *shopRepository) DeleteItem(id int) error {
-	_, err := s.db.Exec("DELETE FROM item WHERE id = ?", id)
+	i, err := s.db.Delete(models.Item{ItemId: id})
+	log.Debugf("delete item %d", i)
 	return err
 }
 
@@ -139,11 +141,13 @@ func (c *cartRepository) HasCart(uid int64) bool {
 }
 
 func (c *cartRepository) GetCart(uid int64) (int64, error) {
+
 	var cart models.Carts
-	_, err := c.db.Select(&cart, "SELECT * FROM cart WHERE user_id = ?", uid)
+	err := c.db.SelectOne(&cart, "SELECT * FROM cart WHERE user_id = ?", uid)
 	if err != nil {
 		return 0, err
 	}
+
 	return cart.CartId, nil
 }
 
