@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/server/Manager"
 	"github.com/Thenecromance/OurStories/server/setting"
 	"github.com/Thenecromance/OurStories/utility/log"

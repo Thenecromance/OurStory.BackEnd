@@ -1,7 +1,7 @@
 package route
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/gin-gonic/gin"
 )
 

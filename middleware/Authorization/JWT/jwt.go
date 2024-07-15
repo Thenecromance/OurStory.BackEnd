@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
-	"github.com/Thenecromance/OurStories/response"
+	response2 "github.com/Thenecromance/OurStories/server/response"
 	"github.com/Thenecromance/OurStories/utility/cache/lru"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ const (
 // claim is a struct that will be used to store the user information
 type claim struct {
 	Obj                  interface{} `json:"info"` // the user information
-	jwt.RegisteredClaims                           // embedded unmodified `jwt.RegisteredClaims`
+	jwt.RegisteredClaims             // embedded unmodified `jwt.RegisteredClaims`
 }
 
 type Service struct {
@@ -117,16 +117,16 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 
 		if err != nil {
 			log.Error("Error while getting token from cookie ", err)
-			resp := response.New()
-			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp := response2.New()
+			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Invalid token provided")
 			resp.Send(c)
 			c.Abort()
 			return
 		}
 		// check if the token is empty
 		if token == "" {
-			resp := response.New()
-			resp.SetCode(response.NetworkAuthenticationRequired).AddData("No token provided")
+			resp := response2.New()
+			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("No token provided")
 			c.Abort()
 			return
 		}
@@ -138,8 +138,8 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 
 		// check if the token is expired
 		if s.TokenExpired(token) {
-			resp := response.New()
-			resp.SetCode(response.NetworkAuthenticationRequired).AddData("your token has been expired")
+			resp := response2.New()
+			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("your token has been expired")
 			resp.Send(c)
 			c.Abort()
 			return
@@ -156,7 +156,7 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 
 		// check if the token is valid
 		if !s.TokenValid(token) {
-			resp := response.New()
+			resp := response2.New()
 			log.Warn("Invalid token provided")
 			/*resp.Error("Invalid token provided")*/
 			resp.Unauthorized("Invalid token provided")
@@ -168,9 +168,9 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 		// if the token is valid and not expired, then continue the request
 		userClaim, err := s.GetUserClaimFromToken(token)
 		if err != nil {
-			resp := response.New()
+			resp := response2.New()
 			log.Error("Error while getting user claim from token ", err)
-			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Something goes wrong while getting user claim from token")
+			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Something goes wrong while getting user claim from token")
 			resp.Send(c)
 			c.Abort()
 			return
@@ -178,8 +178,8 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 		//based on type to do the type assertion
 		if userClaim == nil {
 			log.Error("Error while getting user claim from token ", err)
-			resp := response.New()
-			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp := response2.New()
+			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Invalid token provided")
 			resp.Send(c)
 			c.Abort()
 			return

@@ -1,20 +1,20 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
-	"github.com/Thenecromance/OurStories/response"
-	"github.com/Thenecromance/OurStories/route"
+	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/server/response"
+	route2 "github.com/Thenecromance/OurStories/server/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
 type travelRouter struct {
-	travel     Interface.IRoute
-	travelList Interface.IRoute
+	travel     Interface2.IRoute
+	travelList Interface2.IRoute
 }
 
 type TravelController struct {
@@ -32,7 +32,7 @@ func (tc *TravelController) Initialize() {
 
 func (tc *TravelController) SetupRoutes() {
 	mw := JWT.Middleware()
-	tc.groups.travel = route.NewREST("/api/travel/")
+	tc.groups.travel = route2.NewREST("/api/travel/")
 	{
 		tc.groups.travel.SetMiddleWare(mw)
 		tc.groups.travel.SetHandler(
@@ -42,15 +42,15 @@ func (tc *TravelController) SetupRoutes() {
 			tc.deleteTravel, // DELETE
 		)
 	}
-	tc.groups.travelList = route.NewRouter("/api/travel/list", "POST")
+	tc.groups.travelList = route2.NewRouter("/api/travel/list", "POST")
 	{
 		tc.groups.travelList.SetMiddleWare(mw)
 		tc.groups.travelList.SetHandler(tc.getTravelList)
 	}
 }
 
-func (tc *TravelController) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{tc.groups.travel, tc.groups.travelList}
+func (tc *TravelController) GetRoutes() []Interface2.IRoute {
+	return []Interface2.IRoute{tc.groups.travel, tc.groups.travelList}
 }
 
 //-----------------handlers begin-----------------
@@ -200,7 +200,7 @@ func (tc *TravelController) getTravelList(ctx *gin.Context) {
 
 //-----------------handlers end-----------------
 
-func NewTravelController(s services.TravelService) Interface.IController {
+func NewTravelController(s services.TravelService) Interface2.IController {
 	tc := &TravelController{
 		service: s,
 	}

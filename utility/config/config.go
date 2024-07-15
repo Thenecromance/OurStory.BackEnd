@@ -1,8 +1,8 @@
 package Config
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/constants"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/config/implements"
 )
 

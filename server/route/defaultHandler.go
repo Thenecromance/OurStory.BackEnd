@@ -1,14 +1,14 @@
 package route
 
 import (
-	"github.com/Thenecromance/OurStories/response"
+	response2 "github.com/Thenecromance/OurStories/server/response"
 	"github.com/gin-gonic/gin"
 )
 
 func _defaultHandler(ctx *gin.Context) {
-	resp := response.New()
+	resp := response2.New()
 	defer resp.Send(ctx)
-	resp.Code = response.NotAcceptable
+	resp.Code = response2.NotAcceptable
 	resp.Meta.Count = 0
 	resp.Data = gin.H{
 		"system": "service not found",

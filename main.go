@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/SQL/MySQL"
 	"github.com/Thenecromance/OurStories/application/controller"
 	"github.com/Thenecromance/OurStories/application/repository"
 	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/server"
+	"github.com/Thenecromance/OurStories/server/Interface"
 )
 
 // dependency injection

@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
-	"github.com/Thenecromance/OurStories/response"
-	"github.com/Thenecromance/OurStories/route"
+	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/server/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
@@ -19,11 +19,11 @@ import (
 // 5. associateHistory - GET /api/relation/history/:user - get the user's associate history
 
 type relationGroups struct {
-	createLink       Interface.IRoute
-	activeLink       Interface.IRoute
-	deleteLink       Interface.IRoute
-	getRelation      Interface.IRoute
-	associateHistory Interface.IRoute
+	createLink       Interface2.IRoute
+	activeLink       Interface2.IRoute
+	deleteLink       Interface2.IRoute
+	getRelation      Interface2.IRoute
+	associateHistory Interface2.IRoute
 }
 
 type relationshipController struct {
@@ -67,8 +67,8 @@ func (r *relationshipController) SetupRoutes() {
 	}
 }
 
-func (r *relationshipController) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{r.createLink, r.activeLink, r.deleteLink, r.getRelation, r.associateHistory}
+func (r *relationshipController) GetRoutes() []Interface2.IRoute {
+	return []Interface2.IRoute{r.createLink, r.activeLink, r.deleteLink, r.getRelation, r.associateHistory}
 }
 
 // ---------------------------------------------------------
@@ -225,7 +225,7 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 	resp.Success(lists)
 }
 
-func NewRelationshipController(service services.RelationShipService) Interface.IController {
+func NewRelationshipController(service services.RelationShipService) Interface2.IController {
 	controller := &relationshipController{
 		service: service,
 	}

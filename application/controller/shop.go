@@ -1,17 +1,17 @@
 package controller
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
 	"github.com/Thenecromance/OurStories/application/services"
-	"github.com/Thenecromance/OurStories/response"
-	"github.com/Thenecromance/OurStories/route"
+	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/server/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 )
 
 type shopRoutes struct {
-	shop Interface.IRoute
-	cart Interface.IRoute
+	shop Interface2.IRoute
+	cart Interface2.IRoute
 }
 
 type shopControllerImpl struct {
@@ -46,8 +46,8 @@ func (s *shopControllerImpl) SetupRoutes() {
 
 }
 
-func (s *shopControllerImpl) GetRoutes() []Interface.IRoute {
-	return []Interface.IRoute{s.routes.shop, s.routes.cart}
+func (s *shopControllerImpl) GetRoutes() []Interface2.IRoute {
+	return []Interface2.IRoute{s.routes.shop, s.routes.cart}
 }
 
 // getShopItems can publish all available items in the shop
@@ -203,7 +203,7 @@ func (s *shopControllerImpl) userCleanCart(ctx *gin.Context) {
 	resp.Success("done")
 }
 
-func NewShopController(shop_ services.ShopService) Interface.IController {
+func NewShopController(shop_ services.ShopService) Interface2.IController {
 	return &shopControllerImpl{
 		shop: shop_,
 	}

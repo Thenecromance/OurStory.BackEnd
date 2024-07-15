@@ -1,7 +1,7 @@
 package Manager
 
 import (
-	"github.com/Thenecromance/OurStories/Interface"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"sync"
 )
