@@ -6,61 +6,67 @@ import (
 	"github.com/Thenecromance/OurStories/application/repository"
 	"github.com/Thenecromance/OurStories/application/services"
 	"github.com/Thenecromance/OurStories/server"
-	"github.com/Thenecromance/OurStories/server/Interface"
 )
 
 // dependency injection
-func newUserController() Interface.IController {
-	repo := repository.NewUserRepository(MySQL.Get("user"))
+func newUserController(svr *server.Server) {
+	repo := repository.NewUserRepository(MySQL.Default())
+	svr.RegisterRepository(repo)
 	s := services.NewUserService(repo)
 
-	return controller.NewUserController(s)
+	svr.RegisterController(controller.NewUserController(s))
 }
 
-func newTravelController() Interface.IController {
-	repo := repository.NewTravelRepository(MySQL.Get("travel"))
+func newTravelController(svr *server.Server) {
+	repo := repository.NewTravelRepository(MySQL.Default())
+	svr.RegisterRepository(repo)
 	s := services.NewTravelService(repo)
 
-	return controller.NewTravelController(s)
+	ctrl := controller.NewTravelController(s)
+	svr.RegisterController(ctrl)
 }
 
-func newRelationShipController() Interface.IController {
-	repo := repository.NewRelationShipRepository(MySQL.Get("user"))
+func newRelationShipController(svr *server.Server) {
+	repo := repository.NewRelationShipRepository(MySQL.Default())
+	svr.RegisterRepository(repo)
 	s := services.NewRelationShipService(repo)
 
-	return controller.NewRelationshipController(s)
+	ctrl := controller.NewRelationshipController(s)
+	svr.RegisterController(ctrl)
 }
 
-func newAnniversaryController() Interface.IController {
-	repo := repository.NewAnniversaryRepository(MySQL.Get("user"))
+func newAnniversaryController(svr *server.Server) {
+	repo := repository.NewAnniversaryRepository(MySQL.Default())
+	svr.RegisterRepository(repo)
 	s := services.NewAnniversaryService(repo)
 
-	return controller.NewAnniversaryController(s)
+	ctrl := controller.NewAnniversaryController(s)
+	svr.RegisterController(ctrl)
 }
 
-func newShopController() Interface.IController {
-	sRepo := repository.NewShopRepository(MySQL.Get("shop"))
-	cRepo := repository.NewCartRepository(MySQL.Get("shop"))
+func newShopController(svr *server.Server) {
+	sRepo := repository.NewShopRepository(MySQL.Default())
+	cRepo := repository.NewCartRepository(MySQL.Default())
+	svr.RegisterRepository(sRepo, cRepo)
 	s := services.NewShopService(sRepo, cRepo)
 
-	return controller.NewShopController(s)
+	ctrl := controller.NewShopController(s)
+	svr.RegisterController(ctrl)
 }
 
 func main() {
 
 	svr := server.New()
 
-	uc := newUserController()
+	newUserController(svr)
 
-	tc := newTravelController()
+	newTravelController(svr)
 
-	rc := newRelationShipController()
+	newRelationShipController(svr)
 
-	ac := newAnniversaryController()
+	newAnniversaryController(svr)
 
-	shop := newShopController()
-
-	svr.RegisterController(uc, tc, rc, ac, shop)
+	newShopController(svr)
 
 	if err := svr.Run(); err != nil {
 		panic(err)

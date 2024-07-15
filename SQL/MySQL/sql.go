@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/Thenecromance/OurStories/utility/File"
 	"github.com/Thenecromance/OurStories/utility/log"
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gorp.v2"
@@ -28,7 +29,7 @@ type SQLManager struct {
 
 func (s *SQLManager) getSafeHandler(db string) *gorp.DbMap {
 	if db == "" {
-		return nil
+		db = DEFATUL_DB_NAME
 	}
 	if conn, ok := s.handlerPool[db]; ok {
 		return conn
@@ -124,7 +125,7 @@ func (s *SQLManager) initGorpDb(dbName string) *gorp.DbMap {
 		Encoding: "utf8mb4",
 	}}
 
-	dbmap.TraceOn("[SQL Query]", log.Instance)
+	dbmap.TraceOn("[MySQL Query]", log.Instance)
 	return dbmap
 }
 
@@ -144,5 +145,15 @@ func Get(db string) *gorp.DbMap {
 
 // Default will return the default database connection
 func Default() *gorp.DbMap {
-	return Instance().getSafeHandler("our_stories")
+	return Instance().getSafeHandler(DEFATUL_DB_NAME)
+}
+
+func RunScript(script string) error {
+	return RunScriptOnDb(DEFATUL_DB_NAME, script)
+}
+
+func RunScriptOnDb(db, script string) error {
+	buffer, _ := File.ReadFrom(script)
+	_, err := Get(db).Exec(string(buffer))
+	return err
 }

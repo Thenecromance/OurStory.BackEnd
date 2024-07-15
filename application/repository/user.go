@@ -3,16 +3,18 @@ package repository
 import (
 	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
 
 type UserRepository interface {
+	Interface.Repository
 	GetUser(id int) (*models.User, error)
 	GetUsers() ([]models.User, error)
 	GetUserByUsername(username string) (*models.User, error)
 
-	GetUserIdByName(username string) (int, error)
+	GetUserIdByName(username string) (int64, error)
 	// InsertUser Insert a user to the database
 	// this method won't check if the user is exist or not
 	InsertUser(user *models.User) error
@@ -28,21 +30,26 @@ type UserRepository interface {
 	// if the user or email is exist, return true
 	// other wise return false
 	HasUserAndEmail(username, email string) bool
-	UpdateLastLogin(id int, unix int64) error
+	UpdateLastLogin(id int64, unix int64) error
 }
 
 type user struct {
 	db *gorp.DbMap
 }
 
-func (u *user) GetUserIdByName(username string) (int, error) {
+func (u *user) BindTable() error {
+	u.db.AddTableWithName(models.User{}, "Users")
+	return nil
+}
+
+func (u *user) GetUserIdByName(username string) (int64, error) {
 
 	selectInt, err := u.db.SelectInt("select id from user where username = ?", username)
 	if err != nil {
 		return -1, err
 	}
 
-	return int(selectInt), nil
+	return selectInt, nil
 }
 
 func (u *user) GetUser(id int) (*models.User, error) {
@@ -71,7 +78,7 @@ func (u *user) GetUserByUsername(username string) (*models.User, error) {
 	return obj[0].(*models.User), nil
 }
 
-func (u *user) UpdateLastLogin(id int, unix int64) error {
+func (u *user) UpdateLastLogin(id int64, unix int64) error {
 	trans, err := u.db.Begin()
 	if err != nil {
 		log.Errorf("failed to begin transaction with error: %s", err.Error())
@@ -136,15 +143,15 @@ func (u *user) HasUserAndEmail(username, email string) bool {
 	return false
 }
 
-func (u *user) initTable() error {
+/*func (u *user) initTable() error {
 	if u.db == nil {
 		log.Debugf("db is nil")
 		return fmt.Errorf("db is nil")
 	}
 
 	log.Infof("start to binding user with table user")
-	tbl := u.db.AddTableWithName(models.User{}, "user")
-	tbl.SetKeys(true, "Id") // using snowflake to generate the id
+	tbl := u.db.AddTableWithName(models.User{}, "Users")
+	tbl.SetKeys(true, "UserId") // using snowflake to generate the id
 
 	err := u.db.CreateTablesIfNotExists()
 	if err != nil {
@@ -152,13 +159,13 @@ func (u *user) initTable() error {
 		return err
 	}
 	return nil
-}
+}*/
 
 func NewUserRepository(db *gorp.DbMap) UserRepository {
 	u := &user{db}
-	err := u.initTable()
-	if err != nil {
-		return nil
-	}
+	/*	err := u.initTable()
+		if err != nil {
+			return nil
+		}*/
 	return u
 }

@@ -136,7 +136,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 	//set up claim for sign token to client
 	claim_ := models.UserClaim{
 		UserName: usr.UserName,
-		Id:       usr.Id,
+		Id:       usr.UserId,
 	}
 	// generate the token to client and save it to the cookie
 	token := uc.service.SignedTokenToUser(claim_)
@@ -242,7 +242,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	} else {
 		mp := obj.(map[string]interface{})
 		obj_.UserName = mp["username"].(string)
-		obj_.Id = int(mp["id"].(float64))
+		obj_.Id = mp["id"].(int64)
 	}
 
 	usrName := ctx.Param("username")
@@ -257,7 +257,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 		return
 	}
 
-	if usr.UserName != obj_.UserName || usr.Id != obj_.Id {
+	if usr.UserName != obj_.UserName || usr.UserId != obj_.Id {
 		resp.SetCode(response2.BadRequest).AddData("Invalid request")
 		return
 	}

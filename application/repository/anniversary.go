@@ -2,11 +2,13 @@ package repository
 
 import (
 	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
 
 type Anniversary interface {
+	Interface.Repository
 	CreateAnniversary(anniversary *models.AnniversaryInDb) error
 	RemoveAnniversary(anniversary *models.AnniversaryInDb) error
 	RemoveAnniversaryById(userId, id int) error
@@ -106,6 +108,7 @@ func (a *anniversaryRepository) GetAnniversaryList(user string) ([]models.Annive
 	panic("implement me")
 }
 
+/*
 func (a *anniversaryRepository) initTable() {
 	if a.db == nil {
 		log.Error("db is nil")
@@ -114,23 +117,26 @@ func (a *anniversaryRepository) initTable() {
 
 	log.Info("start to binding anniversary with table travel")
 	tbl := a.db.AddTableWithName(models.AnniversaryInDb{}, "anniversary")
-	tbl.SetKeys(false, "Id") // using snowflake to generate the id
-	tbl.ColMap("Id").SetNotNull(true)
+	tbl.SetKeys(false, "UserId") // using snowflake to generate the id
 	tbl.ColMap("UserId").SetNotNull(true)
-	tbl.ColMap("TimeStamp").SetNotNull(true)
+	tbl.ColMap("UserId").SetNotNull(true)
+	tbl.ColMap("Date").SetNotNull(true)
 	tbl.ColMap("Name").SetNotNull(true)
-	tbl.ColMap("Info").SetNotNull(true)
-	tbl.ColMap("CreatedTime").SetNotNull(true)
-
+	tbl.ColMap("Description").SetNotNull(true)
+	tbl.ColMap("CreatedAt").SetNotNull(true)
 	err := a.db.CreateTablesIfNotExists()
 	if err != nil {
 		log.Errorf("failed to create table anniversary with error: %s", err.Error())
 		return
 	}
+}*/
+
+func (a *anniversaryRepository) BindTable() error {
+	a.db.AddTableWithName(models.Anniversary{}, "Anniversaries")
+	return nil
 }
 
 func NewAnniversaryRepository(db *gorp.DbMap) Anniversary {
 	a := &anniversaryRepository{db}
-	a.initTable()
 	return a
 }

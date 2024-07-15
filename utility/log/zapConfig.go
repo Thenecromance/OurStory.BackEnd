@@ -123,7 +123,7 @@ func CustomCallerEncoder(name string) (func(zapcore.EntryCaller, zapcore.Primiti
 func parseLevel(level string) zapcore.Level {
 	var l zapcore.Level
 	if err := l.UnmarshalText([]byte(level)); err != nil {
-		return zapcore.InfoLevel // default to Info if invalid level
+		return zapcore.InfoLevel // default to Description if invalid level
 	}
 	return l
 }

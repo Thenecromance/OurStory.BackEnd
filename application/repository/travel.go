@@ -2,13 +2,14 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 )
 
 type TravelRepository interface {
+	Interface.Repository
 	CreateTravel(info *models.Travel) error
 	DeleteTravel(travelId int) error
 	UpdateTravel(info *models.Travel) error
@@ -21,6 +22,13 @@ type TravelRepository interface {
 
 type travelRepository struct {
 	db *gorp.DbMap
+}
+
+func (t *travelRepository) BindTable() error {
+
+	t.db.AddTableWithName(models.Travel{}, "Travels")
+	t.db.AddTableWithName(models.TravelLog{}, "TravelLogs")
+	return nil
 }
 
 func (t *travelRepository) CreateTravel(info *models.Travel) error {
@@ -55,7 +63,7 @@ func (t *travelRepository) DeleteTravel(travelId int) error {
 	}*/
 	errId, err := trans.Query("delete from travel where id = ?", travelId)
 	if err != nil {
-		log.Errorf("DeleteTravel error: %v\nerror Id:%d", err, errId)
+		log.Errorf("DeleteTravel error: %v\nerror UserId:%d", err, errId)
 		return errors.New("delete travel failed")
 	}
 
@@ -71,7 +79,7 @@ func (t *travelRepository) UpdateTravel(info *models.Travel) error {
 
 	updateId, err := trans.Update(info)
 	if err != nil {
-		log.Errorf("UpdateTravel error: %v\nerror Id:%d", err, updateId)
+		log.Errorf("UpdateTravel error: %v\nerror UserId:%d", err, updateId)
 		return err
 	}
 
@@ -147,7 +155,7 @@ func (t *travelRepository) GetTravelListByID(userId int) ([]models.Travel, error
 	return lists, nil
 }
 
-func (t *travelRepository) initTable() error {
+/*func (t *travelRepository) initTable() error {
 	if t.db == nil {
 		log.Debugf("db is nil")
 		return fmt.Errorf("db is nil")
@@ -155,7 +163,7 @@ func (t *travelRepository) initTable() error {
 
 	log.Infof("start to binding user with table user")
 	tbl := t.db.AddTableWithName(models.Travel{}, "travel")
-	tbl.SetKeys(true, "Id") // using snowflake to generate the id
+	tbl.SetKeys(true, "UserId") // using snowflake to generate the id
 
 	err := t.db.CreateTablesIfNotExists()
 	if err != nil {
@@ -163,18 +171,18 @@ func (t *travelRepository) initTable() error {
 		return err
 	}
 	return nil
-}
+}*/
 
 func NewTravelRepository(db *gorp.DbMap) TravelRepository {
 	tr := &travelRepository{
 		db: db,
 	}
-	err := tr.initTable()
-	if err != nil {
-		panic(err)
-		return nil
-	}
-
+	/*	err := tr.initTable()
+		if err != nil {
+			panic(err)
+			return nil
+		}
+	*/
 	return tr
 
 }

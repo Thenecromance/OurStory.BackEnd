@@ -15,7 +15,7 @@ type AnniversaryService interface {
 	RemoveAnniversary(userid int, id int) error
 	UpdateAnniversary(userid int, anniversary *models.Anniversary) error
 
-	GetAnniversaries(userId int) ([]models.Anniversary, error)
+	GetAnniversaries(userId int64) ([]models.Anniversary, error)
 }
 
 type anniversaryServiceImpl struct {
@@ -28,8 +28,8 @@ func DbToDTO(anniversary *models.AnniversaryInDb) *models.Anniversary {
 		Id:          anniversary.Id,
 		UserId:      anniversary.UserId,
 		Name:        anniversary.Name,
-		Info:        anniversary.Info,
-		TimeStamp:   anniversary.TimeStamp,
+		Info:        anniversary.Description,
+		TimeStamp:   anniversary.Date,
 		CreatedTime: anniversary.CreatedTime,
 		SharedWith:  []int{},
 	}
@@ -54,8 +54,8 @@ func DTOToDb(anniversary *models.Anniversary) *models.AnniversaryInDb {
 		Id:          anniversary.Id,
 		UserId:      anniversary.UserId,
 		Name:        anniversary.Name,
-		Info:        anniversary.Info,
-		TimeStamp:   anniversary.TimeStamp,
+		Description: anniversary.Info,
+		Date:        anniversary.TimeStamp,
 		CreatedTime: anniversary.CreatedTime,
 		SharedWith:  "",
 	}
@@ -112,9 +112,12 @@ func (a *anniversaryServiceImpl) UpdateAnniversary(userid int, anniversary *mode
 	panic("implement me")
 }
 
-func (a *anniversaryServiceImpl) GetAnniversaries(userId int) ([]models.Anniversary, error) {
+func (a *anniversaryServiceImpl) GetAnniversaries(userId int64) ([]models.Anniversary, error) {
 
-	anniversaries, err := a.repo.GetAnniversaryList(strconv.Itoa(userId))
+	// format int64 to string
+	user := strconv.FormatInt(userId, 10)
+
+	anniversaries, err := a.repo.GetAnniversaryList(user)
 	if err != nil {
 		log.Error("error getting anniversary list")
 		return nil, err

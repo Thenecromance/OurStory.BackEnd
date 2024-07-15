@@ -8,13 +8,13 @@ const (
 
 // UserClaim only for signature JWT Token or other token that need to be signed
 type UserClaim struct {
-	Id       int    `json:"id"`
+	Id       int64  `json:"id"`
 	UserName string `json:"username"`
 }
 
 // UserBasicDTO is the basic information of user
 type UserBasicDTO struct {
-	Id       int    `json:"id"               db:"id"`
+	UserId   int64  `json:"user_id"               db:"user_id"`
 	UserName string `json:"username"         db:"username"` // username is the name that use to login
 	Avatar   string `json:"avatar"           db:"avatar"`   // the path of avatar
 	NickName string `json:"nickname"         db:"nickname"` // nickname is the name that show to others
@@ -24,12 +24,11 @@ type UserBasicDTO struct {
 // UserAdvancedDTO is the advanced information of user
 type UserAdvancedDTO struct {
 	UserBasicDTO
-	Email       string `db:"email"                 json:"email"             `
-	MBTI        string `db:"mbti"                  json:"mbti"              `
-	Birthday    int64  `db:"birthday"              json:"birthday"          `
-	Gender      string `db:"gender"                json:"gender"            `
-	CreatedTime int64  `db:"created_time"          json:"created_time"      `
-	LastLogin   int64  `db:"last_login"            json:"last_login"        `
+	Email     string `db:"email"                 json:"email"             `
+	Birthday  int64  `db:"birthday"              json:"birthday"          `
+	Gender    string `db:"gender"                json:"gender"            `
+	CreatedAt int64  `db:"created_at"          json:"created_at"      `
+	LastLogin int64  `db:"last_login"            json:"last_login"        `
 }
 
 // User is full user information

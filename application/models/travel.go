@@ -33,3 +33,6 @@ type TravelDTO struct {
 // UserTravelInfo is the struct that will be used to store the user travel information
 type UserTravelInfo struct {
 }
+
+type TravelLog struct {
+}

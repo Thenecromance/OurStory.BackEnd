@@ -61,7 +61,7 @@ import (
 //		})
 //	})
 //
-//	log.Info("Server is running")
+//	log.Description("Server is running")
 //
 //	s.core.Run()
 //
@@ -92,6 +92,7 @@ type Server struct {
 
 	//=======================================
 	controllerMgr *Manager.ControllerMgr
+	repoMgr       *Manager.RepoMgr
 	//=======================================
 }
 
@@ -100,6 +101,8 @@ func (s *Server) initialize() {
 	s.core.initialize(s.gin)
 
 	s.setUpGinResource()
+
+	s.repoMgr.Initialize()
 
 	s.controllerMgr.Initialize()
 
@@ -148,6 +151,10 @@ func (s *Server) setUpGinResource() {
 	}
 
 	log.Info("set up resources to gin engine done")
+}
+
+func (s *Server) RegisterRepository(repo ...Interface.Repository) {
+	s.repoMgr.RegisterRepository(repo...)
 }
 
 func (s *Server) RegisterController(controller ...Interface.IController) {
@@ -202,6 +209,7 @@ func New() *Server {
 		gs:   setting.NewGinSetting(),
 
 		controllerMgr: Manager.NewControllerMgr(),
+		repoMgr:       Manager.NewRepositoryManager(),
 	}
 
 	return svr

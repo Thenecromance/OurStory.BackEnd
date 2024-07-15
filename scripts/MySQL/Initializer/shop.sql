@@ -8,21 +8,30 @@ CREATE TABLE IF NOT EXISTS Items(
     release_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expire_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    publisher INT NOT NULL,
-    FOREIGN KEY (publisher) REFERENCES User(user_id)
+    publisher BIGINT NOT NULL,
+    FOREIGN KEY (publisher) REFERENCES Users(user_id)
 );
 
 
 CREATE TABLE IF NOT EXISTS Carts( 
     cart_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE if not exists CartedItems(
+    cart_id INT NOT NULL,
+    item_id INT NOT NULL,
+    count INT DEFAULT 1,
+    PRIMARY KEY (cart_id, item_id),
+    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id)
 );
 
 CREATE TABLE IF NOT EXISTS Transactions ( 
     transaction_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_id BIGINT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     transaction_type ENUM('credit', 'debit') NOT NULL,
     status ENUM('pending', 'completed', 'failed') NOT NULL,
@@ -35,6 +44,13 @@ CREATE TABLE IF NOT EXISTS TransactionLogs (
     log_message TEXT NOT NULL,
     logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (transaction_id) REFERENCES Transactions(transaction_id)
+);
+
+CREATE TABLE UserBalances (
+    user_id BIGINT PRIMARY KEY,
+    balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 

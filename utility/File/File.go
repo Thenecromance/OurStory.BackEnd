@@ -96,3 +96,15 @@ func Delete(path string) {
 func Clean(path string) {
 	os.Truncate(path, 0)
 }
+
+func ListFiles(path string) ([]string, error) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+	var result []string
+	for _, file := range files {
+		result = append(result, file.Name())
+	}
+	return result, nil
+}

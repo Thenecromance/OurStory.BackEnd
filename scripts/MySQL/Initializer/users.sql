@@ -1,0 +1,15 @@
+CREATE table if not exists Users (
+    user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255) DEFAULT 'default.png',
+    nickname VARCHAR(255) DEFAULT NULL,
+    role INT DEFAULT 0 , 
+    email VARCHAR(255) NOT NULL,
+    birthday TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    gender VARCHAR(10) DEFAULT 'unknown',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    pass_word VARCHAR(255) NOT NULL ,
+    salt VARCHAR(255) NOT NULL
+);
+

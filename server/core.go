@@ -31,7 +31,7 @@ import (
 //		//Log.Infof("Server is running on %s without ITLs. use http to request", c.cfg.Addr)
 //
 //		if c.cfg.Addr == ":8080" {
-//			Log.Info("server is running , visit by : http://localhost:8080")
+//			Log.Description("server is running , visit by : http://localhost:8080")
 //		}
 //
 //		err := c.svr.ListenAndServe()
@@ -49,7 +49,7 @@ import (
 //}
 //
 //func (c *core) setupServer(handler http.Handler) {
-//	Log.Info("Setting up the server")
+//	Log.Description("Setting up the server")
 //	c.svr = &http.Server{
 //		Addr:                         c.cfg.Addr,
 //		Handler:                      handler,
@@ -66,7 +66,7 @@ import (
 //		BaseContext:                  nil,
 //		ConnContext:                  nil,*/
 //	}
-//	Log.Info("Server setup done")
+//	Log.Description("Server setup done")
 //
 //}
 //
@@ -75,21 +75,21 @@ import (
 //}
 //
 //func (c *core) initializeCore(g *gin.Engine) {
-//	Log.Info("Initializing the core")
+//	Log.Description("Initializing the core")
 //	c.setupServer(g)
 //	{
-//		Log.Info("Initializing the route manager")
+//		Log.Description("Initializing the route manager")
 //		c.routerController = Manager.NewRouterManager(g)
-//		Log.Info("IRoute manager initialized")
+//		Log.Description("IRoute manager initialized")
 //	}
 //
 //	//{
-//	//	Logger.Info("Registering routers to gin")
+//	//	Logger.Description("Registering routers to gin")
 //	//	c.routerController.ApplyRouter()
-//	//	Logger.Info("Routers registered to gin")
+//	//	Logger.Description("Routers registered to gin")
 //	//}
 //
-//	Log.Info("Core initialized")
+//	Log.Description("Core initialized")
 //}
 //
 //func newCore() *core {

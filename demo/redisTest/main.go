@@ -13,10 +13,10 @@ func main() {
 	ctx := context.Background()
 	cli := SQL.NewRedis()
 	/*routes := []models.Route{
-		{ID: 1, Name: "Home", Path: "/home2", Component: "/components/Home", AllowRole: Role.Admin},
-		{ID: 2, Name: "Dashboard", Path: "/dashboard2", Component: "/components/Dashboard", AllowRole: Role.User},
-		{ID: 3, Name: "Profile", Path: "/profile", Component: "/components/Profile", AllowRole: Role.Admin},
-		{ID: 4, Name: "Settings", Path: "/settings", Component: "/components/Settings", AllowRole: Role.Master},
+		{CartId: 1, Name: "Home", Path: "/home2", Component: "/components/Home", AllowRole: Role.Admin},
+		{CartId: 2, Name: "Dashboard", Path: "/dashboard2", Component: "/components/Dashboard", AllowRole: Role.User},
+		{CartId: 3, Name: "Profile", Path: "/profile", Component: "/components/Profile", AllowRole: Role.Admin},
+		{CartId: 4, Name: "Settings", Path: "/settings", Component: "/components/Settings", AllowRole: Role.Master},
 	}
 
 	for _, route := range routes {
@@ -26,7 +26,7 @@ func main() {
 		}
 
 		// 将JSON字符串存储在Redis中，以ID为键
-		err = cli.Set(ctx, "route:"+strconv.Itoa(route.ID), routeJson, 0).Err()
+		err = cli.Set(ctx, "route:"+strconv.Itoa(route.CartId), routeJson, 0).Err()
 		if err != nil {
 			log.Fatalf("存储Route对象失败: %v", err)
 		}
@@ -34,7 +34,7 @@ func main() {
 		// 将Route对象ID添加到AllowRole对应的集合中
 		sid := strconv.Itoa(route.AllowRole)
 		fmt.Printf("AllowRole: %s\n", sid)
-		err = cli.SAdd(ctx, "role:"+sid, route.ID).Err()
+		err = cli.SAdd(ctx, "role:"+sid, route.CartId).Err()
 		if err != nil {
 			log.Fatalf("添加Route对象ID到角色集合失败: %v", err)
 		}

@@ -11,7 +11,7 @@ import (
 )
 
 type UserService interface {
-	GetUserIdByName(username string) (int, error)
+	GetUserIdByName(username string) (int64, error)
 	GetUser(id int) (*models.User, error)
 	GetUserByUsername(username string) (*models.User, error)
 	AuthorizeUser(login *models.UserLogin) (bool, error)
@@ -25,7 +25,7 @@ type userServiceImpl struct {
 	auth pwdHashing.PwdHasher
 }
 
-func (us *userServiceImpl) GetUserIdByName(username string) (int, error) {
+func (us *userServiceImpl) GetUserIdByName(username string) (int64, error) {
 	return us.repo.GetUserIdByName(username)
 }
 
@@ -50,7 +50,7 @@ func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) 
 	}
 
 	if us.auth.Verify(login.Password, usrInDb.Password, usrInDb.Salt) {
-		err = us.repo.UpdateLastLogin(usrInDb.Id, time.Now().Unix())
+		err = us.repo.UpdateLastLogin(usrInDb.UserId, time.Now().Unix())
 		if err != nil {
 			log.Error("error in updating last login", err)
 			return false, err
@@ -87,8 +87,8 @@ func (us *userServiceImpl) AddUser(user *models.UserRegister) error {
 		Salt:     hashedSalt,
 	}
 
-	fullInfo.CreatedTime = time.Now().Unix()
-	fullInfo.LastLogin = fullInfo.CreatedTime
+	fullInfo.CreatedAt = time.Now().Unix()
+	fullInfo.LastLogin = fullInfo.CreatedAt
 
 	return us.repo.InsertUser(fullInfo)
 }

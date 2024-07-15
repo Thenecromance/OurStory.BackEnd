@@ -114,7 +114,7 @@ func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
 		return
 	}
 
-	anni, err := c.services.GetAnniversaryById(usr.Id, iid)
+	anni, err := c.services.GetAnniversaryById(usr.UserId, iid)
 	if err != nil {
 		log.Error(err)
 		resp.SetCode(response.InternalServerError).AddData("Failed to get anniversary")

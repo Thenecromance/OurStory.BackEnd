@@ -2,8 +2,8 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
+	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
 	"math"
@@ -11,7 +11,7 @@ import (
 )
 
 type RelationshipRepository interface {
-
+	Interface.Repository
 	//HasBindToUser for checking if the user has bind to other user if they already has Bind info , return true
 	//otherwise return false
 	HasBindToUser(userID int, userID2 int) bool
@@ -215,7 +215,7 @@ func (r *relationshipRepositoryImpl) GetHistoryList(userID int) []models.Relatio
 	return histories
 }
 
-func (r *relationshipRepositoryImpl) initTable() error {
+/*func (r *relationshipRepositoryImpl) initTable() error {
 	if r.db == nil {
 		log.Debugf("db is nil")
 		return fmt.Errorf("db is nil")
@@ -235,12 +235,18 @@ func (r *relationshipRepositoryImpl) initTable() error {
 	}
 
 	return r.db.CreateTablesIfNotExists()
+}*/
+
+func (r *relationshipRepositoryImpl) BindTable() error {
+	r.db.AddTableWithName(models.Relationship{}, "Relations")
+	r.db.AddTableWithName(models.RelationShipHistory{}, "RelationLogs")
+	return nil
 }
 
 func NewRelationShipRepository(db *gorp.DbMap) RelationshipRepository {
 	repo := &relationshipRepositoryImpl{
 		db: db,
 	}
-	repo.initTable()
+	//repo.initTable()
 	return repo
 }
