@@ -35,6 +35,7 @@ func main() {
 		return
 	}
 	fmt.Println(usr.UserName)
+	fmt.Println(usr)
 	fmt.Println(usr.Birthday, "\n", time.UnixMilli(usr.Birthday))
 
 }

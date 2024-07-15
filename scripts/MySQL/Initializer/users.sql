@@ -15,3 +15,9 @@ CREATE table IF NOT EXISTS Users (
 
 
 
+CREATE TABLE IF NOT EXISTS LoginLogs(
+    user_id BIGINT NOT NULL , 
+    login_time BIGINT NOT NULL,
+    login_ip VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
