@@ -43,7 +43,7 @@ type user struct {
 }
 
 func (u *user) BindTable() error {
-	u.db.AddTableWithName(models.User{}, "Users")
+	u.db.AddTableWithName(models.User{}, "Users").SetKeys(true, "UserId")
 	u.db.AddTableWithName(models.LoginLogs{}, "LoginLogs").SetKeys(false, "UserId")
 	return nil
 }
