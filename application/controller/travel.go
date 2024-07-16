@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/services"
-	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/server/response"
@@ -59,21 +58,17 @@ func (tc *TravelController) getTravel(ctx *gin.Context) {
 	log.Debugf("getTravel")
 	resp := response.New()
 	defer resp.Send(ctx)
+	travelID := ctx.Query("id")
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		log.Warn("failed get auth object")
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	travelID := ctx.Query("id")
-
-	//parse user id
-	uid := obj.(map[string]interface{})["id"].(int64)
-	log.Debugf("uid: %d", uid)
 	//get travel from database
-	travel, err := tc.service.GetTravelByID(travelID, uid)
+	travel, err := tc.service.GetTravelByID(travelID, claim.Id)
 	if err != nil {
 		resp.Error(err.Error())
 		return
@@ -86,14 +81,13 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		log.Warn("failed get auth object")
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	uid := int64(obj.(map[string]interface{})["id"].(float64))
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	dto := &models.Travel{}
@@ -103,7 +97,7 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 	}
 
 	// a simple precheck
-	if dto.UserId != uid {
+	if dto.UserId != claim.Id {
 		resp.Error("invalid params")
 		return
 	}
@@ -122,14 +116,12 @@ func (tc *TravelController) updateTravel(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		log.Warn("failed get auth object")
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-
-	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	dto := &models.Travel{}
@@ -139,7 +131,7 @@ func (tc *TravelController) updateTravel(ctx *gin.Context) {
 	}
 
 	// a simple precheck
-	if dto.UserId != uid {
+	if dto.UserId != claim.Id {
 		resp.Error("invalid params")
 		return
 	}
@@ -158,18 +150,16 @@ func (tc *TravelController) deleteTravel(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		log.Warn("failed get auth object")
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-
-	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 	id := ctx.Query("id")
 
-	err := tc.service.DeleteTravel(id, uid)
+	err := tc.service.DeleteTravel(id, claim.Id)
 	if err != nil {
 		resp.Error(err.Error())
 		return
@@ -181,17 +171,17 @@ func (tc *TravelController) getTravelList(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		log.Warn("failed get auth object")
+	claim := getAuthObject(ctx)
+
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+	log.Debugf("uid: %d", claim.Id)
 
-	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
-	lists, err := tc.service.GetTravelList(uid)
+	lists, err := tc.service.GetTravelList(claim.Id)
 	if err != nil {
 		return
 	}

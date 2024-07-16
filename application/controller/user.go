@@ -232,24 +232,16 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exist := ctx.Get(constants.AuthObject)
-	if !exist {
-		resp.SetCode(response.BadRequest).AddData("Invalid request")
+	claim := getAuthObject(ctx)
+
+	if claim == nil {
+		resp.Unauthorized("please login first")
 		return
 	}
-	var obj_ models.UserClaim
-	//try to cast to the user claim
-	if _, ok := obj.(models.UserClaim); ok {
-		obj_ = obj.(models.UserClaim)
-
-	} else {
-		mp := obj.(map[string]interface{})
-		obj_.UserName = mp["username"].(string)
-		obj_.Id = mp["id"].(int64)
-	}
+	log.Debugf("uid: %d", claim.Id)
 
 	usrName := ctx.Param("username")
-	if usrName != obj_.UserName {
+	if usrName != claim.UserName {
 		resp.SetCode(response.OK).AddData("Invalid request")
 		return
 	}
@@ -260,7 +252,7 @@ func (uc *UserController) getProfile(ctx *gin.Context) {
 		return
 	}
 
-	if usr.UserName != obj_.UserName || usr.UserId != obj_.Id {
+	if usr.UserName != claim.UserName || usr.UserId != claim.Id {
 		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
 	}

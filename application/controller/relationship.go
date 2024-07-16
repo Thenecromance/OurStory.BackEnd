@@ -2,7 +2,6 @@ package controller
 
 import (
 	"github.com/Thenecromance/OurStories/application/services"
-	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/server/response"
@@ -182,16 +181,14 @@ func (r *relationshipController) getFriendList(ctx *gin.Context) {
 		return
 	}
 
-	val, exists := ctx.Get(constants.AuthObject)
-	if !exists {
-		resp.Error("invalid request")
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
+		resp.Unauthorized("please login first")
 		return
 	}
 
-	id := val.(map[string]interface{})["id"].(int64)
-	//UserName := val.(map[string]interface{})["username"].(string)
-
-	lists := r.service.GetFriendList(id)
+	lists := r.service.GetFriendList(claim.Id)
 
 	resp.Success(lists)
 }
@@ -206,21 +203,19 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 		return
 	}
 
-	result, err := JWT.ValidAndGetResult(ctx)
-	if err != nil || result == nil {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
+		resp.Unauthorized("please login first")
+		return
+	}
+
+	if claim.UserName != user {
 		resp.Error("invalid request")
 		return
 	}
 
-	//models.UserClaim
-	id := result.(map[string]interface{})["id"].(int64)
-	UserName := result.(map[string]interface{})["username"].(string)
-	if user != UserName {
-		resp.Error("invalid request")
-		return
-	}
-
-	lists := r.service.GetHistoryList(id)
+	lists := r.service.GetHistoryList(claim.Id)
 
 	resp.Success(lists)
 }
