@@ -1,13 +1,14 @@
 package services
 
 import (
+	"time"
+
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/repository"
 	"github.com/Thenecromance/OurStories/application/services/pwdHashing"
 	"github.com/Thenecromance/OurStories/application/services/pwdHashing/Scrypt"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	"github.com/Thenecromance/OurStories/utility/log"
-	"time"
 )
 
 type UserService interface {

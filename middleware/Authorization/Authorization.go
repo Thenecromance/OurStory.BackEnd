@@ -1,8 +1,9 @@
 package Authorization
 
 import (
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (

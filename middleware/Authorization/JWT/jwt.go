@@ -1,16 +1,19 @@
 package JWT
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
+	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
-	response2 "github.com/Thenecromance/OurStories/server/response"
-	"github.com/Thenecromance/OurStories/utility/cache/lru"
+	"github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/server/response"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"time"
 )
 
 var (
@@ -27,12 +30,17 @@ type claim struct {
 	jwt.RegisteredClaims             // embedded unmodified `jwt.RegisteredClaims`
 }
 
-type Service struct {
-	cache *lru.Cache
+type AuthImpl struct {
+	cache Interface.ICache
 }
 
-func (s *Service) StoreToken(token_ string, claim_ any, duration_ time.Duration) error {
-	s.cache.Add(token_, claim_, time.Now().Add(duration_)) // store the token to the cache
+func (s *AuthImpl) StoreToken(token_ string, claim_ any, duration_ time.Duration) error {
+	/* s.cache.Add(token_, claim_, time.Now().Add(duration_)) // store the token to the cache */
+	buf, err := json.Marshal(claim_)
+	if err != nil {
+		return err
+	}
+	s.cache.Set(token_, string(buf), duration_)
 	return nil
 }
 
@@ -43,7 +51,7 @@ func defaultRegisteredClaim() jwt.RegisteredClaims {
 	}
 }
 
-func (s *Service) SignTokenToUser(claim_ any) (string, error) {
+func (s *AuthImpl) SignTokenToUser(claim_ any) (string, error) {
 	c := claim{
 		Obj:              claim_,
 		RegisteredClaims: defaultRegisteredClaim(),
@@ -59,7 +67,7 @@ func (s *Service) SignTokenToUser(claim_ any) (string, error) {
 	return tokenStr, nil
 }
 
-func (s *Service) GetClaimFromToken(token_ string) (any, error) {
+func (s *AuthImpl) GetClaimFromToken(token_ string) (any, error) {
 	claims := &claim{}
 	_, err := jwt.ParseWithClaims(token_, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(Authorization.EncryptKey), nil
@@ -72,7 +80,7 @@ func (s *Service) GetClaimFromToken(token_ string) (any, error) {
 	return claims, nil
 }
 
-func (s *Service) GetUserClaimFromToken(token_ string) (any, error) {
+func (s *AuthImpl) GetUserClaimFromToken(token_ string) (any, error) {
 	claim_, err := s.GetClaimFromToken(token_) // get full claim from token
 	if err != nil {
 		log.Error("Error while getting claim from token ", err)
@@ -81,27 +89,27 @@ func (s *Service) GetUserClaimFromToken(token_ string) (any, error) {
 	return claim_.(*claim).Obj, nil
 }
 
-func (s *Service) MarkTokenExpired(token_ string) error {
+func (s *AuthImpl) MarkTokenExpired(token_ string) error {
 	if !s.HasToken(token_) {
 		return fmt.Errorf("token %s not found", token_)
 	}
-	s.cache.Remove(token_)
+	s.cache.Delete(token_)
 	return nil
 }
 
 // HasToken will check if the token is exist in cache or not
-func (s *Service) HasToken(token_ string) bool {
+func (s *AuthImpl) HasToken(token_ string) bool {
 	_, ok := s.cache.Get(token_) // just check if the token is exist or not
-	return ok
+	return ok == nil
 }
 
-func (s *Service) TokenValid(token_ string) bool {
+func (s *AuthImpl) TokenValid(token_ string) bool {
 
 	_, err := s.GetClaimFromToken(token_) // just check if the token is valid or not
 	return err == nil
 }
 
-func (s *Service) TokenExpired(token_ string) bool {
+func (s *AuthImpl) TokenExpired(token_ string) bool {
 	claims, err := s.GetClaimFromToken(token_)
 	if err != nil {
 		return false
@@ -109,7 +117,7 @@ func (s *Service) TokenExpired(token_ string) bool {
 	return claims.(*claim).ExpiresAt.Time.Before(time.Now())
 }
 
-func (s *Service) MiddleWare() gin.HandlerFunc {
+func (s *AuthImpl) MiddleWare() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -117,16 +125,16 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 
 		if err != nil {
 			log.Error("Error while getting token from cookie ", err)
-			resp := response2.New()
-			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp := response.New()
+			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
 			resp.Send(c)
 			c.Abort()
 			return
 		}
 		// check if the token is empty
 		if token == "" {
-			resp := response2.New()
-			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("No token provided")
+			resp := response.New()
+			resp.SetCode(response.NetworkAuthenticationRequired).AddData("No token provided")
 			c.Abort()
 			return
 		}
@@ -138,8 +146,8 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 
 		// check if the token is expired
 		if s.TokenExpired(token) {
-			resp := response2.New()
-			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("your token has been expired")
+			resp := response.New()
+			resp.SetCode(response.NetworkAuthenticationRequired).AddData("your token has been expired")
 			resp.Send(c)
 			c.Abort()
 			return
@@ -151,12 +159,18 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 			if err != nil {
 				return
 			}
-			s.cache.Add(token, restore.(*claim).Obj, restore.(*claim).ExpiresAt.Time)
+			// s.cache.Add(token, restore.(*claim).Obj, restore.(*claim).ExpiresAt.Time)
+			bytes, err := json.Marshal(restore.(*claim).Obj)
+			if err != nil {
+				return
+			}
+			duration := time.Now().Sub(restore.(*claim).ExpiresAt.Time)
+			s.cache.Set(token, string(bytes), duration)
 		}
 
 		// check if the token is valid
 		if !s.TokenValid(token) {
-			resp := response2.New()
+			resp := response.New()
 			log.Warn("Invalid token provided")
 			/*resp.Error("Invalid token provided")*/
 			resp.Unauthorized("Invalid token provided")
@@ -168,9 +182,9 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 		// if the token is valid and not expired, then continue the request
 		userClaim, err := s.GetUserClaimFromToken(token)
 		if err != nil {
-			resp := response2.New()
+			resp := response.New()
 			log.Error("Error while getting user claim from token ", err)
-			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Something goes wrong while getting user claim from token")
+			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Something goes wrong while getting user claim from token")
 			resp.Send(c)
 			c.Abort()
 			return
@@ -178,8 +192,8 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 		//based on type to do the type assertion
 		if userClaim == nil {
 			log.Error("Error while getting user claim from token ", err)
-			resp := response2.New()
-			resp.SetCode(response2.NetworkAuthenticationRequired).AddData("Invalid token provided")
+			resp := response.New()
+			resp.SetCode(response.NetworkAuthenticationRequired).AddData("Invalid token provided")
 			resp.Send(c)
 			c.Abort()
 			return
@@ -192,9 +206,11 @@ func (s *Service) MiddleWare() gin.HandlerFunc {
 }
 
 func New() Authorization.IAuth {
-	return &Service{
-		cache: lru.New(0),
+	impl := &AuthImpl{
+		cache: NoSQL.NewCache(),
 	}
+	impl.cache.Prefix("JWT")
+	return impl
 }
 
 // Instance will return the singleton instance of the Authorization.IAuth

@@ -1,6 +1,8 @@
 package NoSQL
 
-import "github.com/go-redis/redis/v8"
+import (
+	"github.com/go-redis/redis/v8"
+)
 
 var (
 	setting *RedisSetting
