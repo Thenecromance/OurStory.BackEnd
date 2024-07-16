@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/utility/cache/redisCache"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -217,7 +217,7 @@ func (s *AuthImpl) MiddleWare() gin.HandlerFunc {
 
 func New() Authorization.IAuth {
 	impl := &AuthImpl{
-		cache: NoSQL.NewCache(),
+		cache: redisCache.NewCache(),
 	}
 	impl.cache.Prefix("JWT")
 	return impl

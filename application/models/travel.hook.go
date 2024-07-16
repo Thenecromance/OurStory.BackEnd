@@ -11,6 +11,7 @@ import (
 
 func (t *Travel) PreInsert(s gorp.SqlExecutor) error {
 	t.Id = id.Generate()
+	t.CreateAt = time.Now().UnixMilli()
 	bytes, err := json.Marshal(t.TogetherWith)
 	if err != nil {
 		return err
@@ -40,6 +41,14 @@ func (t *Travel) PostUpdate(s gorp.SqlExecutor) error {
 	})
 	if err != nil {
 		log.Error("error in inserting travel log", err)
+		return err
+	}
+	return nil
+}
+
+func (t *Travel) PostGet(s gorp.SqlExecutor) error {
+	err := json.Unmarshal([]byte(t.TogetherWithMarshaled), &t.TogetherWith)
+	if err != nil {
 		return err
 	}
 	return nil

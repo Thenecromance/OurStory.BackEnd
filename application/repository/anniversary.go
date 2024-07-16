@@ -89,9 +89,6 @@ func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anni
 		return nil, err
 	}
 	return result, nil
-
-	//TODO implement me
-	panic("implement me")
 }
 
 func (a *anniversaryRepository) GetAnniversaryList(userId string) ([]models.Anniversary, error) {

@@ -3,11 +3,12 @@ CREATE TABLE IF NOT EXISTS Travels (
     travel_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     state INT NOT NULL , 
-    travel_date BIGINT NOT NULL,
-    travel_time BIGINT NOT NULL,
-    travel_from VARCHAR(255) NOT NULL,
-    travel_to VARCHAR(255) NOT NULL,
-    travel_cost DECIMAL(10,2) NOT NULL,
+    travel_start BIGINT NOT NULL,
+    travel_end BIGINT NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    detail TEXT NOT NULL,
+    together TEXT NOT NULL, 
+    image VARCHAR(255) NOT NULL,
     created_at BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );

@@ -21,55 +21,6 @@ type anniversaryServiceImpl struct {
 	repo repository.Anniversary
 }
 
-//func DbToDTO(anniversary *models.Anniversary) *models.Anniversary {
-//
-//	obj := &models.Anniversary{
-//		Id:          anniversary.Id,
-//		UserId:      anniversary.UserId,
-//		Name:        anniversary.Name,
-//		Info:        anniversary.Description,
-//		TimeStamp:   anniversary.Date,
-//		CreatedTime: anniversary.CreatedTime,
-//		SharedWith:  []int{},
-//	}
-//
-//	for _, v := range strings.Split(anniversary.SharedWith, ",") {
-//		if v == "" {
-//			continue
-//		}
-//		userId, err := strconv.Atoi(v)
-//		if err != nil {
-//			log.Errorf("failed to convert shared with to int with error: %s", err.Error())
-//			continue
-//		}
-//		obj.SharedWith = append(obj.SharedWith, userId)
-//	}
-//
-//	return obj
-//}
-
-/*func DTOToDb(anniversary *models.Anniversary) *models.Anniversary {
-	obj := &models.Anniversary{
-		Id:          anniversary.Id,
-		UserId:      anniversary.UserId,
-		Name:        anniversary.Name,
-		Description: anniversary.Info,
-		Date:        anniversary.TimeStamp,
-		CreatedTime: anniversary.CreatedTime,
-		SharedWith:  "",
-	}
-
-	for _, v := range anniversary.SharedWith {
-		obj.SharedWith += strconv.Itoa(v) + ","
-	}
-
-	if len(obj.SharedWith) > 0 {
-		obj.SharedWith = obj.SharedWith[:len(obj.SharedWith)-1]
-	}
-
-	return obj
-}*/
-
 func (a *anniversaryServiceImpl) GetAnniversaryById(userid, id int) (*models.Anniversary, error) {
 
 	anniversary, err := a.repo.GetAnniversaryById(userid, id)
@@ -100,15 +51,10 @@ func (a *anniversaryServiceImpl) RemoveAnniversary(userid int, id int) error {
 
 	return a.repo.RemoveAnniversaryById(userid, id)
 
-	//TODO implement me
-	panic("implement me")
 }
 
 func (a *anniversaryServiceImpl) UpdateAnniversary(userid int, anniversary *models.Anniversary) error {
-
 	return a.repo.UpdateAnniversary(anniversary)
-	//TODO implement me
-	panic("implement me")
 }
 
 func (a *anniversaryServiceImpl) GetAnniversaries(userId int64) ([]models.Anniversary, error) {

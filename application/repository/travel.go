@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -90,7 +91,7 @@ func (t *travelRepository) UpdateTravel(info *models.Travel) error {
 func (t *travelRepository) GetTravelByID(travelId int64) (*models.Travel, error) {
 	//get travel from db by id
 	travel := new(models.Travel)
-	err := t.db.SelectOne(travel, "select * from travel where id = ?", travelId)
+	err := t.db.SelectOne(travel, "select * from Travels where travel_id = ?", travelId)
 	if err != nil {
 		log.Warnf("GetTravelByID error: %v", err)
 		return nil, err
@@ -102,7 +103,7 @@ func (t *travelRepository) GetTravelByID(travelId int64) (*models.Travel, error)
 func (t *travelRepository) GetTravelByOwner(owner int64) ([]models.Travel, error) {
 	//get travel from db by id
 	var travel []models.Travel
-	objects, err := t.db.Select(models.Travel{}, "select * from travel where owner = ?", owner)
+	objects, err := t.db.Select(models.Travel{}, "select * from Travels where user_id = ?", owner)
 	if err != nil {
 		log.Errorf("GetTravelByID error: %v", err)
 		return nil, err
@@ -118,7 +119,7 @@ func (t *travelRepository) GetTravelByOwner(owner int64) ([]models.Travel, error
 func (t *travelRepository) GetTravelByLocation(location string) ([]models.Travel, error) {
 	//get travel from db by id
 	var travel []models.Travel
-	err := t.db.SelectOne(travel, "select * from travel where location = ?", location)
+	err := t.db.SelectOne(travel, "select * from Travels where location = ?", location)
 	if err != nil {
 		log.Errorf("GetTravelByID error: %v", err)
 		return nil, err

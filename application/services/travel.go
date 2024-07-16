@@ -78,7 +78,7 @@ func (u *updatingTravel) updateDetails(details string) {
 		return
 	}
 	u.needUpdate = true
-	u.Details = details
+	u.Detail = details
 }
 func (u *updatingTravel) updateTogetherWith(togetherWith []int64) {
 	if togetherWith == nil {
@@ -127,51 +127,6 @@ type travelServiceImpl struct {
 	cache         travelMap
 	updatingCache map[travelId]*updatingTravel
 }
-
-/*func travelToDTO(travel *models.Travel) *models.Travel {
-	dto := &models.Travel{
-		Id:           travel.Id,
-		State:        travel.State,
-		UserId:       travel.UserId,
-		Location:     travel.Location,
-		Details:      travel.Details,
-		StartTime:    travel.StartTime,
-		EndTime:      travel.EndTime,
-		TogetherWith: make([]int, 0),
-	}
-	for _, v := range strings.Split(travel.TogetherWith, ",") {
-		id, err := strconv.Atoi(v)
-		if err != nil {
-			log.Warnf("failed convert string to int with error: %v", err)
-			continue
-		}
-		dto.TogetherWith = append(dto.TogetherWith, id)
-	}
-	parseTravelState(dto) // update the state of the travel
-	return dto
-}
-func dtoToTravel(travel *models.Travel) *models.Travel {
-	parseTravelState(travel)
-	obj := &models.Travel{
-		Id:           travel.Id,
-		UserId:       travel.UserId,
-		State:        travel.State,
-		Location:     travel.Location,
-		Details:      travel.Details,
-		StartTime:    travel.StartTime,
-		EndTime:      travel.EndTime,
-		TogetherWith: "",
-	}
-	for _, v := range travel.TogetherWith {
-		obj.TogetherWith += strconv.Itoa(v) + ","
-	}
-	// remove the last comma
-	if len(obj.TogetherWith) > 0 {
-		obj.TogetherWith = obj.TogetherWith[:len(obj.TogetherWith)-1]
-	}
-
-	return obj
-}*/
 
 func parseTravelState(travel *models.Travel) {
 	now := time.Now().Unix()
@@ -424,7 +379,7 @@ func (t *travelServiceImpl) Update(obj *models.Travel) error {
 	if o == nil {
 		return fmt.Errorf("update error: %s", "getUpdaterObject return nil")
 	}
-	o.updateDetails(obj.Details)
+	o.updateDetails(obj.Detail)
 	o.updateEndTime(obj.EndTime)
 	o.updateLocation(obj.Location)
 	o.updateOwner(obj.UserId)

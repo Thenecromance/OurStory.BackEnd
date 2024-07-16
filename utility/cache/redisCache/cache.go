@@ -1,10 +1,11 @@
-package NoSQL
+package redisCache
 
 import (
 	"context"
 	"strings"
 	"time"
 
+	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/go-redis/redis/v8"
 )
@@ -76,6 +77,6 @@ func (c *cache) combineKey(key string) string {
 
 func NewCache() Interface.ICache {
 	return &cache{
-		cli: NewRedis(),
+		cli: NoSQL.NewRedis(),
 	}
 }
