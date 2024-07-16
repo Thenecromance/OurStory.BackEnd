@@ -23,6 +23,33 @@ func (t *Travel) PostInsert(s gorp.SqlExecutor) error {
 	err := s.Insert(&TravelLog{
 		TravelId:   t.Id,
 		ModifiedBy: t.UserId,
+		Message:    "Travel created",
+	})
+	if err != nil {
+		log.Error("error in inserting travel log", err)
+		return err
+	}
+	return nil
+}
+
+func (t *Travel) PostUpdate(s gorp.SqlExecutor) error {
+	err := s.Insert(&TravelLog{
+		TravelId:   t.Id,
+		ModifiedBy: t.UserId,
+		Message:    "Travel updated",
+	})
+	if err != nil {
+		log.Error("error in inserting travel log", err)
+		return err
+	}
+	return nil
+}
+
+func (t *Travel) PostDelete(s gorp.SqlExecutor) error {
+	err := s.Insert(&TravelLog{
+		TravelId:   t.Id,
+		ModifiedBy: t.UserId,
+		Message:    "Travel deleted",
 	})
 	if err != nil {
 		log.Error("error in inserting travel log", err)
@@ -34,7 +61,5 @@ func (t *Travel) PostInsert(s gorp.SqlExecutor) error {
 func (t *TravelLog) PreInsert(s gorp.SqlExecutor) error {
 	t.LogId = id.Generate()
 	t.ModifiedAt = time.Now().UnixMilli()
-	t.Message = "Travel created" // temp add this message for test
-
 	return nil
 }

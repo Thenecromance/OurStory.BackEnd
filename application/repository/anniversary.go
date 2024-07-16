@@ -94,8 +94,8 @@ func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anni
 	panic("implement me")
 }
 
-func (a *anniversaryRepository) GetAnniversaryList(user string) ([]models.Anniversary, error) {
-	result, err := a.db.Select(&models.Anniversary{}, "select * from anniversary where user_id = ?", user)
+func (a *anniversaryRepository) GetAnniversaryList(userId string) ([]models.Anniversary, error) {
+	result, err := a.db.Select(&models.Anniversary{}, "select * from anniversary where user_id = ?", userId)
 	if err != nil {
 		return nil, err
 	}

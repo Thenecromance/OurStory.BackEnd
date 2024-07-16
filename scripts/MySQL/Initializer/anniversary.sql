@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS Anniversaries (
     anniversary_date BIGINT NOT NULL,
     created_at BIGINT NOT NULL,
     updated_at BIGINT NOT NULL, 
+    shared_with TEXT NOT NULL, 
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );

@@ -1,10 +1,11 @@
 package models
 
 import (
+	"time"
+
 	"github.com/Thenecromance/OurStories/utility/id"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
-	"time"
 )
 
 // =========================================================
@@ -25,7 +26,7 @@ func (ub *UserBalance) PreInsert(s gorp.SqlExecutor) error {
 
 func (ub *UserBalance) PostInsert(s gorp.SqlExecutor) error {
 
-	return s.Insert(&Transactions{
+	return s.Insert(&Transaction{
 		UserId: ub.UserId,
 		Amount: 100.0,
 		Type:   "credit",
@@ -33,27 +34,37 @@ func (ub *UserBalance) PostInsert(s gorp.SqlExecutor) error {
 	})
 }
 
-func (t *Transactions) PreInsert(s gorp.SqlExecutor) error {
+func (t *Transaction) PreInsert(s gorp.SqlExecutor) error {
 	t.TransactionId = id.Generate()
 	t.TimeStamp = time.Now().UnixMilli()
 
 	return nil
 
 }
-func (t *Transactions) PostInsert(s gorp.SqlExecutor) error {
 
-	balance, err := s.Get(UserBalance{UserId: t.UserId})
-	if err != nil {
-		log.Warn(err)
+func applyTransactionToUserBalance(s gorp.SqlExecutor, t *Transaction) error {
+	balance := UserBalance{}
+	if err := s.SelectOne(&balance, "SELECT * FROM UserBalances WHERE user_id = ?", t.UserId); err != nil {
+		log.Warnf("Error getting balance: %v", err)
 		return err
 	}
-
-	_, err = s.Update(&UserBalance{UserId: t.UserId, Balance: balance.(*UserBalance).Balance + t.Amount})
+	_, err := s.Update(&UserBalance{UserId: t.UserId, Balance: balance.Balance + t.Amount})
 	if err != nil {
 		log.Warnf("Error updating balance: %v", err)
 		return err
 	}
 
+	return s.Insert(&TransactionLog{
+		TransactionId: t.TransactionId,
+		Message:       "Transaction created",
+		TimeStamp:     t.TimeStamp,
+	})
+}
+
+func (t *Transaction) PostInsert(s gorp.SqlExecutor) error {
+	if err := applyTransactionToUserBalance(s, t); err != nil {
+		return err
+	}
 	return s.Insert(&TransactionLog{
 		TransactionId: t.TransactionId,
 		Message:       "Transaction created",

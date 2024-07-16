@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -56,7 +57,7 @@ type shopRepository struct {
 
 func (s *shopRepository) BindTable() error {
 	s.db.AddTableWithName(models.Item{}, "Items")
-	s.db.AddTableWithName(models.Transactions{}, "Transactions")
+	s.db.AddTableWithName(models.Transaction{}, "Transactions")
 	s.db.AddTableWithName(models.TransactionLog{}, "TransactionLogs")
 	s.db.AddTableWithName(models.UserBalance{}, "UserBalances").SetKeys(false, "UserId")
 	return nil

@@ -25,7 +25,7 @@ type UserBalance struct {
 // Transactions model
 //=========================================================
 
-type Transactions struct {
+type Transaction struct {
 	TransactionId int64   `json:"transaction_id,omitempty" db:"transaction_id"`
 	UserId        int64   `json:"user_id,omitempty" db:"user_id"`
 	Amount        float64 `json:"amount,omitempty" db:"amount"`

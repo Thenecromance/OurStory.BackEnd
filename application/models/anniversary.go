@@ -6,8 +6,8 @@ type Anniversary struct {
 	Date                int64  `json:"anniversary_date" db:"anniversary_date"`     // the time when the anniversary happened
 	Name                string `json:"title"      db:"title"`                      // the name of the anniversary
 	Description         string `json:"description"       db:"description"`         // the information of the anniversary
-	CreatedTime         int64  `json:"created_time" db:"created_time"`             // the time when the anniversary is created
-	UpdateAt            int64  `json:"update_at" db:"update_at"`                   // the time when the anniversary is updated
+	CreatedTime         int64  `json:"created_at" db:"created_at"`                 // the time when the anniversary is created
+	UpdateAt            int64  `json:"updated_at" db:"updated_at"`                 // the time when the anniversary is updated
 	SharedWithMarshaled string `json:"-" db:"shared_with"`                         // the user list who will share this anniversary
 	// these fields are not in the database which will be calculated by the server
 	SharedWith []int `json:"shared_with" db:"-"`  // the user list who will share this anniversary
