@@ -1,17 +1,17 @@
 package controller
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/application/services"
-	"github.com/Thenecromance/OurStories/constants"
 	"github.com/Thenecromance/OurStories/middleware/Authorization/JWT"
 	Interface2 "github.com/Thenecromance/OurStories/server/Interface"
-	response2 "github.com/Thenecromance/OurStories/server/response"
+	"github.com/Thenecromance/OurStories/server/response"
 	"github.com/Thenecromance/OurStories/server/route"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"strings"
 )
 
 type anniversaryRoutes struct {
@@ -64,23 +64,24 @@ func (c *AnniversaryController) Initialize() {
 //---------------------------------------------------------
 
 func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
-	log.Debugf("uid: %d", uid)
 	id := ctx.Query("id")
+
+	// todo: fucking this shit code, only shit can write this shit code
 	var ids []string
 	if strings.Contains(id, ",") {
 		ids = strings.Split(id, ",")
 		if len(ids) == 0 {
-			resp.SetCode(response2.BadRequest).AddData("Invalid id")
+			resp.SetCode(response.BadRequest).AddData("Invalid id")
 			return
 		}
 
@@ -94,7 +95,7 @@ func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
 			log.Error(err)
 			continue
 		}
-		obj, err := c.services.GetAnniversaryById(uid, anniId)
+		obj, err := c.services.GetAnniversaryById(int(claim.Id), anniId)
 		if err != nil {
 			log.Warnf("failed to get anniversary with id: %d", anniId)
 			continue
@@ -102,84 +103,65 @@ func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
 		resp.AddData(obj)
 	}
 	if resp.Meta.Count == 0 {
-		resp.SetCode(response2.BadRequest).AddData("Invalid id")
-		return
-	} else {
-		resp.SetCode(response2.OK)
-	}
-	/*iid, err := strconv.Atoi(id)
-	if err != nil {
-		log.Error(err)
 		resp.SetCode(response.BadRequest).AddData("Invalid id")
 		return
+	} else {
+		resp.SetCode(response.OK)
 	}
-
-	anni, err := c.services.GetAnniversaryById(usr.UserId, iid)
-	if err != nil {
-		log.Error(err)
-		resp.SetCode(response.InternalServerError).AddData("Failed to get anniversary")
-		return
-	}
-
-	resp.Success(anni)*/
 
 	panic("implement me")
 }
 
 func (c *AnniversaryController) createAnniversary(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	uid := obj.(map[string]interface{})["id"].(int64)
-	log.Debugf("uid: %d", uid)
-
 	anni := models.Anniversary{}
 	if err := ctx.BindJSON(&anni); err != nil {
-		resp.SetCode(response2.BadRequest).AddData("Invalid request")
+		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
 	}
 
-	if uid != anni.UserId {
-		resp.SetCode(response2.BadRequest).AddData("Invalid request")
+	if claim.Id != anni.UserId {
+		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
 	}
 
-	err := c.services.CreateAnniversary(uid, &anni)
+	err := c.services.CreateAnniversary(claim.Id, &anni)
 
 	if err != nil {
 		log.Error(err)
-		resp.SetCode(response2.InternalServerError).AddData("Failed to create anniversary")
+		resp.SetCode(response.InternalServerError).AddData("Failed to create anniversary")
 		return
 	}
 	resp.Success(anni)
 }
 
 func (c *AnniversaryController) updateAnniversary(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
-	log.Debugf("uid: %d", uid)
-
 	anni := models.Anniversary{}
 	if err := ctx.BindJSON(&anni); err != nil {
-		resp.SetCode(response2.BadRequest).AddData("Invalid request")
+		resp.SetCode(response.BadRequest).AddData("Invalid request")
 		return
 	}
 
-	err := c.services.UpdateAnniversary(uid, &anni)
+	err := c.services.UpdateAnniversary(int(claim.Id), &anni)
 	if err != nil {
 		log.Error(err)
 		resp.Error("Failed to update anniversary")
@@ -188,21 +170,19 @@ func (c *AnniversaryController) updateAnniversary(ctx *gin.Context) {
 	resp.Success(anni)
 }
 func (c *AnniversaryController) deleteAnniversary(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 
-	obj, exists := ctx.Get(constants.AuthObject)
-	if !exists {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
-	log.Debugf("uid: %d", uid)
-
 	id := ctx.Query("id")
 	if id == "" {
-		resp.SetCode(response2.BadRequest).AddData("Invalid id")
+		resp.SetCode(response.BadRequest).AddData("Invalid id")
 		return
 	}
 
@@ -211,7 +191,7 @@ func (c *AnniversaryController) deleteAnniversary(ctx *gin.Context) {
 
 		ids = strings.Split(id, ",")
 		if len(ids) == 0 {
-			resp.SetCode(response2.BadRequest).AddData("Invalid id")
+			resp.SetCode(response.BadRequest).AddData("Invalid id")
 			return
 		}
 	} else {
@@ -224,7 +204,7 @@ func (c *AnniversaryController) deleteAnniversary(ctx *gin.Context) {
 			log.Error(err)
 			continue
 		}
-		err = c.services.RemoveAnniversary(uid, anniId)
+		err = c.services.RemoveAnniversary(int(claim.Id), anniId)
 		if err != nil {
 			log.Warnf("failed to delete anniversary with id: %d", anniId)
 			continue
@@ -238,20 +218,20 @@ func (c *AnniversaryController) deleteAnniversary(ctx *gin.Context) {
 // anniversary List handlers
 // ---------------------------------------------------------
 func (c *AnniversaryController) getAnniversaries(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 
-	claim, exists := ctx.Get(constants.AuthObject)
-	if !exists {
+	claim := getAuthObject(ctx)
+	log.Debugf("uid: %d", claim.Id)
+	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-	usr := claim.(*models.UserClaim)
 
-	anniversaries, err := c.services.GetAnniversaries(usr.Id)
+	anniversaries, err := c.services.GetAnniversaries(claim.Id)
 	if err != nil {
 		log.Warn("failed to get anniversaries", err)
-		resp.SetCode(response2.BadRequest).AddData("Failed to get anniversaries")
+		resp.SetCode(response.BadRequest).AddData("Failed to get anniversaries")
 		return
 	}
 
@@ -259,7 +239,7 @@ func (c *AnniversaryController) getAnniversaries(ctx *gin.Context) {
 }
 
 func (c *AnniversaryController) getAnniversaryById(ctx *gin.Context) {
-	resp := response2.New()
+	resp := response.New()
 	defer resp.Send(ctx)
 }
 

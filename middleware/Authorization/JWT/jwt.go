@@ -199,7 +199,13 @@ func (s *AuthImpl) MiddleWare() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(constants.AuthObject, userClaim) // set the user claim to the context
+		buf, err := json.Marshal(userClaim)
+		if err != nil {
+			log.Error(err)
+			c.Abort()
+		}
+
+		c.Set(constants.AuthObject, string(buf)) // set the user claim to the context
 
 		c.Next()
 	}
