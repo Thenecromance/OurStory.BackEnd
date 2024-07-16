@@ -58,6 +58,10 @@ func (s *AuthImpl) SignTokenToUser(claim_ any) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	tokenStr, err := token.SignedString([]byte(Authorization.EncryptKey))
+	if err != nil {
+		log.Error("Error while signing token ", err)
+		return "", err
+	}
 
 	if err = s.StoreToken(tokenStr, claim_, duration); err != nil {
 		log.Error("Error while storing token ", err)

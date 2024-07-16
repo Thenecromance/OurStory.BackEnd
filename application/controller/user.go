@@ -188,24 +188,28 @@ func (uc *UserController) register(ctx *gin.Context) {
 	}
 
 	// if the user is added successfully, login the user
-	{
-		uid, err := uc.service.GetUserIdByName(info.UserName)
-		if err != nil {
-			log.Error("get user failed :", err)
-			return
-		}
-
-		claim_ := models.UserClaim{
-			UserName: info.UserName,
-			Id:       uid,
-		}
-		// generate the token to client and save it to the cookie
-		token := uc.service.SignedTokenToUser(claim_)
-		// sign the token to the client
-		uc.signTokenToClient(ctx, token)
+	uid, err := uc.service.GetUserIdByName(info.UserName)
+	if err != nil {
+		log.Error("get user failed :", err)
+		return
 	}
 
-	resp.SetCode(response.OK).AddData("Register success")
+	claim_ := models.UserClaim{
+		UserName: info.UserName,
+		Id:       uid,
+	}
+	// generate the token to client and save it to the cookie
+	token := uc.service.SignedTokenToUser(claim_)
+	// sign the token to the client
+	uc.signTokenToClient(ctx, token)
+
+	usr, err := uc.service.GetUser(uid)
+	if err != nil {
+		log.Error("get user failed :", err)
+		return
+	}
+
+	resp.SetCode(response.OK).AddData(usr.UserBasicDTO)
 }
 
 func (uc *UserController) logout(ctx *gin.Context) {

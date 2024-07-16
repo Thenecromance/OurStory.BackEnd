@@ -17,7 +17,11 @@ func (u *User) PreInsert(s gorp.SqlExecutor) error {
 func (u *User) PostInsert(s gorp.SqlExecutor) error {
 	// get the user id
 	s.SelectOne(&u.UserId, "SELECT user_id FROM Users WHERE username = ? and email = ?", u.UserName, u.Email)
-	go logUserRegister(s, u)
+	logUserRegister(s, u)
+	s.Insert(&UserBalance{
+		UserId:  u.UserId,
+		Balance: 0.0,
+	})
 	return nil
 }
 

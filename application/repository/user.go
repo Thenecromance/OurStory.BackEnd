@@ -60,16 +60,21 @@ func (u *user) GetUserIdByName(username string) (int64, error) {
 
 func (u *user) GetUser(id int64) (*models.User, error) {
 	//models.User
-	obj, err := u.db.Select(models.User{}, "select * from Users where id = ?", id)
+	obj, err := u.db.Select(models.User{}, "select * from Users where user_id = ?", id)
 	if err != nil {
 		return nil, err
 	}
 	return obj[0].(*models.User), nil
 }
 
+// do not use this by client this will return all data in the table
 func (u *user) GetUsers() ([]models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	var users []models.User
+	_, err := u.db.Select(&users, "select * from Users")
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 func (u *user) GetUserByUsername(username string) (*models.User, error) {

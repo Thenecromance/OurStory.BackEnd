@@ -41,5 +41,9 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+
+# redis dump 
+*.rdb
+
 package-lock.json
 yarn.lock
