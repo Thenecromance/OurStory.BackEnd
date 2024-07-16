@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/log"
@@ -43,7 +44,7 @@ type user struct {
 
 func (u *user) BindTable() error {
 	u.db.AddTableWithName(models.User{}, "Users")
-	u.db.AddTableWithName(models.LoginLogs{}, "LoginLogs")
+	u.db.AddTableWithName(models.LoginLogs{}, "LoginLogs").SetKeys(false, "UserId")
 	return nil
 }
 
@@ -59,7 +60,7 @@ func (u *user) GetUserIdByName(username string) (int64, error) {
 
 func (u *user) GetUser(id int64) (*models.User, error) {
 	//models.User
-	obj, err := u.db.Select(models.User{}, "select * from user where id = ?", id)
+	obj, err := u.db.Select(models.User{}, "select * from Users where id = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (u *user) GetUsers() ([]models.User, error) {
 
 func (u *user) GetUserByUsername(username string) (*models.User, error) {
 
-	obj, err := u.db.Select(models.User{}, "select * from user where username = ?", username)
+	obj, err := u.db.Select(models.User{}, "select * from Users where username = ?", username)
 	if err != nil {
 		return nil, err
 	}
@@ -84,21 +85,28 @@ func (u *user) GetUserByUsername(username string) (*models.User, error) {
 }
 
 func (u *user) UpdateLastLogin(id int64, unix int64) error {
-	trans, err := u.db.Begin()
+	//trans, err := u.db.Begin()
+	//if err != nil {
+	//	log.Errorf("failed to begin transaction with error: %s", err.Error())
+	//	return err
+	//}
+	//
+	///*_, err = trans.Exec("update Users set last_login = ? where user_id = ?", unix, id)*/
+	//_, err = trans.Update(&models.LoginLogs{UserId: id})
+	//if err != nil {
+	//	log.Errorf("failed to update last login with error: %s", err.Error())
+	//	trans.Rollback()
+	//	return err
+	//}
+	//
+	//return trans.Commit()
+
+	log.Info("update last login", id)
+	_, err := u.db.Update(&models.LoginLogs{UserId: id})
 	if err != nil {
-		log.Errorf("failed to begin transaction with error: %s", err.Error())
 		return err
 	}
-
-	/*_, err = trans.Exec("update Users set last_login = ? where user_id = ?", unix, id)*/
-	_, err = trans.Update(&models.LoginLogs{UserId: id})
-	if err != nil {
-		log.Errorf("failed to update last login with error: %s", err.Error())
-		trans.Rollback()
-		return err
-	}
-
-	return trans.Commit()
+	return nil
 }
 
 func (u *user) InsertUser(user *models.User) error {
@@ -145,29 +153,7 @@ func (u *user) HasUserAndEmail(username, email string) bool {
 	return false
 }
 
-/*func (u *user) initTable() error {
-	if u.db == nil {
-		log.Debugf("db is nil")
-		return fmt.Errorf("db is nil")
-	}
-
-	log.Infof("start to binding user with table user")
-	tbl := u.db.AddTableWithName(models.User{}, "Users")
-	tbl.SetKeys(true, "UserId") // using snowflake to generate the id
-
-	err := u.db.CreateTablesIfNotExists()
-	if err != nil {
-		log.Errorf("failed to create table user with error: %s", err.Error())
-		return err
-	}
-	return nil
-}*/
-
 func NewUserRepository(db *gorp.DbMap) UserRepository {
 	u := &user{db}
-	/*	err := u.initTable()
-		if err != nil {
-			return nil
-		}*/
 	return u
 }

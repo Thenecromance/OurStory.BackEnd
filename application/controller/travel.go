@@ -93,7 +93,7 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 		return
 	}
 
-	uid := obj.(map[string]interface{})["id"].(int64)
+	uid := int64(obj.(map[string]interface{})["id"].(float64))
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	dto := &models.Travel{}

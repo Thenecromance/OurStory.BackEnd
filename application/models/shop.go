@@ -28,7 +28,7 @@ type UserBalance struct {
 type Transactions struct {
 	TransactionId int64   `json:"transaction_id,omitempty" db:"transaction_id"`
 	UserId        int64   `json:"user_id,omitempty" db:"user_id"`
-	Amount        float64 `json:"item_id,omitempty" db:"item_id"`
+	Amount        float64 `json:"amount,omitempty" db:"amount"`
 	Type          string  `json:"type,omitempty" db:"transaction_type"`
 	Status        string  `json:"status,omitempty" db:"status"`
 	TimeStamp     int64   `json:"created_at,omitempty" db:"created_at"`

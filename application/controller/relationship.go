@@ -45,7 +45,7 @@ func (r *relationshipController) SetupRoutes() {
 		r.createLink.SetMiddleWare(mw)
 		r.createLink.SetHandler(r.createBindLink)
 	}
-	r.activeLink = route.NewRouter("/api/relation/:id", "GET")
+	r.activeLink = route.NewRouter("/api/relation/:link", "GET")
 	{
 		r.activeLink.SetMiddleWare(mw)
 		r.activeLink.SetHandler(r.linkUser)
@@ -118,7 +118,7 @@ func (r *relationshipController) linkUser(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	// get the user's associate link
-	link := ctx.Param("id")
+	link := ctx.Param("link")
 	if link == "" {
 		resp.Error("invalid link")
 		return

@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/Thenecromance/OurStories/utility/id"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"gopkg.in/gorp.v2"
@@ -19,11 +21,20 @@ func (t *Travel) PreInsert(s gorp.SqlExecutor) error {
 
 func (t *Travel) PostInsert(s gorp.SqlExecutor) error {
 	err := s.Insert(&TravelLog{
-		TravelId: t.Id,
+		TravelId:   t.Id,
+		ModifiedBy: t.UserId,
 	})
 	if err != nil {
 		log.Error("error in inserting travel log", err)
 		return err
 	}
+	return nil
+}
+
+func (t *TravelLog) PreInsert(s gorp.SqlExecutor) error {
+	t.LogId = id.Generate()
+	t.ModifiedAt = time.Now().UnixMilli()
+	t.Message = "Travel created" // temp add this message for test
+
 	return nil
 }

@@ -2,10 +2,11 @@ package mq
 
 import (
 	"context"
-	SQL "github.com/Thenecromance/OurStories/SQL/redis"
+	"sync"
+
+	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/go-redis/redis/v8"
-	"sync"
 )
 
 type CallbackList = []Callback
@@ -25,7 +26,7 @@ func NewRedisMQ() IMQ {
 	})*/
 
 	return &redisMQ{
-		client:      SQL.NewRedis(),
+		client:      NoSQL.NewRedis(),
 		subscribers: make(map[string]CallbackList),
 	}
 }

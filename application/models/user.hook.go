@@ -1,14 +1,13 @@
 package models
 
 import (
-	"github.com/Thenecromance/OurStories/utility/id"
-	"github.com/Thenecromance/OurStories/utility/log"
-	"gopkg.in/gorp.v2"
 	"time"
+
+	"gopkg.in/gorp.v2"
 )
 
 func (u *User) PreInsert(s gorp.SqlExecutor) error {
-	u.UserId = id.Generate()
+	// u.UserId = id.Generate()  // no need to generate id, because it is auto increment
 	u.CreatedAt = time.Now().UnixMilli()
 	u.LastLogin = time.Now().UnixMilli()
 
@@ -16,23 +15,9 @@ func (u *User) PreInsert(s gorp.SqlExecutor) error {
 }
 
 func (u *User) PostInsert(s gorp.SqlExecutor) error {
-	// Create Balance account
-	err := s.Insert(&UserBalance{
-		UserId:  u.UserId,
-		Balance: 0,
-	})
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	err = s.Insert(&LoginLogs{
-		UserId: u.UserId,
-	})
-	if err != nil {
-		log.Error(err)
-		return err
-	}
+	// get the user id
+	s.SelectOne(&u.UserId, "SELECT user_id FROM Users WHERE username = ? and email = ?", u.UserName, u.Email)
+	go logUserRegister(s, u)
 	return nil
 }
 
@@ -43,4 +28,11 @@ func (ll *LoginLogs) PreInsert(s gorp.SqlExecutor) error {
 func (ll *LoginLogs) PreUpdate(s gorp.SqlExecutor) error {
 	ll.LoginTime = time.Now().UnixMilli()
 	return nil
+}
+
+func logUserRegister(s gorp.SqlExecutor, user *User) error {
+	return s.Insert(&LoginLogs{
+		UserId:    user.UserId,
+		LoginTime: time.Now().UnixMilli(),
+	})
 }

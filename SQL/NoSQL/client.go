@@ -1,4 +1,4 @@
-package SQL
+package NoSQL
 
 import "github.com/go-redis/redis/v8"
 

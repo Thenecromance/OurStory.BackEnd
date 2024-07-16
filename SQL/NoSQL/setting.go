@@ -1,9 +1,10 @@
-package SQL
+package NoSQL
 
 import (
+	"time"
+
 	Config "github.com/Thenecromance/OurStories/utility/config"
 	"github.com/go-redis/redis/v8"
-	"time"
 )
 
 type RedisSetting struct {

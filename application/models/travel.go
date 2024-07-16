@@ -11,7 +11,7 @@ const (
 // =======================================================
 
 type Travel struct {
-	Id                    int64  `json:"id"          db:"id"`
+	Id                    int64  `json:"travel_id"          db:"travel_id"`
 	State                 int    `json:"state"       db:"state"        form:"state"`
 	UserId                int64  `json:"owner"       db:"owner"        form:"owner"     binding:"required"` // the user who create this travel
 	StartTime             int64  `json:"start"       db:"start"        form:"start"     binding:"required"` // this stamp is the time when the travel start, so it's need to be required

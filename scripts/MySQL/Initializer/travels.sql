@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS Travels ( 
     travel_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
+    state INT NOT NULL , 
     travel_date BIGINT NOT NULL,
     travel_time BIGINT NOT NULL,
     travel_from VARCHAR(255) NOT NULL,

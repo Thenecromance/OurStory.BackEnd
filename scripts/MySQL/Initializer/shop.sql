@@ -35,14 +35,14 @@ CREATE TABLE IF NOT EXISTS Transactions (
     amount DECIMAL(10,2) NOT NULL,
     transaction_type ENUM('credit', 'debit') NOT NULL,
     status ENUM('pending', 'completed', 'failed') NOT NULL,
-    created_at INT NOT NULL
+    created_at BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS TransactionLogs (
     log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     transaction_id BIGINT NOT NULL,
     log_message TEXT NOT NULL,
-    logged_at INT  NOT NULL,
+    logged_at BIGINT  NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES Transactions(transaction_id)
 );
 
