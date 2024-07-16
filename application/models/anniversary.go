@@ -1,12 +1,5 @@
 package models
 
-import (
-	"encoding/json"
-	"github.com/Thenecromance/OurStories/utility/id"
-	"gopkg.in/gorp.v2"
-	"time"
-)
-
 type Anniversary struct {
 	Id                  int64  `json:"anniversary_id"         db:"anniversary_id"` // the anniversary's id
 	UserId              int64  `json:"user_id"   db:"user_id"`                     // the user who create this anniversary
@@ -20,25 +13,4 @@ type Anniversary struct {
 	SharedWith []int `json:"shared_with" db:"-"`  // the user list who will share this anniversary
 	TotalSpend int   `json:"total_spend" db:"-"`  // this filed will be calculated by the server until now
 	TimeToNext int   `json:"time_to_next" db:"-"` // this filed will be calculated by the server until the next anniversary
-}
-
-//------------------------------------------------------------
-// hooks
-//------------------------------------------------------------
-
-func (a *Anniversary) PreInsert(s gorp.SqlExecutor) error {
-	a.Id = id.Generate()
-	a.CreatedTime = time.Now().UnixMilli()
-
-	buf, err := json.Marshal(a.SharedWith)
-	if err != nil {
-		a.SharedWithMarshaled = ""
-	}
-	a.SharedWithMarshaled = string(buf)
-	return nil
-}
-
-func (a *Anniversary) PostGet(s gorp.SqlExecutor) error {
-	err := json.Unmarshal([]byte(a.SharedWithMarshaled), &a.SharedWith)
-	return err
 }

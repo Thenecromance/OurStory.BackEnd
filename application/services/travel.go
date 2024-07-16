@@ -8,7 +8,6 @@ import (
 	"github.com/Thenecromance/OurStories/utility/helper"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -20,20 +19,20 @@ type travelUpdater interface {
 	UpdateState(id string, state int) error
 	UpdateLocation(id string, location string) error
 	UpdateDetails(id string, details string) error
-	UpdateTogetherWith(id string, togetherWith []int) error
+	UpdateTogetherWith(id string, togetherWith []int64) error
 	UpdateStartTime(id string, startTime int64) error
 	UpdateEndTime(id string, endTime int64) error
-	UpdateOwner(id string, owner int) error
+	UpdateOwner(id string, owner int64) error
 	UpdateToDb(id string) error
-	Update(obj *models.TravelDTO) error
+	Update(obj *models.Travel) error
 }
 
 type travelGetter interface {
-	GetTravelByID(id string, userId int) (*models.TravelDTO, error)
-	GetTravelByOwner(owner int64) ([]models.TravelDTO, error)
-	GetTravelByLocation(location string) ([]models.TravelDTO, error)
-	GetTravelByState(state int) ([]models.TravelDTO, error)
-	GetTravelList(userId int64) ([]models.TravelDTO, error)
+	GetTravelByID(id string, userId int64) (*models.Travel, error)
+	GetTravelByOwner(owner int64) ([]models.Travel, error)
+	GetTravelByLocation(location string) ([]models.Travel, error)
+	GetTravelByState(state int) ([]models.Travel, error)
+	GetTravelList(userId int64) ([]models.Travel, error)
 }
 
 // TravelService is interface for travel service
@@ -41,21 +40,21 @@ type TravelService interface {
 	travelGetter
 	travelUpdater
 
-	CreateTravel(dto *models.TravelDTO) error
-	DeleteTravel(id string, userId int) error
+	CreateTravel(dto *models.Travel) error
+	DeleteTravel(id string, userId int64) error
 }
 
 type travelId = string
 
 // todo: use ICache to store the travel info,due to ICache only implements LRU, so  temp to use map instead.
-type travelMap = map[travelId]*models.TravelDTO
+type travelMap = map[travelId]*models.Travel
 
 // ---------------------------------
 // updater object
 // ---------------------------------
 // using a type to store the travel info , decrease the code duplication
 type updatingTravel struct {
-	*models.TravelDTO
+	*models.Travel
 	needUpdate bool
 }
 
@@ -80,7 +79,7 @@ func (u *updatingTravel) updateDetails(details string) {
 	u.needUpdate = true
 	u.Details = details
 }
-func (u *updatingTravel) updateTogetherWith(togetherWith []int) {
+func (u *updatingTravel) updateTogetherWith(togetherWith []int64) {
 	if togetherWith == nil {
 		return
 	}
@@ -102,7 +101,7 @@ func (u *updatingTravel) updateEndTime(endTime int64) {
 	u.needUpdate = true
 	u.EndTime = endTime
 }
-func (u *updatingTravel) updateOwner(owner int) {
+func (u *updatingTravel) updateOwner(owner int64) {
 	if owner <= 0 {
 		return
 	}
@@ -110,9 +109,9 @@ func (u *updatingTravel) updateOwner(owner int) {
 	u.UserId = owner
 }
 
-func newUpdater(travel *models.TravelDTO) *updatingTravel {
+func newUpdater(travel *models.Travel) *updatingTravel {
 	return &updatingTravel{
-		TravelDTO:  travel,
+		Travel:     travel,
 		needUpdate: false,
 	}
 
@@ -128,8 +127,8 @@ type travelServiceImpl struct {
 	updatingCache map[travelId]*updatingTravel
 }
 
-func travelToDTO(travel *models.Travel) *models.TravelDTO {
-	dto := &models.TravelDTO{
+/*func travelToDTO(travel *models.Travel) *models.Travel {
+	dto := &models.Travel{
 		Id:           travel.Id,
 		State:        travel.State,
 		UserId:       travel.UserId,
@@ -150,7 +149,7 @@ func travelToDTO(travel *models.Travel) *models.TravelDTO {
 	parseTravelState(dto) // update the state of the travel
 	return dto
 }
-func dtoToTravel(travel *models.TravelDTO) *models.Travel {
+func dtoToTravel(travel *models.Travel) *models.Travel {
 	parseTravelState(travel)
 	obj := &models.Travel{
 		Id:           travel.Id,
@@ -171,9 +170,9 @@ func dtoToTravel(travel *models.TravelDTO) *models.Travel {
 	}
 
 	return obj
-}
+}*/
 
-func parseTravelState(travel *models.TravelDTO) {
+func parseTravelState(travel *models.Travel) {
 	now := time.Now().Unix()
 	if travel.StartTime > now {
 		travel.State = models.TravelStatePending
@@ -201,7 +200,7 @@ func (t *travelServiceImpl) getUpdaterObject(id string) *updatingTravel {
 }
 
 // userInTravel check if the user in the travel
-func (t *travelServiceImpl) userInTravel(travel *models.TravelDTO, userId int) bool {
+func (t *travelServiceImpl) userInTravel(travel *models.Travel, userId int64) bool {
 	if userId == travel.UserId {
 		return true
 	}
@@ -213,7 +212,7 @@ func (t *travelServiceImpl) userInTravel(travel *models.TravelDTO, userId int) b
 	return false
 }
 
-func (t *travelServiceImpl) getTravelData(travelId string) *models.TravelDTO {
+func (t *travelServiceImpl) getTravelData(travelId string) *models.Travel {
 	if travel, ok := t.cache[travelId]; ok {
 		return travel
 	}
@@ -231,12 +230,12 @@ func (t *travelServiceImpl) getTravelData(travelId string) *models.TravelDTO {
 		log.Warnf("getTravelData error: %v", err)
 		return nil
 	}
-	t.cache[travelId] = travelToDTO(travel)
+	t.cache[travelId] = travel
 
-	return travelToDTO(travel)
+	return travel
 }
 
-func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelByID(id string, userId int64) (*models.Travel, error) {
 	log.Debug("start to get travel by id:", id)
 	dto := t.getTravelData(id)
 	if dto == nil {
@@ -253,59 +252,63 @@ func (t *travelServiceImpl) GetTravelByID(id string, userId int) (*models.Travel
 	return nil, fmt.Errorf("user not in travel")
 }
 
-func (t *travelServiceImpl) GetTravelByOwner(owner int64) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelByOwner(owner int64) ([]models.Travel, error) {
 	travels, err := t.repo.GetTravelByOwner(owner)
 	if err != nil {
 		log.Errorf("GetTravelByOwner error: %v", err)
 		return nil, errors.New("no travel data in db")
 	}
-	var returnObjs []models.TravelDTO
+	var returnObjs []models.Travel
 	for _, v := range travels {
-		returnObjs = append(returnObjs, *travelToDTO(&v))
+		travel := v
+		returnObjs = append(returnObjs, travel)
 	}
 	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelByLocation(location string) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelByLocation(location string) ([]models.Travel, error) {
 	travels, err := t.repo.GetTravelByLocation(location)
 	if err != nil {
 		log.Errorf("GetTravelByLocation error: %v", err)
 		return nil, errors.New("no travel data in db")
 	}
 
-	var returnObjs []models.TravelDTO
+	var returnObjs []models.Travel
 	for _, v := range travels {
-		returnObjs = append(returnObjs, *travelToDTO(&v))
+		travel := v
+		returnObjs = append(returnObjs, travel)
 	}
 
 	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelByState(state int) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelByState(state int) ([]models.Travel, error) {
 	travels, err := t.repo.GetTravelByState(state)
 	if err != nil {
 		log.Errorf("GetTravelByState error: %v", err)
 		return nil, errors.New("no travel data in db")
 	}
 
-	var returnObjs []models.TravelDTO
+	var returnObjs []models.Travel
 	for _, v := range travels {
-		returnObjs = append(returnObjs, *travelToDTO(&v))
+		travel := v
+		returnObjs = append(returnObjs, travel)
 	}
 
 	return returnObjs, nil
 }
 
-func (t *travelServiceImpl) GetTravelList(userId int64) ([]models.TravelDTO, error) {
+func (t *travelServiceImpl) GetTravelList(userId int64) ([]models.Travel, error) {
 	travels, err := t.repo.GetTravelListByID(userId)
 	if err != nil {
 		log.Errorf("GetTravelList error: %v", err)
 		return nil, errors.New("no travel data in db")
 	}
 
-	var returnObjs []models.TravelDTO
+	var returnObjs []models.Travel
 	for _, v := range travels {
-		returnObjs = append(returnObjs, *travelToDTO(&v))
+		travel := v
+		returnObjs = append(returnObjs, travel)
 	}
 
 	return returnObjs, nil
@@ -342,7 +345,7 @@ func (t *travelServiceImpl) UpdateDetails(id string, details string) error {
 	return nil
 }
 
-func (t *travelServiceImpl) UpdateTogetherWith(id string, togetherWith []int) error {
+func (t *travelServiceImpl) UpdateTogetherWith(id string, togetherWith []int64) error {
 	log.Debugf("UpdateTogetherWith id: %s, togetherWith: %v", id, togetherWith)
 	obj := t.getUpdaterObject(id)
 	if obj == nil {
@@ -373,7 +376,7 @@ func (t *travelServiceImpl) UpdateEndTime(id string, endTime int64) error {
 	return nil
 }
 
-func (t *travelServiceImpl) UpdateOwner(id string, owner int) error {
+func (t *travelServiceImpl) UpdateOwner(id string, owner int64) error {
 	/*travel, err := t.GetTravelByID(id)
 	if err != nil {
 		return err
@@ -395,12 +398,12 @@ func (t *travelServiceImpl) UpdateOwner(id string, owner int) error {
 func (t *travelServiceImpl) UpdateToDb(id string) error {
 	log.Debugf("UpdateToDb id: %s", id)
 
-	obj := t.getUpdaterObject(id).TravelDTO
+	obj := t.getUpdaterObject(id)
 	if obj == nil {
 		return fmt.Errorf("UpdateToDb error: %s", "getUpdaterObject return nil")
 	}
 	// trying to update to db (transaction)
-	err := t.repo.UpdateTravel(dtoToTravel(obj))
+	err := t.repo.UpdateTravel(obj.Travel)
 	if err != nil {
 		// if failed , need to handle the cache
 		panic("something wrong with db, need to handle the cache here")
@@ -408,14 +411,15 @@ func (t *travelServiceImpl) UpdateToDb(id string) error {
 	}
 
 	// if update success, remove the cache, sync back to cache
-	t.cache[id] = obj
+	t.cache[id] = obj.Travel
 	delete(t.updatingCache, id) // erase the updating cache
 	return nil
 
 }
 
-func (t *travelServiceImpl) Update(obj *models.TravelDTO) error {
-	o := t.getUpdaterObject(strconv.Itoa(obj.Id))
+func (t *travelServiceImpl) Update(obj *models.Travel) error {
+
+	o := t.getUpdaterObject(strconv.FormatInt(obj.Id, 10))
 	if o == nil {
 		return fmt.Errorf("update error: %s", "getUpdaterObject return nil")
 	}
@@ -432,7 +436,7 @@ func (t *travelServiceImpl) Update(obj *models.TravelDTO) error {
 		return nil
 	}
 
-	err := t.UpdateToDb(strconv.Itoa(o.Id))
+	err := t.UpdateToDb(strconv.FormatInt(o.Id, 10))
 	if err != nil {
 		log.Errorf("Update error: %v", err)
 		return err
@@ -441,16 +445,16 @@ func (t *travelServiceImpl) Update(obj *models.TravelDTO) error {
 
 }
 
-func (t *travelServiceImpl) CreateTravel(dto *models.TravelDTO) error {
+func (t *travelServiceImpl) CreateTravel(travel *models.Travel) error {
 	if t.repo == nil {
 		panic("repo is nil")
 	}
 
-	travel := dtoToTravel(dto)
+	//travel := dtoToTravel(dto)
 	return t.repo.CreateTravel(travel)
 }
 
-func (t *travelServiceImpl) DeleteTravel(id string, userId int) error {
+func (t *travelServiceImpl) DeleteTravel(id string, userId int64) error {
 
 	dto, err := t.GetTravelByID(id, userId)
 	if err != nil {

@@ -33,18 +33,23 @@ type UserRepository interface {
 	UpdateLastLogin(id int64, unix int64) error
 }
 
+const (
+	UserDbName = "Users"
+)
+
 type user struct {
 	db *gorp.DbMap
 }
 
 func (u *user) BindTable() error {
 	u.db.AddTableWithName(models.User{}, "Users")
+	u.db.AddTableWithName(models.LoginLogs{}, "LoginLogs")
 	return nil
 }
 
 func (u *user) GetUserIdByName(username string) (int64, error) {
 
-	selectInt, err := u.db.SelectInt("select id from user where username = ?", username)
+	selectInt, err := u.db.SelectInt("select user_id from "+UserDbName+" where username = ?", username)
 	if err != nil {
 		return -1, err
 	}
@@ -85,7 +90,8 @@ func (u *user) UpdateLastLogin(id int64, unix int64) error {
 		return err
 	}
 
-	_, err = trans.Exec("update user set last_login = ? where id = ?", unix, id)
+	/*_, err = trans.Exec("update Users set last_login = ? where user_id = ?", unix, id)*/
+	_, err = trans.Update(&models.LoginLogs{UserId: id})
 	if err != nil {
 		log.Errorf("failed to update last login with error: %s", err.Error())
 		trans.Rollback()
@@ -96,22 +102,18 @@ func (u *user) UpdateLastLogin(id int64, unix int64) error {
 }
 
 func (u *user) InsertUser(user *models.User) error {
-	transaction, err := u.db.Begin()
+
+	err := u.db.Insert(user)
 	if err != nil {
-		return err
-	}
-	err = transaction.Insert(user)
-	if err != nil {
-		transaction.Rollback()
+
 		log.Errorf("failed to insert user with error: %s", err.Error())
 		return err
 	}
-
-	return transaction.Commit()
+	return nil
 }
 
 func (u *user) HasUser(username string) {
-	obj, err := u.db.SelectInt("select count(*) from user where username = ?", username)
+	obj, err := u.db.SelectInt("select count(*) from Users where username = ?", username)
 	if err != nil {
 		return
 	}
@@ -122,7 +124,7 @@ func (u *user) HasUser(username string) {
 }
 
 func (u *user) HasId(id int64) bool {
-	obj, err := u.db.SelectInt("select count(*) from user where id = ?", id)
+	obj, err := u.db.SelectInt("select count(*) from Users where id = ?", id)
 	if err != nil {
 		return false
 	}
@@ -133,7 +135,7 @@ func (u *user) HasId(id int64) bool {
 }
 
 func (u *user) HasUserAndEmail(username, email string) bool {
-	obj, err := u.db.SelectInt("select count(*) from user where username = ? or email = ?", username, email)
+	obj, err := u.db.SelectInt("select count(*) from Users where username = ? or email = ?", username, email)
 	if err != nil {
 		return false
 	}

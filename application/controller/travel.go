@@ -70,7 +70,7 @@ func (tc *TravelController) getTravel(ctx *gin.Context) {
 	travelID := ctx.Query("id")
 
 	//parse user id
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	log.Debugf("uid: %d", uid)
 	//get travel from database
 	travel, err := tc.service.GetTravelByID(travelID, uid)
@@ -93,10 +93,10 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
-	dto := &models.TravelDTO{}
+	dto := &models.Travel{}
 	if err := ctx.ShouldBindJSON(dto); err != nil {
 		resp.Error("invalid request")
 		return
@@ -129,10 +129,10 @@ func (tc *TravelController) updateTravel(ctx *gin.Context) {
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
-	dto := &models.TravelDTO{}
+	dto := &models.Travel{}
 	if err := ctx.ShouldBindJSON(dto); err != nil {
 		resp.Error("invalid request")
 		return
@@ -165,7 +165,7 @@ func (tc *TravelController) deleteTravel(ctx *gin.Context) {
 		return
 	}
 
-	uid := int(obj.(map[string]interface{})["id"].(float64))
+	uid := obj.(map[string]interface{})["id"].(int64)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 	id := ctx.Query("id")
 

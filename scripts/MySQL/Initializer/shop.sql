@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS TransactionLogs (
 CREATE TABLE IF NOT EXISTS UserBalances (
     user_id BIGINT PRIMARY KEY,
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    updated_at INT NOT NULL,
+    updated_at BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 

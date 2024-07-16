@@ -1,10 +1,5 @@
 package models
 
-import (
-	"github.com/Thenecromance/OurStories/utility/id"
-	"gopkg.in/gorp.v2"
-)
-
 // Relationship is the struct that defines the relationship between users which stores in the database
 type Relationship struct {
 	RelationId    int64  `json:"relation_id" db:"relation_id"`
@@ -46,10 +41,4 @@ type RelationShipHistory struct {
 	ReceiverID int64 `json:"target_id" db:"target_id"`
 
 	OperationUser int64 `json:"operation_user" db:"operation_user"`
-}
-
-func (r *Relationship) PreInsert(s gorp.SqlExecutor) error {
-	r.RelationId = id.Generate()
-
-	return nil
 }
