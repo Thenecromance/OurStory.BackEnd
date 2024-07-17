@@ -34,4 +34,6 @@ CREATE TABLE IF NOT EXISTS RelationLogs(
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (target_id) REFERENCES Users(user_id),
     FOREIGN KEY (operation_user) REFERENCES Users(user_id)
+    on update cascade 
+    on delete cascade
 );

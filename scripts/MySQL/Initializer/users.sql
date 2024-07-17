@@ -8,7 +8,6 @@ CREATE table IF NOT EXISTS Users (
     birthday BIGINT NOT NULL,
     gender VARCHAR(10) DEFAULT 'unknown',
     created_at  BIGINT NOT NULL,
-    last_login  BIGINT NOT NULL,
     pass_word VARCHAR(255) NOT NULL ,
     salt VARCHAR(255) NOT NULL
 );
@@ -19,4 +18,6 @@ CREATE TABLE IF NOT EXISTS LoginLogs(
     user_id BIGINT NOT NULL , 
     login_time BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    on update cascade 
+    on delete cascade
 );

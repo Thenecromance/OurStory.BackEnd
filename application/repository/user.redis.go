@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"encoding/json"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/cache/redisCache"
+	"github.com/goccy/go-json"
 	"strconv"
 	"time"
 )
@@ -38,7 +38,13 @@ func (u userRedis) GetUser(id int64) (*models.User, error) {
 		return nil, err
 	}
 
-	return obj.(*models.User), nil
+	usr := &models.User{}
+	err = json.Unmarshal([]byte(obj.(string)), usr)
+	if err != nil {
+		return nil, err
+	}
+
+	return usr, nil
 }
 
 // GetUsers

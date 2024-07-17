@@ -105,6 +105,7 @@ func (u *user) dbGetUserIdByName(username string) (int64, error) {
 func (u *user) GetUser(id int64) (*models.User, error) {
 	//models.User
 	if cache, ok := u.cache.(HasGetUser); ok {
+		log.Debug("get user from cache")
 		usr, err := cache.GetUser(id)
 		if usr != nil && err == nil {
 			return usr, nil

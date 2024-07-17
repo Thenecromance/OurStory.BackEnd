@@ -28,7 +28,7 @@ type UserAdvancedDTO struct {
 	Birthday  int64  `db:"birthday"              json:"birthday"          `
 	Gender    string `db:"gender"                json:"gender"            `
 	CreatedAt int64  `db:"created_at"          json:"created_at"      `
-	LastLogin int64  `db:"last_login"            json:"last_login"        `
+	LastLogin int64  `db:"-"            json:"last_login"        `
 }
 
 // User is full user information

@@ -238,7 +238,7 @@ func Middleware() gin.HandlerFunc {
 func TokenValid(ctx *gin.Context) (bool, error) {
 
 	cookie, err := ctx.Cookie("Authorization")
-	log.Info("Cookie:", cookie)
+
 	if err != nil || cookie == "" {
 		log.Warn("Error while getting token from cookie ", err)
 		return false, errors.New("please login first")
@@ -252,7 +252,9 @@ func ValidAndGetResult(ctx *gin.Context) (any, error) {
 	if err != nil || !ok {
 		return nil, errors.New("please login first")
 	}
-	claims, err := Instance().GetUserClaimFromToken(ctx.GetString("Authorization"))
+
+	token, err := ctx.Cookie("Authorization")
+	claims, err := Instance().GetUserClaimFromToken(token)
 	if err != nil {
 		return nil, errors.New("please login first")
 	}

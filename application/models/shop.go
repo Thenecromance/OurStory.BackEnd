@@ -16,8 +16,10 @@ type Item struct {
 	Publisher   int     `json:"publisher,omitempty" db:"publisher"`
 }
 type UserBalance struct {
-	UserId   int64   `json:"user_id,omitempty" db:"user_id"`
-	Balance  float64 `json:"balance,omitempty" db:"balance"`
+	UserId int64 `json:"user_id,omitempty" db:"user_id"`
+
+	// store the balance of user (just because our shop is not real money, so just use float64 to store the value)
+	Balance  float64 `json:"balance,omitempty" db:"balance"` // if this part bind to real money, please use other way (just like 2 int, or string or something shit )  to store the value to avoid float precision problem
 	UpdateAt int64   `json:"updated_at,omitempty" db:"updated_at"`
 }
 

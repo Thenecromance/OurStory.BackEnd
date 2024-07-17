@@ -86,6 +86,44 @@ func (uc *UserController) hasCredential(ctx *gin.Context) bool {
 	return false
 }
 
+func (uc *UserController) preCheckByToken(ctx *gin.Context, resp *response.Response) bool {
+	token, err := ctx.Cookie("Authorization")
+	log.Debugf(token)
+	if token != "" && err == nil {
+		// check the token is valid
+		ok, err := JWT.TokenValid(ctx)
+		if !ok || err != nil {
+			return false
+		}
+		// get the user info from the token
+		claim, err := JWT.Instance().GetUserClaimFromToken(token)
+		if err != nil {
+			return false
+		}
+
+		if userClaim, ok := claim.(*models.UserClaim); ok {
+			user, err := uc.service.GetUser(userClaim.Id)
+			if user == nil || err != nil {
+				return false
+			}
+			resp.SetCode(response.OK).AddData(user.UserBasicDTO)
+			return true
+		} else {
+			id := int64(claim.(map[string]interface{})["id"].(float64))
+			user, err := uc.service.GetUser(id)
+			if user == nil || err != nil {
+				return false
+			}
+			resp.SetCode(response.OK).AddData(user.UserBasicDTO)
+
+			return true
+		}
+
+	}
+	return false
+}
+
+// login  337.7µs about ~3000 QPS
 func (uc *UserController) login(ctx *gin.Context) {
 
 	resp := response.New()
@@ -96,14 +134,10 @@ func (uc *UserController) login(ctx *gin.Context) {
 		return
 	}*/
 
-	_, exists := ctx.Get("Authorization")
-	if exists {
-		ok, err := JWT.TokenValid(ctx)
-		if err != nil || !ok {
-			log.Error("token valid failed :", err)
-			resp.SetCode(response.BadRequest).AddData("Invalid request")
-			return
-		}
+	// use the token to check if the user is already login
+	// if the user is already login, return the user info to the client
+	if uc.preCheckByToken(ctx, resp) {
+		return
 	}
 
 	info := models.UserLogin{}
@@ -118,7 +152,7 @@ func (uc *UserController) login(ctx *gin.Context) {
 
 	loginSuccess, err := uc.service.AuthorizeUser(&info)
 	if err != nil {
-		log.Error("authorize user failed :", err)
+		log.Info("authorize user failed :", err)
 		resp.SetCode(response.BadRequest).AddData("Invalid username or password")
 		return
 	}

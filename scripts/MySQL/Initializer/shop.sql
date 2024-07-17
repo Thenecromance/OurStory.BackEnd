@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS CartedItems(
     PRIMARY KEY (cart_id, item_id),
     FOREIGN KEY (cart_id) REFERENCES Carts(cart_id),
     FOREIGN KEY (item_id) REFERENCES Items(item_id)
+    on update cascade 
+    on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS Transactions ( 
@@ -44,6 +46,8 @@ CREATE TABLE IF NOT EXISTS TransactionLogs (
     log_message TEXT NOT NULL,
     logged_at BIGINT  NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES Transactions(transaction_id)
+    on update cascade 
+    on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS UserBalances (
@@ -51,6 +55,8 @@ CREATE TABLE IF NOT EXISTS UserBalances (
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     updated_at BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    on update cascade 
+    on delete cascade
 );
 
 

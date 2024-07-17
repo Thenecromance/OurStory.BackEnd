@@ -41,12 +41,8 @@ func (us *userServiceImpl) GetUserByUsername(username string) (*models.User, err
 func (us *userServiceImpl) AuthorizeUser(login *models.UserLogin) (bool, error) {
 
 	usrInDb, err := us.repo.GetUserByUsername(login.UserName)
-	if err != nil {
-		log.Error("error in getting user", err)
-		return false, err
-	}
-	if usrInDb == nil {
-		log.Error("user not found")
+	if usrInDb == nil || err != nil {
+		log.Warn("user not found")
 		return false, nil
 	}
 
