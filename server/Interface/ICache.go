@@ -42,3 +42,8 @@ type CacheSupportHash interface {
 	HashSetObject(key string, obj interface{}, expire time.Duration) error
 	HashGetObject(key string, obj interface{}) error
 }
+
+type HasTransform interface {
+	To() interface{}
+	From(interface{})
+}

@@ -6,6 +6,9 @@ import (
 	"github.com/Thenecromance/OurStories/server/setting"
 	"github.com/Thenecromance/OurStories/utility/log"
 	"github.com/gin-gonic/gin"
+	"github.com/uptrace/uptrace-go/uptrace"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel/attribute"
 	"net/http"
 )
 
@@ -192,6 +195,19 @@ func (s *Server) initializeGinRoutes() {
 
 // Run will Start the server
 func (s *Server) Run() error {
+
+	uptrace.ConfigureOpentelemetry(
+		// copy your project DSN here or use UPTRACE_DSN env var
+		uptrace.WithDSN("https://vsi1N0l7MkZw-VNTRJQIOQ@api.uptrace.dev?grpc=4317"),
+		uptrace.WithServiceName("ourStory"),
+		uptrace.WithServiceVersion("v1.0.0"),
+		uptrace.WithResourceAttributes(
+			attribute.String("deployment.environment", "production"),
+		),
+	)
+
+	s.gin.Use(otelgin.Middleware("ourStory"))
+
 	s.initialize()
 
 	return s.core.run()

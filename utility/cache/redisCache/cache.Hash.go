@@ -99,6 +99,12 @@ func (c *cache) HashSetObject(key string, obj interface{}, expire time.Duration)
 	defer c.clearInternal()
 	key = c.combineKey(key)
 	c.ctx = context.Background()
+
+	/*	t, ok := obj.(Interface.HasTransform)
+		if ok {
+			obj = t.To()
+		}*/
+
 	err := c.cli.HSet(c.ctx, key, obj).Err()
 	if err != nil {
 		return err
@@ -116,5 +122,21 @@ func (c *cache) HashGetObject(key string, obj interface{}) error {
 	key = c.combineKey(key)
 	c.ctx = context.Background()
 
-	return c.cli.HGetAll(c.ctx, key).Scan(obj)
+	if t, ok := obj.(Interface.HasTransform); ok {
+		tempObj := t.To()
+		err := c.cli.HGetAll(c.ctx, key).Scan(tempObj)
+		if err != nil {
+			return err
+
+		}
+		t.From(tempObj)
+		return nil
+	}
+
+	err := c.cli.HGetAll(c.ctx, key).Scan(obj)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

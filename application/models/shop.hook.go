@@ -65,11 +65,7 @@ func (t *Transaction) PostInsert(s gorp.SqlExecutor) error {
 	if err := applyTransactionToUserBalance(s, t); err != nil {
 		return err
 	}
-	return s.Insert(&TransactionLog{
-		TransactionId: t.TransactionId,
-		Message:       "Transaction created",
-		TimeStamp:     t.TimeStamp,
-	})
+	return nil
 }
 
 func (t *TransactionLog) PreInsert(s gorp.SqlExecutor) error {

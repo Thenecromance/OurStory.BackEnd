@@ -152,7 +152,12 @@ func (t *travelRepository) dbUpdateTravel(info *models.Travel) error {
 
 func (t *travelRepository) GetTravelByID(travelId int64) (*models.Travel, error) {
 	if cache, ok := t.cache.(HasGetTravelByID); ok {
-		return cache.GetTravelByID(travelId)
+		travel, err := cache.GetTravelByID(travelId)
+		if err == nil {
+			log.Info("cache hit")
+			return travel, nil
+		}
+		log.Info("cache missed")
 	}
 
 	return t.dbGetTravelByID(travelId)
@@ -256,7 +261,8 @@ func (t *travelRepository) dbGetTravelListByID(id int64) ([]models.Travel, error
 
 func NewTravelRepository(db *gorp.DbMap) TravelRepository {
 	tr := &travelRepository{
-		db: db,
+		db:    db,
+		cache: newTravelCache(),
 	}
 
 	return tr

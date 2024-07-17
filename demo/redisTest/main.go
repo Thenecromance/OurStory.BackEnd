@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/cache/redisCache"
+	"math"
 	"strconv"
 )
 
@@ -76,26 +78,17 @@ func cacheObject(cache Interface.ICache) {
 	if !ok {
 		fmt.Println("cache does not support object")
 	}
-	type Object struct {
-		Name  string `redis:"name"`
-		Age   int    `redis:"age"`
-		Value []byte `redis:"value"`
-	}
-	old := Object{
-		Name: "name",
-		Age:  10,
-		Value: []byte{
-			1, 2, 3, 4, 5,
-		},
-	}
+	old := models.Travel{}
+	old.TogetherWith = append(old.TogetherWith, math.MaxInt64)
 
 	err := c.HashSetObject("object2", &old, 0)
 	if err != nil {
+		panic(err)
 		fmt.Println("1", err)
 		return
 	}
 
-	var obj Object
+	var obj models.Travel
 	err = c.HashGetObject("object2", &obj)
 	if err != nil {
 		fmt.Println("2", err)
@@ -105,7 +98,7 @@ func cacheObject(cache Interface.ICache) {
 }
 
 func main() {
-	cache := redisCache.NewCache()
+	cache := redisCache.NewCacheWithDb(1)
 
 	//cacheBase(cache)
 	//cacheList(cache)

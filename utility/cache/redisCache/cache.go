@@ -2,6 +2,7 @@ package redisCache
 
 import (
 	"context"
+	"github.com/Thenecromance/OurStories/utility/cache/redisCache/hook"
 	"github.com/redis/go-redis/v9"
 	"strings"
 	"time"
@@ -105,7 +106,9 @@ func NewCache() Interface.ICache {
 }
 
 func NewCacheWithDb(db int) Interface.ICache {
-	return &cache{
+	cli := &cache{
 		cli: NoSQL.NewRedisWithDb(db),
 	}
+	cli.cli.AddHook(hook.Int64SliceSupport{})
+	return cli
 }

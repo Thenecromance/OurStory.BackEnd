@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Thenecromance/OurStories/application/models"
 	"github.com/Thenecromance/OurStories/server/Interface"
 	"github.com/Thenecromance/OurStories/utility/cache/redisCache"
@@ -58,23 +59,45 @@ func (t travelRedis) GetTravelByID(travelId int64) (*models.Travel, error) {
 }
 
 func (t travelRedis) GetTravelByOwner(owner int64) ([]models.Travel, error) {
-	//TODO implement me
-	panic("implement me")
+	t.cli.Prefix(prefixTravelIdToObject)
+	cache, ok := t.cli.(Interface.CacheSupportList)
+	if !ok {
+		//todo: implement me
+
+		return nil, fmt.Errorf("not implemented")
+	}
+	travelIds, err := cache.ListRange(strconv.FormatInt(owner, 10), 0, -1)
+	if err != nil {
+		return nil, err
+	}
+	var travels []models.Travel
+	for _, id := range travelIds {
+		iid, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		travel, err := t.GetTravelByID(iid)
+		if err != nil {
+			return nil, err
+		}
+		travels = append(travels, *travel)
+	}
+
+	return travels, nil
+
 }
 
 func (t travelRedis) GetTravelByLocation(location string) ([]models.Travel, error) {
-	//TODO implement me
-	panic("implement me")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (t travelRedis) GetTravelByState(state int) ([]models.Travel, error) {
-	//TODO implement me
-	panic("implement me")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (t travelRedis) GetTravelListByID(id int64) ([]models.Travel, error) {
-	//TODO implement me
-	panic("implement me")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func newTravelCache() TravelRepository {
