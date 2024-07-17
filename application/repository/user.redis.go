@@ -29,22 +29,25 @@ func (u userRedis) BindTable() error {
 }
 
 func (u userRedis) GetUser(id int64) (*models.User, error) {
-	/*//TODO implement me
-	panic("implement me")*/
 	u.cli.Prefix(prefixIdToObject)
-	sId := strconv.FormatInt(id, 10)
-	obj, err := u.cli.Get(sId)
-	if err != nil {
-		return nil, err
-	}
 
-	usr := &models.User{}
-	err = json.Unmarshal([]byte(obj.(string)), usr)
-	if err != nil {
-		return nil, err
-	}
+	{
+		/*//TODO implement me
+		panic("implement me")*/
+		sId := strconv.FormatInt(id, 10)
+		obj, err := u.cli.Get(sId)
+		if err != nil {
+			return nil, err
+		}
 
-	return usr, nil
+		usr := &models.User{}
+		err = json.Unmarshal([]byte(obj.(string)), usr)
+		if err != nil {
+			return nil, err
+		}
+
+		return usr, nil
+	}
 }
 
 // GetUsers
@@ -79,12 +82,14 @@ func (u userRedis) GetUserIdByName(username string) (int64, error) {
 // key: user.id.{id} value: user object (json)
 func (u userRedis) addIdToUser(user *models.User) error {
 	u.cli.Prefix(prefixIdToObject)
+
 	sId := strconv.FormatInt(user.UserId, 10)
 	buf, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 	return u.cli.Set(sId, string(buf), cacheExpireTime)
+
 }
 
 // addNameToId add username to cache create a key with prefixNameToId and value is user id
@@ -101,19 +106,20 @@ func (u userRedis) addEmailToId(user *models.User) error {
 
 func (u userRedis) deleteAll(user *models.User) error {
 	u.cli.Prefix(prefixIdToObject)
+
 	sId := strconv.FormatInt(user.UserId, 10)
+
 	err := u.cli.Delete(sId)
 	if err != nil {
 		return err
 	}
+
 	u.cli.Prefix(prefixNameToId)
-	err = u.cli.Delete(user.UserName)
-	if err != nil {
+	if err := u.cli.Delete(user.UserName); err != nil {
 		return err
 	}
 	u.cli.Prefix(prefixEmailToId)
 	return u.cli.Delete(user.Email)
-
 }
 
 func (u userRedis) InsertUser(user *models.User) error {
@@ -159,6 +165,7 @@ func (u userRedis) HasId(id int64) bool {
 
 func (u userRedis) hasEmail(email string) bool {
 	u.cli.Prefix(prefixEmailToId)
+
 	obj, err := u.cli.Get(email)
 	if err != nil {
 		return false
@@ -171,6 +178,7 @@ func (u userRedis) hasEmail(email string) bool {
 }
 
 func (u userRedis) HasUserAndEmail(username, email string) bool {
+
 	return u.HasUser(username) || u.hasEmail(email)
 }
 

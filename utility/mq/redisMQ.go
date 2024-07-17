@@ -4,9 +4,10 @@ import (
 	"context"
 	"sync"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/utility/log"
-	"github.com/go-redis/redis/v8"
 )
 
 type CallbackList = []Callback

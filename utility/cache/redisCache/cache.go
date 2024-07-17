@@ -10,6 +10,18 @@ import (
 	"github.com/Thenecromance/OurStories/server/Interface"
 )
 
+/*
+future work:
+	change to a new framework to speed up data processing, just simulate CPU structures
+	- L1: use local memory to store data
+	- L2: use redis or other cache to store hotspot data
+	- L3: use mysql for data persistence
+
+fuck this crazy idea....
+at least 1 server , 1 redis server ,1 mysql ,1 data profiler server
+tooooooooooooooooooo expensive
+*/
+
 type cache struct {
 	cli *redis.Client
 	ctx context.Context

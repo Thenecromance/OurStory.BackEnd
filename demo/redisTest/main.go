@@ -89,7 +89,7 @@ func cacheObject(cache Interface.ICache) {
 		},
 	}
 
-	err := c.HashSetObject("object2", &old)
+	err := c.HashSetObject("object2", &old, 0)
 	if err != nil {
 		fmt.Println("1", err)
 		return

@@ -3,6 +3,7 @@ package redisCache
 import (
 	"context"
 	"github.com/Thenecromance/OurStories/server/Interface"
+	"time"
 )
 
 const (
@@ -11,13 +12,19 @@ const (
 
 var _ Interface.CacheSupportHash = &cache{}
 
-func (c *cache) HashSet(key string, field string, value interface{}) error {
+func (c *cache) HashSet(key string, field string, value interface{}, expire time.Duration) error {
 	c.internal = hash_internal_
 	defer c.clearInternal()
 	key = c.combineKey(key)
 	c.ctx = context.Background()
 
 	_, err := c.cli.HSet(c.ctx, key, field, value).Result()
+	if err != nil {
+		return err
+	}
+	if expire != 0 {
+		c.cli.Expire(c.ctx, key, expire)
+	}
 	return err
 }
 
@@ -86,14 +93,21 @@ func (c *cache) HashGetAll(key string) (map[string]string, error) {
 	return c.cli.HGetAll(c.ctx, key).Result()
 }
 
-func (c *cache) HashSetObject(key string, obj interface{}) error {
+func (c *cache) HashSetObject(key string, obj interface{}, expire time.Duration) error {
 
 	c.internal = hash_internal_
 	defer c.clearInternal()
 	key = c.combineKey(key)
 	c.ctx = context.Background()
+	err := c.cli.HSet(c.ctx, key, obj).Err()
+	if err != nil {
+		return err
+	}
 
-	return c.cli.HSet(c.ctx, key, obj).Err()
+	if expire != 0 {
+		c.cli.Expire(c.ctx, key, expire)
+	}
+	return nil
 }
 
 func (c *cache) HashGetObject(key string, obj interface{}) error {

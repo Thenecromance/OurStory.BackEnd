@@ -30,7 +30,7 @@ type CacheSupportSet interface {
 }
 
 type CacheSupportHash interface {
-	HashSet(key string, field string, value interface{}) error
+	HashSet(key string, field string, value interface{}, expire time.Duration) error
 	HashGet(key string, field string) (any, error)
 	HashDel(key string, field string) error
 	HashExists(key string, field string) (bool, error)
@@ -39,6 +39,6 @@ type CacheSupportHash interface {
 	HashLength(key string) (int64, error)
 	HashGetAll(key string) (map[string]string, error)
 
-	HashSetObject(key string, obj interface{}) error
+	HashSetObject(key string, obj interface{}, expire time.Duration) error
 	HashGetObject(key string, obj interface{}) error
 }

@@ -9,3 +9,6 @@ the base of the project is the MVC architecture, the project is divided into 5 l
 - **Service**: contains the classes that contain the business logic.
 - **Controller**: contains the classes that handle the requests and responses.
 - **View**: just let gin handle the views.
+
+
+
