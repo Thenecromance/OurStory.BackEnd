@@ -2,19 +2,21 @@ package redisCache
 
 import (
 	"context"
+	"github.com/redis/go-redis/v9"
 	"strings"
 	"time"
 
 	"github.com/Thenecromance/OurStories/SQL/NoSQL"
 	"github.com/Thenecromance/OurStories/server/Interface"
-	"github.com/go-redis/redis/v8"
 )
 
 type cache struct {
 	cli *redis.Client
+	ctx context.Context
 
-	_prefix string
-	_sufix  string
+	internal string
+	_prefix  string
+	suffix   string
 }
 
 // Delete implements Interface.ICache.
@@ -39,7 +41,7 @@ func (c *cache) GetPrefix() string {
 
 // GetSufix implements Interface.ICache.
 func (c *cache) GetSufix() string {
-	return c._sufix
+	return c.suffix
 }
 
 // Prefix implements Interface.ICache.
@@ -54,25 +56,34 @@ func (c *cache) Set(key string, value interface{}, expire time.Duration) error {
 	return cmd.Err()
 }
 
-// Sufix implements Interface.ICache.
-func (c *cache) Sufix(sufix_ string) {
-	c._sufix = sufix_
+// Suffix implements Interface.ICache.
+func (c *cache) Suffix(suffix_ string) {
+	c.suffix = suffix_
 }
 
 func (c *cache) combineKey(key string) string {
 	var builder strings.Builder
+	if c.internal != "" {
+		builder.WriteString(c.internal)
+		builder.WriteString(".")
+	}
+
 	if c._prefix != "" {
 		builder.WriteString(c._prefix)
 		builder.WriteString(".")
 	}
 
 	builder.WriteString(key)
-	if c._sufix != "" {
+	if c.suffix != "" {
 		builder.WriteString(".")
-		builder.WriteString(c._sufix)
+		builder.WriteString(c.suffix)
 	}
 
 	return builder.String()
+}
+
+func (c *cache) clearInternal() {
+	c.internal = ""
 }
 
 func NewCache() Interface.ICache {

@@ -1,8 +1,6 @@
 package NoSQL
 
-import (
-	"github.com/go-redis/redis/v8"
-)
+import "github.com/redis/go-redis/v9"
 
 var (
 	setting *RedisSetting
@@ -14,6 +12,7 @@ func NewRedis() *redis.Client {
 
 func NewRedisWithDb(db int) *redis.Client {
 	opt := LoadSetting().ToRedisOption()
+	
 	opt.DB = db
 	return redis.NewClient(opt)
 }

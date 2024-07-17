@@ -61,12 +61,12 @@ func (tc *TravelController) getTravel(ctx *gin.Context) {
 	travelID := ctx.Query("id")
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
+	log.Debugf("uid: %d", claim.Id)
 	//get travel from database
 	travel, err := tc.service.GetTravelByID(travelID, claim.Id)
 	if err != nil {
@@ -82,12 +82,12 @@ func (tc *TravelController) createTravel(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
+	log.Debugf("uid: %d", claim.Id)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	dto := &models.Travel{}
@@ -117,11 +117,12 @@ func (tc *TravelController) updateTravel(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+
+	log.Debugf("uid: %d", claim.Id)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 
 	dto := &models.Travel{}
@@ -151,11 +152,12 @@ func (tc *TravelController) deleteTravel(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+	log.Debugf("uid: %d", claim.Id)
 	//UserName := obj.(map[string]interface{})["name"].(string)
 	id := ctx.Query("id")
 

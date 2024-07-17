@@ -52,7 +52,7 @@ func (c *cacheImpl) Set(key string, value interface{}, expire time.Duration) err
 }
 
 // Sufix implements Interface.ICache.
-func (c *cacheImpl) Sufix(sufix_ string) {
+func (c *cacheImpl) Suffix(sufix_ string) {
 	c._sufix = sufix_
 }
 

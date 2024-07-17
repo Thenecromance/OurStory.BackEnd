@@ -77,16 +77,16 @@ func cacheObject(cache Interface.ICache) {
 		fmt.Println("cache does not support object")
 	}
 	type Object struct {
-		Name string `redis:"name"`
-		Age  int    `redis:"age"`
-		//value []int  `redis:"value"`
+		Name  string `redis:"name"`
+		Age   int    `redis:"age"`
+		Value []byte `redis:"value"`
 	}
 	old := Object{
 		Name: "name",
 		Age:  10,
-		/*	value: []int{
+		Value: []byte{
 			1, 2, 3, 4, 5,
-		},*/
+		},
 	}
 
 	err := c.HashSetObject("object2", &old)

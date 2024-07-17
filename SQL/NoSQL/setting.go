@@ -1,10 +1,10 @@
 package NoSQL
 
 import (
+	"github.com/redis/go-redis/v9"
 	"time"
 
 	Config "github.com/Thenecromance/OurStories/utility/config"
-	"github.com/go-redis/redis/v8"
 )
 
 type RedisSetting struct {
@@ -58,22 +58,10 @@ type RedisSetting struct {
 	// Minimum number of idle connections which is useful when establishing
 	// new connection is slow.
 	MinIdleConns int `json:"min_idle_conns,omitempty" yaml:"min_idle_conns"`
-	// Connection age at which client retires (closes) the connection.
-	// Default is to not close aged connections.
-	MaxConnAge time.Duration `json:"max_conn_age,omitempty" yaml:"max_conn_age"`
 	// Amount of time client waits for connection if all connections
 	// are busy before returning an error.
 	// Default is ReadTimeout + 1 second.
 	PoolTimeout time.Duration `json:"pool_timeout,omitempty" yaml:"pool_timeout"`
-	// Amount of time after which client closes idle connections.
-	// Should be less than server's timeout.
-	// Default is 5 minutes. -1 disables idle timeout check.
-	IdleTimeout time.Duration `json:"idle_timeout,omitempty" yaml:"idle_timeout"`
-	// Frequency of idle checks made by idle connections reaper.
-	// Default is 1 minute. -1 disables idle connections reaper,
-	// but idle connections are still discarded by the client
-	// if IdleTimeout is set.
-	IdleCheckFrequency time.Duration `json:"idle_check_frequency,omitempty" yaml:"idle_check_frequency"`
 
 	// Enables read only queries on slave nodes.
 	readOnly bool `json:"read_only,omitempty" yaml:"read_only"`
@@ -100,12 +88,9 @@ func (r *RedisSetting) ToRedisOption() *redis.Options {
 		WriteTimeout:    r.WriteTimeout,
 		PoolFIFO:        r.PoolFIFO,
 
-		PoolSize:           r.PoolSize,
-		MinIdleConns:       r.MinIdleConns,
-		MaxConnAge:         r.MaxConnAge,
-		PoolTimeout:        r.PoolTimeout,
-		IdleTimeout:        r.IdleTimeout,
-		IdleCheckFrequency: r.IdleCheckFrequency,
+		PoolSize:     r.PoolSize,
+		MinIdleConns: r.MinIdleConns,
+		PoolTimeout:  r.PoolTimeout,
 		//TLSConfig:          r.TLSConfig,
 	}
 

@@ -123,8 +123,8 @@ func newUpdater(travel *models.Travel) *updatingTravel {
 //---------------------------------
 
 type travelServiceImpl struct {
-	repo          repository.TravelRepository
-	cache         travelMap
+	repo repository.TravelRepository
+
 	updatingCache map[travelId]*updatingTravel
 }
 
@@ -169,9 +169,6 @@ func (t *travelServiceImpl) userInTravel(travel *models.Travel, userId int64) bo
 }
 
 func (t *travelServiceImpl) getTravelData(travelId string) *models.Travel {
-	if travel, ok := t.cache[travelId]; ok {
-		return travel
-	}
 
 	//format the string to int64
 	id, err := strconv.ParseInt(travelId, 10, 64)
@@ -186,7 +183,6 @@ func (t *travelServiceImpl) getTravelData(travelId string) *models.Travel {
 		log.Warnf("getTravelData error: %v", err)
 		return nil
 	}
-	t.cache[travelId] = travel
 
 	return travel
 }
@@ -366,8 +362,6 @@ func (t *travelServiceImpl) UpdateToDb(id string) error {
 		return err
 	}
 
-	// if update success, remove the cache, sync back to cache
-	t.cache[id] = obj.Travel
 	delete(t.updatingCache, id) // erase the updating cache
 	return nil
 
@@ -432,11 +426,6 @@ func (t *travelServiceImpl) DeleteTravel(id string, userId int64) error {
 		return err
 	}
 
-	//remove the cache if exists
-	if _, ok := t.cache[id]; ok {
-		delete(t.cache, id)
-	}
-
 	if _, ok := t.updatingCache[id]; ok {
 		log.Error("DeleteTravel error: %s", "updatingCache should not be contains the id after delete it from db")
 		delete(t.updatingCache, id)
@@ -447,7 +436,6 @@ func (t *travelServiceImpl) DeleteTravel(id string, userId int64) error {
 func NewTravelService(repo repository.TravelRepository) TravelService {
 	return &travelServiceImpl{
 		repo,
-		make(travelMap),
 		make(map[travelId]*updatingTravel),
 	}
 }
