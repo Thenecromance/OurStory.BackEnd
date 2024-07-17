@@ -182,11 +182,12 @@ func (r *relationshipController) getFriendList(ctx *gin.Context) {
 	}
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+	log.Debugf("uid: %d", claim.Id)
 
 	lists := r.service.GetFriendList(claim.Id)
 
@@ -204,12 +205,12 @@ func (r *relationshipController) getHistory(ctx *gin.Context) {
 	}
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
 
+	log.Debugf("uid: %d", claim.Id)
 	if claim.UserName != user {
 		resp.Error("invalid request")
 		return

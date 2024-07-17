@@ -6,6 +6,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// todo: File's WatchDog still haven't been implemented
+
 type watchDog struct {
 	watcher *fsnotify.Watcher
 }

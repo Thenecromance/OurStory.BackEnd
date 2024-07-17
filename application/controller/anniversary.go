@@ -68,11 +68,12 @@ func (c *AnniversaryController) getAnniversary(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+	log.Debugf("uid: %d", claim.Id)
 
 	id := ctx.Query("id")
 
@@ -117,12 +118,12 @@ func (c *AnniversaryController) createAnniversary(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-
+	log.Debugf("uid: %d", claim.Id)
 	anni := models.Anniversary{}
 	if err := ctx.BindJSON(&anni); err != nil {
 		resp.SetCode(response.BadRequest).AddData("Invalid request")
@@ -149,11 +150,12 @@ func (c *AnniversaryController) updateAnniversary(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
+	log.Debugf("uid: %d", claim.Id)
 
 	anni := models.Anniversary{}
 	if err := ctx.BindJSON(&anni); err != nil {
@@ -174,12 +176,12 @@ func (c *AnniversaryController) deleteAnniversary(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-
+	log.Debugf("uid: %d", claim.Id)
 	id := ctx.Query("id")
 	if id == "" {
 		resp.SetCode(response.BadRequest).AddData("Invalid id")
@@ -222,12 +224,12 @@ func (c *AnniversaryController) getAnniversaries(ctx *gin.Context) {
 	defer resp.Send(ctx)
 
 	claim := getAuthObject(ctx)
-	log.Debugf("uid: %d", claim.Id)
+
 	if claim == nil {
 		resp.Unauthorized("please login first")
 		return
 	}
-
+	log.Debugf("uid: %d", claim.Id)
 	anniversaries, err := c.services.GetAnniversaries(claim.Id)
 	if err != nil {
 		log.Warn("failed to get anniversaries", err)
