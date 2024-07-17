@@ -1,67 +1,113 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	SQL "github.com/Thenecromance/OurStories/SQL/redis"
-	"github.com/Thenecromance/OurStories/application/dashboard/models"
-	"log"
+	"github.com/Thenecromance/OurStories/server/Interface"
+	"github.com/Thenecromance/OurStories/utility/cache/redisCache"
+	"strconv"
 )
 
-func main() {
-	ctx := context.Background()
-	cli := SQL.NewRedis()
-	/*routes := []models.Route{
-		{CartId: 1, Name: "Home", Path: "/home2", Component: "/components/Home", AllowRole: Role.Admin},
-		{CartId: 2, Name: "Dashboard", Path: "/dashboard2", Component: "/components/Dashboard", AllowRole: Role.User},
-		{CartId: 3, Name: "Profile", Path: "/profile", Component: "/components/Profile", AllowRole: Role.Admin},
-		{CartId: 4, Name: "Settings", Path: "/settings", Component: "/components/Settings", AllowRole: Role.Master},
+func cacheBase(cache Interface.ICache) {
+	cache.Prefix("base")
+
+	for i := 0; i < 1000; i++ {
+		cache.Set(strconv.Itoa(i), "value"+strconv.Itoa(i), 0)
 	}
 
-	for _, route := range routes {
-		routeJson, err := json.Marshal(route)
+	for i := 0; i < 1000; i++ {
+		data, err := cache.Get(strconv.Itoa(i))
 		if err != nil {
-			log.Fatalf("序列化Route对象失败: %v", err)
+			return
 		}
+		fmt.Println(data)
+	}
+}
 
-		// 将JSON字符串存储在Redis中，以ID为键
-		err = cli.Set(ctx, "route:"+strconv.Itoa(route.CartId), routeJson, 0).Err()
-		if err != nil {
-			log.Fatalf("存储Route对象失败: %v", err)
-		}
+func cacheList(cache Interface.ICache) {
+	c, ok := cache.(Interface.CacheSupportList)
+	if !ok {
+		fmt.Println("cache does not support list")
+	}
 
-		// 将Route对象ID添加到AllowRole对应的集合中
-		sid := strconv.Itoa(route.AllowRole)
-		fmt.Printf("AllowRole: %s\n", sid)
-		err = cli.SAdd(ctx, "role:"+sid, route.CartId).Err()
+	for i := 0; i < 100; i++ {
+		c.ListPush("list", "value"+strconv.Itoa(i))
+	}
+
+	data, err := c.ListRange("list", 0, 50)
+	if err != nil {
+		return
+	}
+	fmt.Println(data)
+
+	/*	for i := 0; i < 100; i++ {
+		data, err := c.ListPop("list")
 		if err != nil {
-			log.Fatalf("添加Route对象ID到角色集合失败: %v", err)
+			return
 		}
+		fmt.Println(data)
 	}*/
 
-	// 根据AllowRole获取Route对象ID列表
-	role := "2"
-	routeIDs, err := cli.SMembers(ctx, "role:"+role).Result()
+}
+
+func cacheSet(cache Interface.ICache) {
+	c, ok := cache.(Interface.CacheSupportSet)
+	if !ok {
+		fmt.Println("cache does not support set")
+	}
+
+	for i := 0; i < 100; i++ {
+		c.SetAdd("demo", "value"+strconv.Itoa(i))
+	}
+
+	for i := 0; i < 100; i++ {
+		data, err := c.SetMembers(strconv.Itoa(i))
+		if err != nil {
+			return
+		}
+		fmt.Println(data)
+	}
+
+	fmt.Println(c.SetIsMember("demo", "value1"))
+
+}
+
+func cacheObject(cache Interface.ICache) {
+	c, ok := cache.(Interface.CacheSupportHash)
+	if !ok {
+		fmt.Println("cache does not support object")
+	}
+	type Object struct {
+		Name string `redis:"name"`
+		Age  int    `redis:"age"`
+		//value []int  `redis:"value"`
+	}
+	old := Object{
+		Name: "name",
+		Age:  10,
+		/*	value: []int{
+			1, 2, 3, 4, 5,
+		},*/
+	}
+
+	err := c.HashSetObject("object2", &old)
 	if err != nil {
-		log.Fatalf("获取角色集合失败: %v", err)
+		fmt.Println("1", err)
+		return
 	}
 
-	fmt.Printf("角色为 %s 的Route对象ID列表: %v\n", role, routeIDs)
-
-	// 根据ID获取Route对象
-	for _, id := range routeIDs {
-		val, err := cli.Get(ctx, "route:"+id).Result()
-		if err != nil {
-			log.Fatalf("获取Route对象失败: %v", err)
-		}
-
-		var route models.Route
-		err = json.Unmarshal([]byte(val), &route)
-		if err != nil {
-			log.Fatalf("反序列化Route对象失败: %v", err)
-		}
-
-		fmt.Printf("从Redis中获取的Route对象: %+v\n", route)
+	var obj Object
+	err = c.HashGetObject("object2", &obj)
+	if err != nil {
+		fmt.Println("2", err)
+		return
 	}
+	fmt.Println(obj)
+}
+
+func main() {
+	cache := redisCache.NewCache()
+
+	//cacheBase(cache)
+	//cacheList(cache)
+	cacheObject(cache)
 }
