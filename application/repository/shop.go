@@ -134,7 +134,7 @@ func (c *cartRepository) BindTable() error {
 
 func (c *cartRepository) HasCart(uid int64) bool {
 
-	selectInt, err := c.db.SelectInt("SELECT COUNT(*) FROM cart WHERE user_id = ?", uid)
+	selectInt, err := c.db.SelectInt("SELECT COUNT(*) FROM Carts WHERE user_id = ?", uid)
 	if err != nil {
 		return false
 	}
@@ -144,7 +144,7 @@ func (c *cartRepository) HasCart(uid int64) bool {
 func (c *cartRepository) GetCart(uid int64) (int64, error) {
 
 	var cart models.Carts
-	err := c.db.SelectOne(&cart, "SELECT * FROM cart WHERE user_id = ?", uid)
+	err := c.db.SelectOne(&cart, "SELECT * FROM Carts WHERE user_id = ?", uid)
 	if err != nil {
 		return 0, err
 	}

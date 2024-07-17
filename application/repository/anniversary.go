@@ -58,7 +58,7 @@ func (a *anniversaryRepository) RemoveAnniversaryById(userId, id int) error {
 		return err
 	}
 
-	_, err = trans.Query("delete from anniversary where id = ? and user_id = ?", id, userId)
+	_, err = trans.Query("delete from Anniversaries where anniversary_id = ? and user_id = ?", id, userId)
 	if err != nil {
 		trans.Rollback()
 		return err
@@ -84,7 +84,7 @@ func (a *anniversaryRepository) UpdateAnniversary(anniversary *models.Anniversar
 func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anniversary, error) {
 
 	result := &models.Anniversary{}
-	err := a.db.SelectOne(result, "select * from anniversary where id = ? and user_id = ?", id, userId)
+	err := a.db.SelectOne(result, "select * from Anniversaries where anniversary_id = ? and user_id = ?", id, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (a *anniversaryRepository) GetAnniversaryById(userId, id int) (*models.Anni
 }
 
 func (a *anniversaryRepository) GetAnniversaryList(userId string) ([]models.Anniversary, error) {
-	result, err := a.db.Select(&models.Anniversary{}, "select * from anniversary where user_id = ?", userId)
+	result, err := a.db.Select(&models.Anniversary{}, "select * from Anniversaries where user_id = ?", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -104,29 +104,6 @@ func (a *anniversaryRepository) GetAnniversaryList(userId string) ([]models.Anni
 	//TODO implement me
 	panic("implement me")
 }
-
-/*
-func (a *anniversaryRepository) initTable() {
-	if a.db == nil {
-		log.Error("db is nil")
-		return
-	}
-
-	log.Info("start to binding anniversary with table travel")
-	tbl := a.db.AddTableWithName(models.Anniversary{}, "anniversary")
-	tbl.SetKeys(false, "UserId") // using snowflake to generate the id
-	tbl.ColMap("UserId").SetNotNull(true)
-	tbl.ColMap("UserId").SetNotNull(true)
-	tbl.ColMap("Date").SetNotNull(true)
-	tbl.ColMap("Name").SetNotNull(true)
-	tbl.ColMap("Description").SetNotNull(true)
-	tbl.ColMap("CreatedAt").SetNotNull(true)
-	err := a.db.CreateTablesIfNotExists()
-	if err != nil {
-		log.Errorf("failed to create table anniversary with error: %s", err.Error())
-		return
-	}
-}*/
 
 func (a *anniversaryRepository) BindTable() error {
 	a.db.AddTableWithName(models.Anniversary{}, "Anniversaries")

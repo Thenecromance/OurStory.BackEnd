@@ -62,9 +62,11 @@ func (t *travelRepository) DeleteTravel(travelId int64) error {
 	if err != nil {
 		return err
 	}*/
-	errId, err := trans.Query("delete from travel where id = ?", travelId)
+	errId, err := trans.Query("delete from Travels where travel_id = ?", travelId)
+	defer errId.Close()
 	if err != nil {
-		log.Errorf("DeleteTravel error: %v\nerror UserId:%d", err, errId)
+		log.Errorf("DeleteTravel error: %v\n", err)
+
 		return errors.New("delete travel failed")
 	}
 
@@ -132,7 +134,7 @@ func (t *travelRepository) GetTravelByLocation(location string) ([]models.Travel
 func (t *travelRepository) GetTravelByState(state int) ([]models.Travel, error) {
 	//get travel from db by id
 	var travel []models.Travel
-	err := t.db.SelectOne(travel, "select * from travel where state = ?", state)
+	err := t.db.SelectOne(travel, "select * from Travels where state = ?", state)
 	if err != nil {
 		log.Errorf("GetTravelByID error: %v", err)
 		return nil, err
@@ -143,7 +145,7 @@ func (t *travelRepository) GetTravelByState(state int) ([]models.Travel, error) 
 func (t *travelRepository) GetTravelListByID(id int64) ([]models.Travel, error) {
 	var lists []models.Travel
 
-	objects, err := t.db.Select(models.Travel{}, "select * from travel where ( owner = ?) or (find_in_set(?,TogetherWith) > 0)", id, id)
+	objects, err := t.db.Select(models.Travel{}, "select * from Travels where ( user_id = ?) or (find_in_set(?,together) > 0)", id, id)
 	if err != nil {
 		log.Errorf("GetTravelListByID error: %v", err)
 		return nil, err
@@ -156,34 +158,11 @@ func (t *travelRepository) GetTravelListByID(id int64) ([]models.Travel, error) 
 	return lists, nil
 }
 
-/*func (t *travelRepository) initTable() error {
-	if t.db == nil {
-		log.Debugf("db is nil")
-		return fmt.Errorf("db is nil")
-	}
-
-	log.Infof("start to binding user with table user")
-	tbl := t.db.AddTableWithName(models.Travel{}, "travel")
-	tbl.SetKeys(true, "UserId") // using snowflake to generate the id
-
-	err := t.db.CreateTablesIfNotExists()
-	if err != nil {
-		log.Errorf("failed to create table user with error: %s", err.Error())
-		return err
-	}
-	return nil
-}*/
-
 func NewTravelRepository(db *gorp.DbMap) TravelRepository {
 	tr := &travelRepository{
 		db: db,
 	}
-	/*	err := tr.initTable()
-		if err != nil {
-			panic(err)
-			return nil
-		}
-	*/
+
 	return tr
 
 }

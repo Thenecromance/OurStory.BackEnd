@@ -80,3 +80,9 @@ func NewCache() Interface.ICache {
 		cli: NoSQL.NewRedis(),
 	}
 }
+
+func NewCacheWithDb(db int) Interface.ICache {
+	return &cache{
+		cli: NoSQL.NewRedisWithDb(db),
+	}
+}
